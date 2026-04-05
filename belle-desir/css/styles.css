@@ -1,0 +1,798 @@
+/* ============================================
+   BELLE DÉSIR — Hoja de estilos principal
+   ============================================ */
+
+/* --- VARIABLES DE COLOR ---
+   Aquí definimos los colores de la marca.
+   Si algún día quieres cambiar un color,
+   solo lo cambias aquí y se actualiza en toda la página.
+*/
+:root {
+  --morado-oscuro: #2D1B69;
+  --lila-medio:    #7B5EA7;
+  --lila-claro:    #C4A8E8;
+  --gris-perla:    #F0EAF8;
+  --blanco:        #FFFFFF;
+  --texto-oscuro:  #1a1a2e;
+  --texto-gris:    #666680;
+}
+
+/* --- RESET ---
+   Elimina márgenes y paddings que el navegador
+   agrega por defecto. Empezamos desde cero.
+*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- BASE ---
+   Estilos generales del cuerpo de la página
+*/
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--blanco);
+  color: var(--texto-oscuro);
+  line-height: 1.6;
+}
+
+/* --- CLASE OCULTO ---
+   Esto hace que el contenido principal
+   no se vea hasta que el usuario confirme su edad
+*/
+.oculto {
+  display: none;
+}
+
+
+/* ============================================
+   VERIFICACIÓN DE EDAD
+   ============================================ */
+
+/* El overlay cubre TODA la pantalla */
+.verificacion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--morado-oscuro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* La caja blanca del centro */
+.verificacion-caja {
+  background: var(--blanco);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+}
+
+/* El logo dentro de la caja */
+.verificacion-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--morado-oscuro);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+/* La línea decorativa bajo el logo */
+.verificacion-linea {
+  width: 50px;
+  height: 1px;
+  background-color: var(--lila-claro);
+  margin: 0.8rem auto 1.5rem;
+}
+
+.verificacion-subtitulo {
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--lila-medio);
+  margin-bottom: 0.8rem;
+}
+
+.verificacion-titulo {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--texto-oscuro);
+  margin-bottom: 1rem;
+}
+
+.verificacion-texto {
+  font-size: 0.95rem;
+  color: var(--texto-gris);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Contenedor de los dos botones */
+.verificacion-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ============================================
+   BOTONES — reutilizables en toda la página
+   ============================================ */
+
+.btn-primario {
+  background-color: var(--morado-oscuro);
+  color: var(--blanco);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+/* Efecto hover — cuando el mouse pasa encima */
+.btn-primario:hover {
+  background-color: var(--lila-medio);
+}
+
+.btn-secundario {
+  background-color: transparent;
+  color: var(--texto-gris);
+  border: 1px solid #ddd;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secundario:hover {
+  border-color: var(--lila-medio);
+  color: var(--lila-medio);
+}
+
+
+/* ============================================
+   NAVBAR — barra de navegación
+   ============================================ */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--morado-oscuro);
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+/* Logo en el navbar */
+.navbar-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--gris-perla);
+  letter-spacing: 0.1em;
+}
+
+/* Lista de links — quitamos los puntos de lista */
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+}
+
+.navbar-menu a {
+  color: var(--lila-claro);
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.navbar-menu a:hover {
+  color: var(--blanco);
+}
+
+/* Ícono del carrito */
+.navbar-carrito {
+  color: var(--lila-claro);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+
+/* ============================================
+   HERO — sección principal de bienvenida
+   ============================================ */
+
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--morado-oscuro) 0%, #4a2d8a 60%, var(--lila-medio) 100%);
+  display: flex;
+  align-items: center;
+  padding: 8rem 3rem 4rem;
+}
+
+.hero-contenido {
+  max-width: 650px;
+}
+
+.hero-eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 1.5rem;
+}
+
+/* El título grande del hero */
+.hero-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4.5rem;
+  font-weight: 300;
+  color: var(--blanco);
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+}
+
+/* La parte en itálica del título */
+.hero-titulo em {
+  color: var(--lila-claro);
+  font-style: italic;
+}
+
+.hero-subtitulo {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 2.5rem;
+  max-width: 480px;
+  line-height: 1.7;
+}
+
+/* ============================================
+   SECCIÓN NOSOTROS
+   ============================================ */
+
+.nosotros {
+  background-color: var(--blanco);
+  padding: 6rem 3rem;
+}
+
+/* --- Encabezado de sección --- */
+.nosotros-encabezado {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+/* Pequeño texto arriba del título — reutilizable */
+.seccion-eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lila-medio);
+  margin-bottom: 1rem;
+}
+
+/* Título de sección grande */
+.seccion-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--texto-oscuro);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+/* La parte itálica del título */
+.seccion-titulo em {
+  color: var(--lila-medio);
+  font-style: italic;
+}
+
+/* Línea decorativa bajo el título */
+.seccion-linea {
+  width: 50px;
+  height: 2px;
+  background-color: var(--lila-claro);
+  margin: 0 auto;
+}
+
+/* --- Bloque de misión --- */
+.nosotros-mision {
+  max-width: 720px;
+  margin: 0 auto 5rem;
+  text-align: center;
+}
+
+/* Texto grande destacado */
+.nosotros-texto-grande {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--morado-oscuro);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* Texto normal de párrafo */
+.nosotros-texto {
+  font-size: 1rem;
+  color: var(--texto-gris);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+/* --- Tarjetas de valores --- */
+.nosotros-valores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.valor-tarjeta {
+  background-color: var(--gris-perla);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+
+  /* Transición suave al hacer hover */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto al pasar el mouse por encima */
+.valor-tarjeta:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(45, 27, 105, 0.12);
+}
+
+.valor-icono {
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.valor-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--morado-oscuro);
+  margin-bottom: 0.8rem;
+}
+
+.valor-texto {
+  font-size: 0.95rem;
+  color: var(--texto-gris);
+  line-height: 1.7;
+}
+/* ============================================
+   SECCIÓN CONTACTO
+   ============================================ */
+
+.contacto {
+  background-color: var(--gris-perla);
+  padding: 6rem 3rem;
+}
+
+/* Layout de dos columnas */
+.contacto-contenido {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+/* --- Lado izquierdo --- */
+.contacto-descripcion {
+  font-size: 1rem;
+  color: var(--texto-gris);
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+/* Lista de info — horario, discreción, respuesta */
+.contacto-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contacto-lista li {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  color: var(--texto-oscuro);
+}
+
+.contacto-lista-icono {
+  font-size: 1.2rem;
+  width: 28px;
+  text-align: center;
+}
+
+/* --- Lado derecho — tarjeta WhatsApp --- */
+.whatsapp-tarjeta {
+  background-color: var(--blanco);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(45, 27, 105, 0.1);
+}
+
+/* Header verde tipo WhatsApp */
+.whatsapp-header {
+  background-color: #075E54;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Círculo con iniciales */
+.whatsapp-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--lila-claro);
+  color: var(--morado-oscuro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.whatsapp-nombre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--blanco);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.whatsapp-estado {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2px;
+}
+
+/* Área del mensaje */
+.whatsapp-burbuja {
+  background-color: #ECE5DD;
+  padding: 1.5rem;
+  min-height: 120px;
+  position: relative;
+}
+
+.whatsapp-burbuja p {
+  background-color: var(--blanco);
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  border-radius: 0 12px 12px 12px;
+  font-size: 0.95rem;
+  color: var(--texto-oscuro);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  max-width: 90%;
+}
+
+.whatsapp-hora {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--texto-gris);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Botón verde de WhatsApp */
+.whatsapp-btn {
+  display: block;
+  background-color: #25D366;
+  color: var(--blanco);
+  text-align: center;
+  padding: 1.1rem;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: background-color 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+  background-color: #20BA5A;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.footer {
+  background-color: var(--morado-oscuro);
+  padding: 4rem 3rem 2rem;
+  color: var(--lila-claro);
+}
+
+/* Grid de 4 columnas */
+.footer-contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  padding-bottom: 3rem;
+}
+
+/* --- Columna de marca --- */
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--gris-perla);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.footer-linea {
+  width: 40px;
+  height: 1px;
+  background-color: var(--lila-claro);
+  margin: 0.8rem 0;
+}
+
+.footer-slogan {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 1rem;
+}
+
+.footer-descripcion {
+  font-size: 0.9rem;
+  color: rgba(196, 168, 232, 0.7);
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+/* --- Columnas de links --- */
+.footer-titulo-col {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gris-perla);
+  font-weight: 500;
+  margin-bottom: 1.2rem;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.footer-links a {
+  color: rgba(196, 168, 232, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--gris-perla);
+}
+
+/* Lista de contacto con íconos */
+.footer-contacto-info li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  color: rgba(196, 168, 232, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* --- Línea divisoria --- */
+.footer-divisor {
+  max-width: 1100px;
+  margin: 0 auto 1.5rem;
+  height: 1px;
+  background-color: rgba(196, 168, 232, 0.2);
+}
+
+/* --- Fila inferior --- */
+.footer-inferior {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-copyright {
+  font-size: 0.85rem;
+  color: rgba(196, 168, 232, 0.5);
+}
+
+.footer-aviso {
+  font-size: 0.85rem;
+  color: rgba(196, 168, 232, 0.5);
+}
+
+/* Badges de métodos de pago */
+.footer-pagos {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pago-badge {
+  background-color: rgba(196, 168, 232, 0.1);
+  border: 1px solid rgba(196, 168, 232, 0.2);
+  color: var(--lila-claro);
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+/* ============================================
+   RESPONSIVE — Diseño para celular
+   Se aplica cuando la pantalla es <= 768px
+   (la mayoría de celulares)
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* --- NAVBAR --- */
+  .navbar {
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  /* Ocultamos el menú en celular por ahora */
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-logo {
+    font-size: 1.3rem;
+  }
+
+  /* --- HERO --- */
+  .hero {
+    padding: 7rem 1.5rem 3rem;
+    min-height: 100svh;
+  }
+
+  .hero-titulo {
+    font-size: 2.8rem;
+  }
+
+  .hero-subtitulo {
+    font-size: 1rem;
+  }
+
+  /* --- NOSOTROS --- */
+  .nosotros {
+    padding: 4rem 1.5rem;
+  }
+
+  .seccion-titulo {
+    font-size: 2.2rem;
+  }
+
+  /* Las 3 tarjetas pasan a una sola columna */
+  .nosotros-valores {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .nosotros-texto-grande {
+    font-size: 1.3rem;
+  }
+
+  /* --- CONTACTO --- */
+  .contacto {
+    padding: 4rem 1.5rem;
+  }
+
+  /* Las dos columnas pasan a una sola */
+  .contacto-contenido {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  /* --- FOOTER --- */
+  .footer {
+    padding: 3rem 1.5rem 2rem;
+  }
+
+  /* Las 4 columnas pasan a una sola */
+  .footer-contenido {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-descripcion {
+    max-width: 100%;
+  }
+
+  /* Fila inferior del footer en columna */
+  .footer-inferior {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  /* --- VERIFICACIÓN DE EDAD --- */
+  .verificacion-caja {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .verificacion-logo {
+    font-size: 2rem;
+  }
+
+  .verificacion-titulo {
+    font-size: 1.3rem;
+  }
+
+}
+
+/* ============================================
+   Para tablets — pantallas entre 769px y 1024px
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .hero-titulo {
+    font-size: 3.5rem;
+  }
+
+  .nosotros-valores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .hero {
+    padding: 7rem 2rem 3rem;
+  }
+
+  .nosotros,
+  .contacto {
+    padding: 5rem 2rem;
+  }
+
+}
