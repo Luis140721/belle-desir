@@ -53,3 +53,24 @@ if (yaVerifico === 'true') {
   verificacionOverlay.style.display = 'none'
   contenidoPrincipal.classList.remove('oculto')
 }
+// ============================================
+// MENÚ HAMBURGUESA
+// ============================================
+
+const btnMenu    = document.getElementById('btn-menu')
+const navbarMenu = document.getElementById('navbar-menu')
+
+if (btnMenu && navbarMenu) {
+  btnMenu.addEventListener('click', function() {
+    btnMenu.classList.toggle('abierto')
+    navbarMenu.classList.toggle('abierto')
+    
+  })
+
+  navbarMenu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      btnMenu.classList.remove('abierto')
+      navbarMenu.classList.remove('abierto')
+    })
+  })
+}

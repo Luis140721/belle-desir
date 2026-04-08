@@ -796,3 +796,60 @@ body {
   }
 
 }
+/* ============================================
+   MENÚ HAMBURGUESA
+   ============================================ */
+
+.navbar-hamburguesa {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  min-width: 30px;
+}
+
+.navbar-hamburguesa span {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background-color: var(--lila-claro);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+
+  .navbar-hamburguesa {
+    display: flex !important;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-menu.abierto {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background-color: var(--morado-oscuro);
+    padding: 1.5rem;
+    gap: 1.2rem;
+    z-index: 999;
+  }
+
+  .navbar-hamburguesa.abierto span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .navbar-hamburguesa.abierto span:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar-hamburguesa.abierto span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
