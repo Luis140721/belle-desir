@@ -1,46 +1,39 @@
 /* ============================================
    BELLE DÉSIR — Hoja de estilos principal
+   Versión 2.0 — Diseño Editorial Premium
    ============================================ */
 
-/* --- VARIABLES DE COLOR ---
-   Aquí definimos los colores de la marca.
-   Si algún día quieres cambiar un color,
-   solo lo cambias aquí y se actualiza en toda la página.
-*/
+/* --- VARIABLES DE COLOR --- */
 :root {
-  --morado-oscuro: #2D1B69;
-  --lila-medio:    #7B5EA7;
-  --lila-claro:    #C4A8E8;
-  --gris-perla:    #F0EAF8;
-  --blanco:        #FFFFFF;
-  --texto-oscuro:  #1a1a2e;
-  --texto-gris:    #666680;
+  --negro-ciruela:  #120B18;
+  --violeta-premium: #5B2A86;
+  --ciruela-medio:  #2A163A;
+  --morado-oscuro:  #2D1B69;
+  --lila-medio:     #7B5EA7;
+  --lila-claro:     #C4A8E8;
+  --champana:       #F5EDE1;
+  --gris-perla:     #F0EAF8;
+  --blanco:         #FFFFFF;
+  --texto-oscuro:   #1a1a2e;
+  --texto-gris:     #9a8fb0;
 }
 
-/* --- RESET ---
-   Elimina márgenes y paddings que el navegador
-   agrega por defecto. Empezamos desde cero.
-*/
+/* --- RESET --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* --- BASE ---
-   Estilos generales del cuerpo de la página
-*/
+/* --- BASE --- */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background-color: var(--blanco);
-  color: var(--texto-oscuro);
+  background-color: var(--negro-ciruela);
+  color: var(--champana);
   line-height: 1.6;
 }
 
-/* --- CLASE OCULTO ---
-   Esto hace que el contenido principal
-   no se vea hasta que el usuario confirme su edad
-*/
+/* --- CLASE OCULTO --- */
 .oculto {
   display: none;
 }
@@ -50,42 +43,41 @@ body {
    VERIFICACIÓN DE EDAD
    ============================================ */
 
-/* El overlay cubre TODA la pantalla */
 .verificacion-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--morado-oscuro);
+  background: radial-gradient(ellipse at center, #2A163A 0%, #120B18 70%);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
 
-/* La caja blanca del centro */
 .verificacion-caja {
-  background: var(--blanco);
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(196, 168, 232, 0.15);
+  border-radius: 24px;
   padding: 3rem 2.5rem;
   max-width: 480px;
   width: 90%;
   text-align: center;
 }
 
-/* El logo dentro de la caja */
 .verificacion-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2.5rem;
   font-weight: 300;
   font-style: italic;
-  color: var(--morado-oscuro);
+  color: var(--champana);
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
 }
 
-/* La línea decorativa bajo el logo */
 .verificacion-linea {
   width: 50px;
   height: 1px;
@@ -94,28 +86,27 @@ body {
 }
 
 .verificacion-subtitulo {
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--lila-medio);
+  color: var(--lila-claro);
   margin-bottom: 0.8rem;
 }
 
 .verificacion-titulo {
   font-size: 1.6rem;
-  font-weight: 600;
-  color: var(--texto-oscuro);
+  font-weight: 400;
+  color: var(--champana);
   margin-bottom: 1rem;
 }
 
 .verificacion-texto {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--texto-gris);
   margin-bottom: 2rem;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
-/* Contenedor de los dos botones */
 .verificacion-botones {
   display: flex;
   flex-direction: column;
@@ -124,47 +115,66 @@ body {
 
 
 /* ============================================
-   BOTONES — reutilizables en toda la página
+   BOTONES
    ============================================ */
 
 .btn-primario {
-  background-color: var(--morado-oscuro);
-  color: var(--blanco);
+  background: linear-gradient(135deg, var(--violeta-premium), var(--morado-oscuro));
+  color: var(--champana);
   border: none;
   padding: 14px 28px;
   border-radius: 8px;
-  font-size: 1rem;
-  letter-spacing: 0.05em;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Efecto hover — cuando el mouse pasa encima */
+.btn-primario::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primario:hover::before {
+  left: 100%;
+}
+
 .btn-primario:hover {
-  background-color: var(--lila-medio);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(91, 42, 134, 0.5);
 }
 
 .btn-secundario {
   background-color: transparent;
   color: var(--texto-gris);
-  border: 1px solid #ddd;
+  border: 1px solid rgba(196, 168, 232, 0.2);
   padding: 14px 28px;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-secundario:hover {
-  border-color: var(--lila-medio);
-  color: var(--lila-medio);
+  border-color: var(--lila-claro);
+  color: var(--lila-claro);
 }
 
 
 /* ============================================
-   NAVBAR — barra de navegación
+   NAVBAR — glassmorphism
    ============================================ */
 
 .navbar {
@@ -172,7 +182,10 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: var(--morado-oscuro);
+  background: rgba(18, 11, 24, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196, 168, 232, 0.1);
   padding: 1.2rem 3rem;
   display: flex;
   align-items: center;
@@ -180,17 +193,15 @@ body {
   z-index: 1000;
 }
 
-/* Logo en el navbar */
 .navbar-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.6rem;
   font-weight: 300;
   font-style: italic;
-  color: var(--gris-perla);
+  color: var(--champana);
   letter-spacing: 0.1em;
 }
 
-/* Lista de links — quitamos los puntos de lista */
 .navbar-menu {
   list-style: none;
   display: flex;
@@ -198,149 +209,183 @@ body {
 }
 
 .navbar-menu a {
-  color: var(--lila-claro);
+  color: rgba(196, 168, 232, 0.7);
   text-decoration: none;
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   transition: color 0.3s ease;
+  position: relative;
+}
+
+.navbar-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--lila-claro);
+  transition: width 0.3s ease;
 }
 
 .navbar-menu a:hover {
-  color: var(--blanco);
+  color: var(--champana);
 }
 
-/* Ícono del carrito */
+.navbar-menu a:hover::after {
+  width: 100%;
+}
+
 .navbar-carrito {
   color: var(--lila-claro);
   font-size: 1.1rem;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.navbar-carrito:hover {
+  transform: scale(1.15);
 }
 
 
 /* ============================================
-   HERO — sección principal de bienvenida
+   HERO
    ============================================ */
 
 .hero {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--morado-oscuro) 0%, #4a2d8a 60%, var(--lila-medio) 100%);
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(91, 42, 134, 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(45, 27, 105, 0.3) 0%, transparent 50%),
+    var(--negro-ciruela);
   display: flex;
   align-items: center;
   padding: 8rem 3rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de luz decorativa de fondo */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(91, 42, 134, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .hero-contenido {
   max-width: 650px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-eyebrow {
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--lila-claro);
   margin-bottom: 1.5rem;
 }
 
-/* El título grande del hero */
 .hero-titulo {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 4.5rem;
+  font-size: 5rem;
   font-weight: 300;
-  color: var(--blanco);
-  line-height: 1.15;
+  color: var(--champana);
+  line-height: 1.1;
   margin-bottom: 1.5rem;
 }
 
-/* La parte en itálica del título */
 .hero-titulo em {
   color: var(--lila-claro);
   font-style: italic;
 }
 
 .hero-subtitulo {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 1rem;
+  color: var(--texto-gris);
   margin-bottom: 2.5rem;
   max-width: 480px;
-  line-height: 1.7;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
 }
+
 
 /* ============================================
    SECCIÓN NOSOTROS
    ============================================ */
 
 .nosotros {
-  background-color: var(--blanco);
-  padding: 6rem 3rem;
+  background: linear-gradient(180deg, var(--negro-ciruela) 0%, var(--ciruela-medio) 50%, var(--negro-ciruela) 100%);
+  padding: 7rem 3rem;
+  position: relative;
 }
 
-/* --- Encabezado de sección --- */
 .nosotros-encabezado {
   text-align: center;
   margin-bottom: 4rem;
 }
 
-/* Pequeño texto arriba del título — reutilizable */
 .seccion-eyebrow {
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--lila-medio);
+  color: var(--lila-claro);
   margin-bottom: 1rem;
 }
 
-/* Título de sección grande */
 .seccion-titulo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 3rem;
   font-weight: 300;
-  color: var(--texto-oscuro);
+  color: var(--champana);
   line-height: 1.2;
   margin-bottom: 1.5rem;
 }
 
-/* La parte itálica del título */
 .seccion-titulo em {
-  color: var(--lila-medio);
+  color: var(--lila-claro);
   font-style: italic;
 }
 
-/* Línea decorativa bajo el título */
 .seccion-linea {
   width: 50px;
-  height: 2px;
-  background-color: var(--lila-claro);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lila-claro), transparent);
   margin: 0 auto;
 }
 
-/* --- Bloque de misión --- */
 .nosotros-mision {
   max-width: 720px;
   margin: 0 auto 5rem;
   text-align: center;
 }
 
-/* Texto grande destacado */
 .nosotros-texto-grande {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 300;
-  color: var(--morado-oscuro);
+  color: var(--champana);
   line-height: 1.5;
   margin-bottom: 1.5rem;
   font-style: italic;
 }
 
-/* Texto normal de párrafo */
 .nosotros-texto {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--texto-gris);
-  line-height: 1.8;
+  line-height: 1.9;
   margin-bottom: 1rem;
+  letter-spacing: 0.02em;
 }
 
-/* --- Tarjetas de valores --- */
+/* Tarjetas de valores */
 .nosotros-valores {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -350,19 +395,20 @@ body {
 }
 
 .valor-tarjeta {
-  background-color: var(--gris-perla);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 168, 232, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
   padding: 2.5rem 2rem;
   text-align: center;
-
-  /* Transición suave al hacer hover */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s ease;
 }
 
-/* Efecto al pasar el mouse por encima */
 .valor-tarjeta:hover {
+  background: rgba(91, 42, 134, 0.15);
+  border-color: rgba(196, 168, 232, 0.3);
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(45, 27, 105, 0.12);
+  box-shadow: 0 20px 40px rgba(91, 42, 134, 0.2);
 }
 
 .valor-icono {
@@ -374,25 +420,40 @@ body {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.4rem;
   font-weight: 400;
-  color: var(--morado-oscuro);
+  color: var(--champana);
   margin-bottom: 0.8rem;
+  letter-spacing: 0.05em;
 }
 
 .valor-texto {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--texto-gris);
-  line-height: 1.7;
+  line-height: 1.8;
 }
+
+
 /* ============================================
    SECCIÓN CONTACTO
    ============================================ */
 
 .contacto {
-  background-color: var(--gris-perla);
-  padding: 6rem 3rem;
+  background: var(--negro-ciruela);
+  padding: 7rem 3rem;
+  position: relative;
 }
 
-/* Layout de dos columnas */
+.contacto::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(91, 42, 134, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 .contacto-contenido {
   max-width: 1000px;
   margin: 0 auto;
@@ -402,15 +463,13 @@ body {
   align-items: center;
 }
 
-/* --- Lado izquierdo --- */
 .contacto-descripcion {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--texto-gris);
-  line-height: 1.8;
+  line-height: 1.9;
   margin-bottom: 2rem;
 }
 
-/* Lista de info — horario, discreción, respuesta */
 .contacto-lista {
   list-style: none;
   display: flex;
@@ -422,46 +481,47 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  font-size: 0.95rem;
-  color: var(--texto-oscuro);
+  font-size: 0.9rem;
+  color: var(--champana);
+  letter-spacing: 0.02em;
 }
 
 .contacto-lista-icono {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   width: 28px;
   text-align: center;
 }
 
-/* --- Lado derecho — tarjeta WhatsApp --- */
+/* Tarjeta WhatsApp */
 .whatsapp-tarjeta {
-  background-color: var(--blanco);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(196, 168, 232, 0.12);
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(45, 27, 105, 0.1);
 }
 
-/* Header verde tipo WhatsApp */
 .whatsapp-header {
-  background-color: #075E54;
+  background: linear-gradient(135deg, #075E54, #128C7E);
   padding: 1.2rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Círculo con iniciales */
 .whatsapp-avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-color: var(--lila-claro);
-  color: var(--morado-oscuro);
+  background: rgba(196, 168, 232, 0.3);
+  color: var(--champana);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
   font-weight: 600;
   flex-shrink: 0;
+  letter-spacing: 0.05em;
 }
 
 .whatsapp-nombre {
@@ -479,21 +539,20 @@ body {
   margin-top: 2px;
 }
 
-/* Área del mensaje */
 .whatsapp-burbuja {
-  background-color: #ECE5DD;
+  background-color: #1a0f24;
   padding: 1.5rem;
   min-height: 120px;
-  position: relative;
 }
 
 .whatsapp-burbuja p {
-  background-color: var(--blanco);
+  background: rgba(91, 42, 134, 0.3);
+  border: 1px solid rgba(196, 168, 232, 0.1);
   display: inline-block;
   padding: 0.7rem 1rem;
   border-radius: 0 12px 12px 12px;
-  font-size: 0.95rem;
-  color: var(--texto-oscuro);
+  font-size: 0.9rem;
+  color: var(--champana);
   margin-bottom: 0.5rem;
   line-height: 1.5;
   max-width: 90%;
@@ -501,41 +560,42 @@ body {
 
 .whatsapp-hora {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--texto-gris);
   text-align: right;
   margin-top: 4px;
 }
 
-/* Botón verde de WhatsApp */
 .whatsapp-btn {
   display: block;
-  background-color: #25D366;
+  background: linear-gradient(135deg, #25D366, #20BA5A);
   color: var(--blanco);
   text-align: center;
   padding: 1.1rem;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
-  transition: background-color 0.3s ease;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
 }
 
 .whatsapp-btn:hover {
-  background-color: #20BA5A;
+  background: linear-gradient(135deg, #20BA5A, #1aa34a);
+  letter-spacing: 0.12em;
 }
+
 
 /* ============================================
    FOOTER
    ============================================ */
 
 .footer {
-  background-color: var(--morado-oscuro);
+  background: #0a0610;
   padding: 4rem 3rem 2rem;
-  color: var(--lila-claro);
+  border-top: 1px solid rgba(196, 168, 232, 0.08);
 }
 
-/* Grid de 4 columnas */
 .footer-contenido {
   max-width: 1100px;
   margin: 0 auto;
@@ -545,13 +605,12 @@ body {
   padding-bottom: 3rem;
 }
 
-/* --- Columna de marca --- */
 .footer-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2rem;
   font-weight: 300;
   font-style: italic;
-  color: var(--gris-perla);
+  color: var(--champana);
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
 }
@@ -559,31 +618,30 @@ body {
 .footer-linea {
   width: 40px;
   height: 1px;
-  background-color: var(--lila-claro);
+  background: linear-gradient(90deg, var(--lila-claro), transparent);
   margin: 0.8rem 0;
 }
 
 .footer-slogan {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--lila-claro);
   margin-bottom: 1rem;
 }
 
 .footer-descripcion {
-  font-size: 0.9rem;
-  color: rgba(196, 168, 232, 0.7);
-  line-height: 1.7;
+  font-size: 0.85rem;
+  color: var(--texto-gris);
+  line-height: 1.8;
   max-width: 260px;
 }
 
-/* --- Columnas de links --- */
 .footer-titulo-col {
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gris-perla);
+  color: var(--champana);
   font-weight: 500;
   margin-bottom: 1.2rem;
 }
@@ -596,35 +654,35 @@ body {
 }
 
 .footer-links a {
-  color: rgba(196, 168, 232, 0.7);
+  color: var(--texto-gris);
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .footer-links a:hover {
-  color: var(--gris-perla);
+  color: var(--lila-claro);
+  padding-left: 8px;
 }
 
-/* Lista de contacto con íconos */
 .footer-contacto-info li {
   display: flex;
   gap: 0.7rem;
   align-items: flex-start;
-  color: rgba(196, 168, 232, 0.7);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  color: var(--texto-gris);
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
-/* --- Línea divisoria --- */
 .footer-divisor {
   max-width: 1100px;
   margin: 0 auto 1.5rem;
   height: 1px;
-  background-color: rgba(196, 168, 232, 0.2);
+  background: rgba(196, 168, 232, 0.08);
 }
 
-/* --- Fila inferior --- */
 .footer-inferior {
   max-width: 1100px;
   margin: 0 auto;
@@ -636,16 +694,16 @@ body {
 }
 
 .footer-copyright {
-  font-size: 0.85rem;
-  color: rgba(196, 168, 232, 0.5);
+  font-size: 0.8rem;
+  color: rgba(154, 143, 176, 0.4);
+  letter-spacing: 0.05em;
 }
 
 .footer-aviso {
-  font-size: 0.85rem;
-  color: rgba(196, 168, 232, 0.5);
+  font-size: 0.8rem;
+  color: rgba(154, 143, 176, 0.4);
 }
 
-/* Badges de métodos de pago */
 .footer-pagos {
   display: flex;
   gap: 0.5rem;
@@ -653,149 +711,17 @@ body {
 }
 
 .pago-badge {
-  background-color: rgba(196, 168, 232, 0.1);
-  border: 1px solid rgba(196, 168, 232, 0.2);
-  color: var(--lila-claro);
-  font-size: 0.75rem;
+  background: rgba(196, 168, 232, 0.06);
+  border: 1px solid rgba(196, 168, 232, 0.12);
+  color: var(--texto-gris);
+  font-size: 0.7rem;
   padding: 4px 12px;
   border-radius: 20px;
-  letter-spacing: 0.05em;
-}
-/* ============================================
-   RESPONSIVE — Diseño para celular
-   Se aplica cuando la pantalla es <= 768px
-   (la mayoría de celulares)
-   ============================================ */
-
-@media (max-width: 768px) {
-
-  /* --- NAVBAR --- */
-  .navbar {
-    padding: 1rem 1.5rem;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-  }
-
-  /* Ocultamos el menú en celular por ahora */
-  .navbar-menu {
-    display: none;
-  }
-
-  .navbar-logo {
-    font-size: 1.3rem;
-  }
-
-  /* --- HERO --- */
-  .hero {
-    padding: 7rem 1.5rem 3rem;
-    min-height: 100svh;
-  }
-
-  .hero-titulo {
-    font-size: 2.8rem;
-  }
-
-  .hero-subtitulo {
-    font-size: 1rem;
-  }
-
-  /* --- NOSOTROS --- */
-  .nosotros {
-    padding: 4rem 1.5rem;
-  }
-
-  .seccion-titulo {
-    font-size: 2.2rem;
-  }
-
-  /* Las 3 tarjetas pasan a una sola columna */
-  .nosotros-valores {
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
-  }
-
-  .nosotros-texto-grande {
-    font-size: 1.3rem;
-  }
-
-  /* --- CONTACTO --- */
-  .contacto {
-    padding: 4rem 1.5rem;
-  }
-
-  /* Las dos columnas pasan a una sola */
-  .contacto-contenido {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
-
-  /* --- FOOTER --- */
-  .footer {
-    padding: 3rem 1.5rem 2rem;
-  }
-
-  /* Las 4 columnas pasan a una sola */
-  .footer-contenido {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .footer-descripcion {
-    max-width: 100%;
-  }
-
-  /* Fila inferior del footer en columna */
-  .footer-inferior {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.8rem;
-  }
-
-  /* --- VERIFICACIÓN DE EDAD --- */
-  .verificacion-caja {
-    padding: 2rem 1.5rem;
-    margin: 1rem;
-  }
-
-  .verificacion-logo {
-    font-size: 2rem;
-  }
-
-  .verificacion-titulo {
-    font-size: 1.3rem;
-  }
-
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* ============================================
-   Para tablets — pantallas entre 769px y 1024px
-   ============================================ */
 
-@media (min-width: 769px) and (max-width: 1024px) {
-
-  .hero-titulo {
-    font-size: 3.5rem;
-  }
-
-  .nosotros-valores {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .footer-contenido {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-  }
-
-  .hero {
-    padding: 7rem 2rem 3rem;
-  }
-
-  .nosotros,
-  .contacto {
-    padding: 5rem 2rem;
-  }
-
-}
 /* ============================================
    MENÚ HAMBURGUESA
    ============================================ */
@@ -820,10 +746,19 @@ body {
   transition: all 0.3s ease;
 }
 
+
+/* ============================================
+   RESPONSIVE — Celular
+   ============================================ */
+
 @media (max-width: 768px) {
 
   .navbar-hamburguesa {
     display: flex !important;
+  }
+
+  .navbar {
+    padding: 1rem 1.5rem;
   }
 
   .navbar-menu {
@@ -837,10 +772,12 @@ body {
     top: 64px;
     left: 0;
     width: 100%;
-    background-color: var(--morado-oscuro);
+    background: rgba(18, 11, 24, 0.97);
+    backdrop-filter: blur(20px);
     padding: 1.5rem;
     gap: 1.2rem;
     z-index: 999;
+    border-bottom: 1px solid rgba(196, 168, 232, 0.1);
   }
 
   .navbar-hamburguesa.abierto span:nth-child(1) {
@@ -851,5 +788,110 @@ body {
   }
   .navbar-hamburguesa.abierto span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .navbar-logo {
+    font-size: 1.3rem;
+  }
+
+  .hero {
+    padding: 7rem 1.5rem 3rem;
+    min-height: 100svh;
+  }
+
+  .hero-titulo {
+    font-size: 3rem;
+  }
+
+  .hero-subtitulo {
+    font-size: 0.95rem;
+  }
+
+  .nosotros {
+    padding: 4rem 1.5rem;
+  }
+
+  .seccion-titulo {
+    font-size: 2.2rem;
+  }
+
+  .nosotros-valores {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .nosotros-texto-grande {
+    font-size: 1.3rem;
+  }
+
+  .contacto {
+    padding: 4rem 1.5rem;
+  }
+
+  .contacto-contenido {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer {
+    padding: 3rem 1.5rem 2rem;
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-descripcion {
+    max-width: 100%;
+  }
+
+  .footer-inferior {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .verificacion-caja {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .verificacion-logo {
+    font-size: 2rem;
+  }
+
+  .verificacion-titulo {
+    font-size: 1.3rem;
+  }
+}
+
+
+/* ============================================
+   Tablets — entre 769px y 1024px
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .hero-titulo {
+    font-size: 3.5rem;
+  }
+
+  .nosotros-valores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .hero {
+    padding: 7rem 2rem 3rem;
+  }
+
+  .nosotros,
+  .contacto {
+    padding: 5rem 2rem;
   }
 }
