@@ -1,0 +1,73 @@
+@baseUrl = http://localhost:3001/api
+
+### ==========================================
+### PASO 1: REGISTRAR UN NUEVO USUARIO
+### (Solo ejecutar UNA vez, si da error 400 es porque ya existe)
+### ==========================================
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Cliente de Prueba",
+  "email": "cliente1@belledesir.com",
+  "password": "Password123!"
+}
+
+### ==========================================
+### PASO 2: INICIAR SESIÓN (LOGIN)
+### (Ejecutar para obtener el Token)
+### ==========================================
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "cliente1@belledesir.com",
+  "password": "Password123!"
+}
+
+### Extrae el token (No necesitas tocarlo, ocurre automático)
+@token = {{login.response.body.data.accessToken}}
+
+### ==========================================
+### PASO 3: OBTENER UN ID DE PRODUCTO
+### (Ejecuta esto y copia un "id" de la respuesta)
+### ==========================================
+GET {{baseUrl}}/products?limit=3
+
+### ==========================================
+### PASO 4: AGREGAR AL CARRITO
+### (¡REEMPLAZA "pega_el_id_aqui" por el ID que copiaste!)
+### ==========================================
+POST {{baseUrl}}/cart/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "productId": "pega_el_id_aqui",
+  "quantity": 2
+}
+
+### ==========================================
+### PASO 5: REVISAR CARRITO
+### ==========================================
+GET {{baseUrl}}/cart
+Authorization: Bearer {{token}}
+
+### ==========================================
+### PASO 6: CREAR LA ORDEN (CHECKOUT)
+### (Esto vaciará el carrito y te dará un orderId)
+### ==========================================
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "shippingAddress": {
+    "name": "Cliente de Prueba",
+    "address": "Calle 123",
+    "city": "Bogota",
+    "country": "Colombia",
+    "zip": "110111"
+  }
+}
