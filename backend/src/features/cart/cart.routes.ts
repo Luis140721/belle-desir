@@ -8,7 +8,7 @@ import { asyncHandler } from '../../shared/utils/asyncHandler';
 export const cartRoutes = Router();
 
 // All routes require authentication
-cartRoutes.use(authenticate);
+cartRoutes.use(authenticate());
 
 cartRoutes.get('/', asyncHandler(CartController.getCart));
 cartRoutes.post('/items', validate(cartItemSchema), asyncHandler(CartController.addItem));

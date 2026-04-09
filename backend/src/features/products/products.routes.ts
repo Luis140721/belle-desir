@@ -15,7 +15,7 @@ productRoutes.get('/', asyncHandler(ProductController.getAll));
 productRoutes.get('/:slug', asyncHandler(ProductController.getBySlug));
 
 // Admin only
-productRoutes.use(authenticate, authorize('ADMIN'));
+productRoutes.use(authenticate(), authorize('ADMIN'));
 
 productRoutes.post('/', validate(createProductSchema), asyncHandler(ProductController.create));
 productRoutes.put('/:id', validate(updateProductSchema), asyncHandler(ProductController.update));

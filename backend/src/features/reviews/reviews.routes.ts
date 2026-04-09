@@ -8,4 +8,4 @@ import { asyncHandler } from '../../shared/utils/asyncHandler';
 export const reviewRoutes = Router({ mergeParams: true }); // Important if mounted under products/:productId/reviews
 
 reviewRoutes.get('/', asyncHandler(ReviewController.getProductReviews));
-reviewRoutes.post('/', authenticate, validate(createReviewSchema), asyncHandler(ReviewController.addReview));
+reviewRoutes.post('/', authenticate(), validate(createReviewSchema), asyncHandler(ReviewController.addReview));

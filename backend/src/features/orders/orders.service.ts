@@ -1,75 +1,163 @@
 import { prisma } from '../../config/database';
 import { AppError } from '../../shared/errors/AppError';
-import { CreateOrderInput, UpdateOrderStatusInput } from './orders.schemas';
 import { env } from '../../config/env';
 import { getPagination, getPagingData } from '../../shared/utils/pagination';
+import { CreateOrderInput, UpdateOrderStatusInput } from './orders.schemas';
 
 export class OrderService {
-  static async createOrder(userId: string, data: CreateOrderInput) {
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      include: { items: { include: { product: true } } },
-    });
 
-    if (!cart || cart.items.length === 0) {
-      throw new AppError('Cart is empty', 400);
+  /**
+   * Crea una orden.
+   *
+   * - Si userId está presente (usuario autenticado) toma los ítems del
+   *   carrito en base de datos (y opcionalmente los del body).
+   * - Si userId es null (invitado) los ítems DEBEN llegar en data.items.
+   */
+  static async createOrder(userId: string | null, data: CreateOrderInput) {
+
+    // ── 1. Resolver los ítems ────────────────────────────────
+    let resolvedItems: Array<{ productId: string; quantity: number }> = [];
+
+    if (userId) {
+      // Usuario autenticado: intenta tomar del carrito DB
+      const cart = await prisma.cart.findUnique({
+        where: { userId },
+        include: { items: true },
+      });
+
+      if (cart && cart.items.length > 0) {
+        resolvedItems = cart.items.map((i) => ({
+          productId: i.productId,
+          quantity:  i.quantity,
+        }));
+      } else if (data.items?.length) {
+        // Carrito DB vacío pero el front envió items (respaldo)
+        resolvedItems = data.items;
+      } else {
+        throw new AppError('El carrito está vacío', 400);
+      }
+    } else {
+      // Invitado: los items son obligatorios en el body
+      if (!data.items?.length) {
+        throw new AppError('Se requieren los ítems del carrito', 400);
+      }
+      resolvedItems = data.items;
     }
 
-    // Calcula Subtotal
-    const subtotal = cart.items.reduce((sum, item) => {
-      return sum + Number(item.product.price) * item.quantity;
+    // ── 2. Validar stock y calcular totales ──────────────────
+    const products = await prisma.product.findMany({
+      where: { id: { in: resolvedItems.map((i) => i.productId) }, isActive: true },
+    });
+
+    if (products.length !== resolvedItems.length) {
+      throw new AppError('Uno o más productos no están disponibles', 400);
+    }
+
+    const subtotal = resolvedItems.reduce((sum, item) => {
+      const product = products.find((p) => p.id === item.productId)!;
+      return sum + Number(product.price) * item.quantity;
     }, 0);
 
-    // Regla: Envio gratis sobre 150000 COP, sino 15000
     const shipping = subtotal > 150000 ? 0 : 15000;
-    const total = subtotal + shipping;
+    const total    = subtotal + shipping;
 
-    // Crear orden en transaccion
+    // ── 3. Crear la orden en transacción ─────────────────────
+    // Para invitados guardamos sus datos en shippingAddress
+    const shippingAddressData = {
+      ...data.shippingAddress,
+      // Enriquecemos con datos del invitado si no vienen en shippingAddress
+      email: data.shippingAddress.email ?? data.guestEmail,
+      name:  data.shippingAddress.name  || data.guestName  || 'Invitado',
+      phone: data.shippingAddress.phone || data.guestPhone,
+    };
+
     const order = await prisma.$transaction(async (tx) => {
+      // Para invitados necesitamos un userId-nullable o creamos usuario fantasma.
+      // Nuestra estrategia: creamos un usuario guest en cada orden.
+      // Si el email ya pertenece a un usuario real, lo vinculamos.
+      let effectiveUserId = userId;
+
+      if (!effectiveUserId) {
+        const guestEmail = data.guestEmail ?? shippingAddressData.email;
+        if (!guestEmail) {
+          throw new AppError('Se requiere un email para procesar el pedido', 400);
+        }
+
+        // Busca si ya existe un usuario con ese email
+        let guestUser = await tx.user.findUnique({ where: { email: guestEmail } });
+
+        if (!guestUser) {
+          // Crea un usuario guest con contraseña aleatoria (nunca podrán loguearse
+          // con ella a menos que hagan "olvidé mi contraseña")
+          const { randomBytes } = await import('crypto');
+          const randomPassword  = randomBytes(32).toString('hex');
+          const bcrypt          = await import('bcryptjs');
+          const hashedPassword  = await bcrypt.hash(randomPassword, 10);
+
+          guestUser = await tx.user.create({
+            data: {
+              email:    guestEmail,
+              name:     shippingAddressData.name,
+              password: hashedPassword,
+              phone:    shippingAddressData.phone ?? null,
+            },
+          });
+        }
+
+        effectiveUserId = guestUser.id;
+      }
+
       const newOrder = await tx.order.create({
         data: {
-          userId,
-          status: 'PENDING',
+          userId:          effectiveUserId,
+          status:          'PENDING',
           subtotal,
           shipping,
           total,
-          shippingAddress: data.shippingAddress,
+          shippingAddress: shippingAddressData,
           items: {
-            create: cart.items.map((item) => ({
-              productId: item.productId,
-              quantity: item.quantity,
-              unitPrice: item.product.price,
-              productSnapshot: { ...item.product },
-            })),
+            create: resolvedItems.map((item) => {
+              const product = products.find((p) => p.id === item.productId)!;
+              return {
+                productId:       item.productId,
+                quantity:        item.quantity,
+                unitPrice:       product.price,
+                productSnapshot: { ...product },
+              };
+            }),
           },
         },
         include: { items: true },
       });
 
-      await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+      // Vacía el carrito DB si el usuario está autenticado
+      if (userId) {
+        const cart = await tx.cart.findUnique({ where: { userId } });
+        if (cart) {
+          await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+        }
+      }
 
       return newOrder;
     });
 
-    // Retorna la orden para que el Frontend abra el Widget de Wompi
     return {
-      orderId: order.id,
-      amountInCents: total * 100, // Wompi requiere montos en centavos
-      currency: 'COP',
-      publicKey: env.WOMPI_PUBLIC_KEY || '',
-      redirectUrl: `${env.FRONTEND_URL}/checkout/success?orderId=${order.id}`,
+      orderId:       order.id,
+      amountInCents: total * 100,
+      currency:      'COP',
+      publicKey:     env.WOMPI_PUBLIC_KEY ?? '',
+      redirectUrl:   `${env.FRONTEND_URL.split(',')[0]}/checkout/success?orderId=${order.id}`,
     };
   }
 
   static async getUserOrders(userId: string, query: any) {
     const { page, limit } = query;
-    const { take, skip } = getPagination(page ? +page : 1, limit ? +limit : 10);
+    const { take, skip }  = getPagination(page ? +page : 1, limit ? +limit : 10);
 
     const [orders, total] = await prisma.$transaction([
       prisma.order.findMany({
         where: { userId },
-        take,
-        skip,
+        take, skip,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.order.count({ where: { userId } }),
@@ -100,9 +188,7 @@ export class OrderService {
 
     const [orders, total] = await prisma.$transaction([
       prisma.order.findMany({
-        where,
-        take,
-        skip,
+        where, take, skip,
         orderBy: { createdAt: 'desc' },
         include: { user: { select: { email: true, name: true } } },
       }),
@@ -118,7 +204,7 @@ export class OrderService {
 
     return prisma.order.update({
       where: { id: orderId },
-      data: { status: data.status },
+      data:  { status: data.status },
     });
   }
 }

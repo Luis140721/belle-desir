@@ -9,7 +9,7 @@ import { updateOrderStatusSchema } from '../orders/orders.schemas';
 
 export const adminRoutes = Router();
 
-adminRoutes.use(authenticate, authorize('ADMIN'));
+adminRoutes.use(authenticate(), authorize('ADMIN'));
 
 adminRoutes.get('/stats', asyncHandler(AdminController.getStats));
 

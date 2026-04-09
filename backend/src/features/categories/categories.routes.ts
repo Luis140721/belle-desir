@@ -13,7 +13,7 @@ categoryRoutes.get('/', asyncHandler(CategoryController.getAll));
 categoryRoutes.get('/:slug', asyncHandler(CategoryController.getBySlug));
 
 // Admin only
-categoryRoutes.use(authenticate, authorize('ADMIN'));
+categoryRoutes.use(authenticate(), authorize('ADMIN'));
 
 categoryRoutes.post('/', validate(createCategorySchema), asyncHandler(CategoryController.create));
 categoryRoutes.put('/:id', validate(updateCategorySchema), asyncHandler(CategoryController.update));

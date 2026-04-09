@@ -1,14 +1,14 @@
 // ============================================================
 // COMPONENT — CartSidebar
 // Escucha cart:add, maneja estado local, permite
-// sumar/restar/eliminar ítems, muestra total COP
-// y al confirmar llama al checkoutService (Widget Wompi)
+// sumar/restar/eliminar, muestra total COP.
+// Al pulsar "Ir a pagar" abre CheckoutModal.
 // ============================================================
 
 import type { CartItem } from '../types/index.js';
 import { on, emit } from '../utils/events.js';
 import { formatCOP } from '../utils/currency.js';
-import { createOrder, abrirWidgetWompi } from '../services/checkoutService.js';
+import { initCheckoutModal, abrirCheckoutModal } from './CheckoutModal.js';
 
 let items: CartItem[] = [];
 
@@ -25,7 +25,10 @@ export function initCartSidebar(): void {
 
   if (!sidebar) return;
 
-  // ── Apertura y cierre ────────────────────────────────────
+  // ── Inicializa el modal de checkout (inyecta el HTML) ────
+  initCheckoutModal(() => [...items]);
+
+  // ── Apertura y cierre del sidebar ────────────────────────
   function abrir(): void {
     sidebar!.classList.add('abierto');
     sidebar!.setAttribute('aria-hidden', 'false');
@@ -67,10 +70,9 @@ export function initCartSidebar(): void {
   itemsEl?.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
 
-    // Sumar / restar cantidad
     const btnCant = target.closest<HTMLButtonElement>('[data-accion]');
     if (btnCant) {
-      const id = btnCant.dataset.id!;
+      const id   = btnCant.dataset.id!;
       const item = items.find((i) => i.id === id);
       if (!item) return;
       btnCant.dataset.accion === 'sumar' ? item.quantity++ : item.quantity--;
@@ -80,7 +82,6 @@ export function initCartSidebar(): void {
       return;
     }
 
-    // Eliminar
     const btnElim = target.closest<HTMLButtonElement>('[data-eliminar]');
     if (btnElim) {
       items = items.filter((i) => i.id !== btnElim.dataset.eliminar);
@@ -89,40 +90,14 @@ export function initCartSidebar(): void {
     }
   });
 
-  // ── Checkout ──────────────────────────────────────────────
-  btnPagar?.addEventListener('click', async () => {
+  // ── "Ir a pagar" → abre el modal de checkout ─────────────
+  btnPagar?.addEventListener('click', () => {
     if (!items.length) {
       alert('Tu carrito está vacío');
       return;
     }
-
-    // Por ahora usamos datos de envío de ejemplo.
-    // En producción abre un modal/form para capturarlos.
-    const payload = {
-      shippingAddress: {
-        name: 'Cliente',
-        email: 'cliente@example.com',
-        phone: '',
-        address: '',
-        city: 'Colombia',
-      },
-    };
-
-    btnPagar.textContent = 'Procesando...';
-    btnPagar.disabled = true;
-
-    try {
-      const token = localStorage.getItem('accessToken') ?? undefined;
-      const orderData = await createOrder(payload, token);
-      abrirWidgetWompi(orderData);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al procesar el pago';
-      alert(msg + '\n\n¿El backend está corriendo?');
-      console.error('[Belle Désir] Checkout error:', err);
-    } finally {
-      btnPagar.textContent = 'Ir a pagar';
-      btnPagar.disabled = false;
-    }
+    cerrar();                   // cierra el sidebar
+    abrirCheckoutModal();       // abre el modal de checkout
   });
 }
 
@@ -130,13 +105,12 @@ export function initCartSidebar(): void {
 
 function actualizarContador(el: HTMLElement | null): void {
   if (!el) return;
-  const total = items.reduce((s, i) => s + i.quantity, 0);
-  el.textContent = String(total);
+  el.textContent = String(items.reduce((s, i) => s + i.quantity, 0));
 }
 
 function renderItems(
   contenedor: HTMLElement | null,
-  totalEl: HTMLElement | null
+  totalEl:   HTMLElement | null
 ): void {
   if (!contenedor) return;
 
@@ -167,7 +141,8 @@ function renderItems(
           <span>${item.quantity}</span>
           <button data-accion="sumar"  data-id="${item.id}" aria-label="Agregar uno">+</button>
         </div>
-        <button class="btn-eliminar-item" data-eliminar="${item.id}" aria-label="Eliminar ${item.name}">✕</button>
+        <button class="btn-eliminar-item" data-eliminar="${item.id}"
+                aria-label="Eliminar ${item.name}">✕</button>
       </div>
     `
     )

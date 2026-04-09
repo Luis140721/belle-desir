@@ -3,8 +3,15 @@ import { OrderService } from './orders.service';
 import { sendResponse } from '../../shared/utils/response';
 
 export class OrderController {
+
+  /**
+   * POST /api/orders
+   * Acepta usuarios autenticados (req.user presente) e invitados (req.user ausente).
+   */
   static async createOrder(req: Request, res: Response) {
-    const result = await OrderService.createOrder(req.user!.id, req.body);
+    // req.user puede ser undefined si vino sin JWT (invitado)
+    const userId = req.user?.id ?? null;
+    const result = await OrderService.createOrder(userId, req.body);
     sendResponse(res, 201, result);
   }
 
@@ -14,7 +21,11 @@ export class OrderController {
   }
 
   static async getOrderById(req: Request, res: Response) {
-    const result = await OrderService.getOrderById(req.user!.id, (req.params.id as string), req.user!.role);
+    const result = await OrderService.getOrderById(
+      req.user!.id,
+      req.params.id as string,
+      req.user!.role
+    );
     sendResponse(res, 200, result);
   }
 
@@ -24,7 +35,10 @@ export class OrderController {
   }
 
   static async updateOrderStatus(req: Request, res: Response) {
-    const result = await OrderService.updateOrderStatus((req.params.id as string), req.body);
+    const result = await OrderService.updateOrderStatus(
+      req.params.id as string,
+      req.body
+    );
     sendResponse(res, 200, result);
   }
 }

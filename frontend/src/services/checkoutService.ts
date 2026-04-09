@@ -1,76 +1,117 @@
 // ============================================================
-// SERVICE — Checkout: crea la orden y retorna datos del Widget Wompi
-// ============================================================
-// NOTA: El endpoint /api/orders requiere autenticación JWT.
-// La respuesta incluye: orderId, amountInCents, currency,
-// publicKey (Wompi) y redirectUrl.
-// El frontend usa estos datos para iniciar el Widget de Wompi.
+// SERVICE — Checkout: crea la orden y abre el Widget Wompi
+// Soporta pedidos de invitado y pedidos autenticados.
 // ============================================================
 
-import type { CheckoutPayload, CheckoutResponse } from '../types/index.js';
+import type { CheckoutResponse } from '../types/index.js';
+
+// ── Tipos ─────────────────────────────────────────────────────
+
+export interface CartItemPayload {
+  productId: string;
+  quantity:  number;
+}
+
+export interface GuestCheckoutPayload {
+  guestEmail:      string;
+  guestName?:      string;
+  guestPhone?:     string;
+  items:           CartItemPayload[];
+  shippingAddress: {
+    name:    string;
+    email:   string;
+    address: string;
+    city:    string;
+    country: string;
+    phone?:  string;
+  };
+}
+
+export interface AuthCheckoutPayload {
+  items?:          CartItemPayload[];   // opcional: si el carrito DB está vacío
+  shippingAddress: {
+    name:    string;
+    address: string;
+    city:    string;
+    country: string;
+    phone?:  string;
+  };
+}
+
+// ── Funciones ────────────────────────────────────────────────
 
 /**
- * Crea una orden en el backend y retorna los datos para el Widget de Wompi.
- * Requiere que el usuario esté autenticado (Bearer token en el header).
+ * Crea una orden como INVITADO (sin JWT).
  */
-export async function createOrder(
-  payload: CheckoutPayload,
-  authToken?: string
+export async function createGuestOrder(
+  payload: GuestCheckoutPayload
 ): Promise<CheckoutResponse> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
-
   const res = await fetch('/api/orders', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(payload),
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload),
   });
 
+  const body = await res.json();
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(
-      (err as { message?: string }).message || `Error ${res.status} al procesar el checkout`
-    );
+    throw new Error(body?.message ?? `Error ${res.status} al procesar el pedido`);
   }
-
-  return res.json();
+  return body.data as CheckoutResponse;
 }
 
 /**
- * Abre el Widget de Wompi con los datos de la orden.
- * Carga el script de Wompi si no está en el DOM.
+ * Crea una orden como USUARIO AUTENTICADO (con JWT).
+ */
+export async function createAuthOrder(
+  payload: AuthCheckoutPayload,
+  token:   string
+): Promise<CheckoutResponse> {
+  const res = await fetch('/api/orders', {
+    method:  'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const body = await res.json();
+  if (!res.ok) {
+    throw new Error(body?.message ?? `Error ${res.status} al procesar el pedido`);
+  }
+  return body.data as CheckoutResponse;
+}
+
+/**
+ * Abre el Widget de Wompi Colombia con los datos de la orden.
+ * Carga el script dinámicamente si no está presente.
  */
 export function abrirWidgetWompi(data: CheckoutResponse): void {
-  // El Widget de Wompi Colombia se inicializa con estos parámetros
-  const widget = (window as any).WidgetCheckout;
-
   const ejecutar = () => {
-    const checkout = new widget({
-      currency: data.currency,
+    const WidgetCheckout = (window as any).WidgetCheckout;
+    if (!WidgetCheckout) {
+      console.error('[Belle Désir] WidgetCheckout no disponible.');
+      return;
+    }
+    const checkout = new WidgetCheckout({
+      currency:      data.currency,
       amountInCents: data.amountInCents,
-      reference: data.orderId,
-      publicKey: data.publicKey,
-      redirectUrl: data.redirectUrl,
+      reference:     data.orderId,
+      publicKey:     data.publicKey,
+      redirectUrl:   data.redirectUrl,
     });
     checkout.open((result: any) => {
-      const transaction = result?.transaction;
-      if (transaction?.status === 'APPROVED') {
+      if (result?.transaction?.status === 'APPROVED') {
         window.location.href = data.redirectUrl;
       }
     });
   };
 
-  if (widget) {
+  if ((window as any).WidgetCheckout) {
     ejecutar();
     return;
   }
 
-  // Carga dinámica del script de Wompi si no está presente
   const script = document.createElement('script');
   script.src = 'https://checkout.wompi.co/widget.js';
   script.setAttribute('data-render', 'false');
