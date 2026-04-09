@@ -1,0 +1,91 @@
+/* ============================================
+   BASE.CSS — Variables, reset y base tipográfica
+   ============================================ */
+
+/* --- VARIABLES DE COLOR (paleta original intacta) --- */
+:root {
+  --negro-ciruela:    #120B18;
+  --violeta-premium:  #5B2A86;
+  --ciruela-medio:    #2A163A;
+  --morado-oscuro:    #2D1B69;
+  --lila-medio:       #7B5EA7;
+  --lila-claro:       #C4A8E8;
+  --champana:         #F5EDE1;
+  --gris-perla:       #F0EAF8;
+  --blanco:           #FFFFFF;
+  --texto-oscuro:     #1a1a2e;
+  --texto-gris:       #9a8fb0;
+
+  /* --- TIPOGRAFÍA --- */
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans:  'Segoe UI', sans-serif;
+
+  /* --- ESPACIADO (escala 4px) --- */
+  --space-1:  0.25rem;   /* 4px  */
+  --space-2:  0.5rem;    /* 8px  */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+
+  /* --- BORDES --- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* --- TRANSICIONES --- */
+  --transition-fast:   0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow:   0.5s ease;
+
+  /* --- SOMBRAS --- */
+  --shadow-violet: 0 8px 30px rgba(91, 42, 134, 0.5);
+  --shadow-card:   0 20px 40px rgba(91, 42, 134, 0.2);
+}
+
+/* --- RESET --- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- BASE --- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--negro-ciruela);
+  color: var(--champana);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- SKIP LINK (accesibilidad) --- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--violeta-premium);
+  color: var(--champana);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 0.85rem;
+  z-index: 10000;
+  transition: top var(--transition-fast);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* --- CLASE OCULTO --- */
+.oculto {
+  display: none !important;
+}

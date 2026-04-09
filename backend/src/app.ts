@@ -45,9 +45,23 @@ if (env.NODE_ENV !== 'production') {
 app.use(helmet());
 
 // --- 2. CORS ---
+// FRONTEND_URL puede ser un solo origen o varios separados por coma
+// Ejemplo .env: FRONTEND_URL=http://localhost:5173,https://midominio.com
+const allowedOrigins: string[] = env.FRONTEND_URL
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      // Permite peticiones sin "origin" (Postman, curl, mismo servidor)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS: origen no permitido → ${origin}`));
+      }
+    },
     credentials: true,
   })
 );

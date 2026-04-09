@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Belle Désir — Tu tienda de bienestar íntimo en Colombia. Discreción y calidad.">
+  <meta name="robots" content="noindex">
+
+  <title>Belle Désir — Conócete sin límites</title>
+
+  <!-- Fuente elegante para los títulos -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap"
+    rel="stylesheet"
+  >
+</head>
+
+<body>
+
+  <!-- Skip link de accesibilidad -->
+  <a class="skip-link" href="#catalogo">Ir al catálogo</a>
+
+  <!-- ========================================
+       PANTALLA DE VERIFICACIÓN DE EDAD
+  ======================================== -->
+  <div id="verificacion-edad" class="verificacion-overlay">
+    <div class="verificacion-caja">
+      <div class="verificacion-logo">Belle Désir</div>
+      <div class="verificacion-linea"></div>
+      <p class="verificacion-subtitulo">Contenido para adultos</p>
+      <h2 class="verificacion-titulo">¿Tienes 18 años o más?</h2>
+      <p class="verificacion-texto">
+        Este sitio contiene productos para adultos.
+        Al ingresar confirmas que tienes 18 años o más.
+      </p>
+      <div class="verificacion-botones">
+        <button id="btn-entrar" class="btn-primario">Sí, tengo 18 o más</button>
+        <button id="btn-salir"  class="btn-secundario">No, salir</button>
+      </div>
+    </div>
+  </div>
+  <!-- FIN verificacion-edad -->
+
+  <!-- ========================================
+       CONTENIDO PRINCIPAL
+  ======================================== -->
+  <div id="contenido-principal" class="oculto">
+  <main id="main-content">
+
+    <!-- NAVEGACIÓN -->
+    <nav class="navbar" aria-label="Navegación principal">
+      <div class="navbar-logo">Belle Désir</div>
+
+      <!-- Botón hamburguesa — solo visible en celular -->
+      <button
+        class="navbar-hamburguesa"
+        id="btn-menu"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="navbar-menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="navbar-menu" id="navbar-menu" role="list">
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#catalogo">Catálogo</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+
+      <div class="navbar-carrito" role="button" tabindex="0" aria-label="Abrir carrito">
+        🛒 <span id="contador-carrito">0</span>
+      </div>
+    </nav>
+    <!-- FIN navbar -->
+
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-contenido">
+        <p class="hero-eyebrow">Bienvenida a Belle Désir</p>
+        <h1 class="hero-titulo">Conócete<br><em>sin límites,<br>sin juicios.</em></h1>
+        <p class="hero-subtitulo">
+          Productos pensados para tu bienestar íntimo,
+          con discreción, calidad y confianza.
+        </p>
+        <a href="#catalogo" class="btn-primario">Ver catálogo</a>
+      </div>
+    </section>
+    <!-- FIN hero -->
+
+
+    <!-- CATÁLOGO (nueva sección) -->
+    <section id="catalogo" class="catalogo">
+      <div class="catalogo-encabezado">
+        <p class="seccion-eyebrow">Nuestros productos</p>
+        <h2 class="seccion-titulo">Explorar<br><em>el catálogo</em></h2>
+        <div class="seccion-linea"></div>
+      </div>
+
+      <div class="catalogo-filtros" id="catalogo-filtros">
+        <button class="filtro-btn activo" data-slug="todos">Todos</button>
+      </div>
+
+      <div class="catalogo-grid" id="catalogo-grid">
+        <div class="catalogo-loading" id="catalogo-loading">
+          <div class="spinner"></div>
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+
+      <div class="catalogo-vacio oculto" id="catalogo-vacio">
+        <p>No se encontraron productos en esta categoría.</p>
+      </div>
+    </section>
+    <!-- FIN catálogo -->
+
+
+    <!-- NOSOTROS -->
+    <section id="nosotros" class="nosotros">
+      <div class="nosotros-encabezado">
+        <p class="seccion-eyebrow">Nuestra historia</p>
+        <h2 class="seccion-titulo">Un espacio creado<br><em>para ti</em></h2>
+        <div class="seccion-linea"></div>
+      </div>
+
+      <div class="nosotros-mision">
+        <p class="nosotros-texto-grande">
+          En Colombia, hablar de placer todavía se siente
+          incómodo. Belle Désir nació para cambiar eso.
+        </p>
+        <p class="nosotros-texto">
+          Creemos que conocerte, explorar tu cuerpo y disfrutar
+          de tu intimidad es un acto de amor propio — no algo
+          de qué avergonzarse. Somos una tienda pensada para
+          personas reales, con curiosidades reales, que merecen
+          un espacio sin juicios donde encontrar lo que buscan
+          con total tranquilidad.
+        </p>
+        <p class="nosotros-texto">
+          Aquí no te vamos a juzgar. No te vamos a mandar
+          correos raros. No te vamos a hacer sentir extraño
+          por lo que eliges. Solo queremos que encuentres
+          lo que necesitas, con confianza y con la discreción
+          que mereces.
+        </p>
+      </div>
+
+      <div class="nosotros-valores">
+        <div class="valor-tarjeta">
+          <div class="valor-icono">🔒</div>
+          <h3 class="valor-titulo">Discreción total</h3>
+          <p class="valor-texto">
+            Tu privacidad es sagrada para nosotros.
+            Envíos discretos, sin logos ni descripciones
+            del contenido en el empaque.
+          </p>
+        </div>
+        <div class="valor-tarjeta">
+          <div class="valor-icono">💜</div>
+          <h3 class="valor-titulo">Sin juicios</h3>
+          <p class="valor-texto">
+            Cada persona es diferente y eso está bien.
+            Aquí todos son bienvenidos, sin importar
+            lo que busquen.
+          </p>
+        </div>
+        <div class="valor-tarjeta">
+          <div class="valor-icono">✨</div>
+          <h3 class="valor-titulo">Calidad garantizada</h3>
+          <p class="valor-texto">
+            Solo ofrecemos productos seguros, de marcas
+            confiables. Tu bienestar y tu seguridad
+            son nuestra prioridad.
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- FIN nosotros -->
+
+
+    <!-- CONTACTO -->
+    <section id="contacto" class="contacto">
+      <div class="contacto-contenido">
+        <div class="contacto-texto">
+          <p class="seccion-eyebrow">Estamos aquí</p>
+          <h2 class="seccion-titulo">¿Tienes alguna<br><em>pregunta?</em></h2>
+          <div class="seccion-linea" style="margin: 1.5rem 0;"></div>
+          <p class="contacto-descripcion">
+            Escríbenos por WhatsApp. Te respondemos
+            con total discreción, sin juicios y con
+            la mejor atención.
+          </p>
+          <ul class="contacto-lista">
+            <li>
+              <span class="contacto-lista-icono">🕐</span>
+              <span>Lunes a sábado · 9am a 8pm</span>
+            </li>
+            <li>
+              <span class="contacto-lista-icono">🔒</span>
+              <span>Conversación privada y discreta</span>
+            </li>
+            <li>
+              <span class="contacto-lista-icono">⚡</span>
+              <span>Respuesta en menos de 2 horas</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="contacto-accion">
+          <div class="whatsapp-tarjeta">
+            <div class="whatsapp-header">
+              <div class="whatsapp-avatar">BD</div>
+              <div class="whatsapp-info">
+                <p class="whatsapp-nombre">Belle Désir</p>
+                <p class="whatsapp-estado">● En línea</p>
+              </div>
+            </div>
+            <div class="whatsapp-burbuja">
+              <p>¡Hola! 👋 Bienvenida a Belle Désir.</p>
+              <p>¿En qué te podemos ayudar hoy?</p>
+              <span class="whatsapp-hora">ahora</span>
+            </div>
+            <a
+              href="https://wa.me/573159739914?text=Hola%20Belle%20D%C3%A9sir%2C%20me%20gustar%C3%ADa%20obtener%20m%C3%A1s%20informaci%C3%B3n"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="whatsapp-btn"
+            >
+              Escribir por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- FIN contacto -->
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-contenido">
+        <div class="footer-marca">
+          <div class="footer-logo">Belle Désir</div>
+          <div class="footer-linea"></div>
+          <p class="footer-slogan">Conócete · Sin límites · Sin juicios</p>
+          <p class="footer-descripcion">
+            Tu tienda de bienestar íntimo en Colombia.
+            Discreción, confianza y calidad en cada compra.
+          </p>
+        </div>
+        <div class="footer-columna">
+          <h4 class="footer-titulo-col">Navegación</h4>
+          <ul class="footer-links">
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+            <li><a href="#catalogo">Catálogo</a></li>
+          </ul>
+        </div>
+        <div class="footer-columna">
+          <h4 class="footer-titulo-col">Información</h4>
+          <ul class="footer-links">
+            <li><a href="#">Política de privacidad</a></li>
+            <li><a href="#">Términos y condiciones</a></li>
+            <li><a href="#">Política de envíos</a></li>
+            <li><a href="#">Preguntas frecuentes</a></li>
+          </ul>
+        </div>
+        <div class="footer-columna">
+          <h4 class="footer-titulo-col">Contacto</h4>
+          <ul class="footer-links footer-contacto-info">
+            <li><span>📍</span><span>Colombia</span></li>
+            <li><span>💬</span><span>WhatsApp disponible<br>Lun - Sáb · 9am a 8pm</span></li>
+            <li><span>🔒</span><span>Envíos 100% discretos</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-divisor"></div>
+
+      <div class="footer-inferior">
+        <p class="footer-copyright">© 2026 Belle Désir · Todos los derechos reservados</p>
+        <p class="footer-aviso">⚠️ Sitio exclusivo para mayores de 18 años</p>
+        <div class="footer-pagos">
+          <span class="pago-badge">Nequi</span>
+          <span class="pago-badge">PSE</span>
+          <span class="pago-badge">Visa</span>
+          <span class="pago-badge">Mastercard</span>
+        </div>
+      </div>
+    </footer>
+    <!-- FIN footer -->
+
+
+    <!-- SIDEBAR DEL CARRITO -->
+    <aside
+      id="carrito-sidebar"
+      class="carrito-sidebar"
+      aria-label="Carrito de compras"
+      aria-hidden="true"
+    >
+      <div class="carrito-header">
+        <h3>Tu carrito</h3>
+        <button id="btn-cerrar-carrito" aria-label="Cerrar carrito">✕</button>
+      </div>
+      <div class="carrito-items" id="carrito-items"></div>
+      <div class="carrito-footer">
+        <div class="carrito-total">
+          <span>Total:</span>
+          <span class="carrito-total-precio" id="carrito-total-precio">$0</span>
+        </div>
+        <button id="btn-checkout" class="btn-primario">Ir a pagar</button>
+      </div>
+    </aside>
+    <div class="carrito-overlay oculto" id="carrito-overlay"></div>
+
+  </main>
+  </div>
+  <!-- FIN contenido-principal -->
+
+  <!-- Punto de entrada único — Vite lo gestiona como módulo ES -->
+  <script type="module" src="/src/main.ts"></script>
+
+</body>
+</html>
