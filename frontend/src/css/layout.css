@@ -549,6 +549,8 @@
   perspective: 500px;
   margin-bottom: 2.5rem;
   cursor: pointer;
+  position: relative;   /* necesario para las etiquetas flotantes (GSAP) */
+  overflow: visible;    /* las etiquetas salen fuera del bounding box del cubo */
 }
 
 /* Cubo — mantiene el espacio 3D y gira */
