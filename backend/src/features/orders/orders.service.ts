@@ -65,6 +65,9 @@ export class OrderService {
     // Para invitados guardamos sus datos en shippingAddress
     const shippingAddressData = {
       ...data.shippingAddress,
+      // Ciudad y país fijos — la tienda solo despacha en Bogotá, Colombia
+      city:    'Bogotá',
+      country: 'Colombia',
       // Enriquecemos con datos del invitado si no vienen en shippingAddress
       email: data.shippingAddress.email ?? data.guestEmail,
       name:  data.shippingAddress.name  || data.guestName  || 'Invitado',

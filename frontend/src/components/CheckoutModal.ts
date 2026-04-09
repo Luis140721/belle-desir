@@ -77,26 +77,19 @@ export function inyectarCheckoutModal(): void {
             </div>
 
             <div class="chk-separador">
-              <span>Dirección de envío</span>
+              <span>Dirección de envío · Bogotá</span>
             </div>
 
             <div class="chk-campo">
-              <label for="inv-direccion">Dirección <span class="chk-req">*</span></label>
+              <label for="inv-direccion">Dirección en Bogotá <span class="chk-req">*</span></label>
               <input id="inv-direccion" type="text" name="direccion"
-                     placeholder="Calle, número, barrio" required autocomplete="street-address">
+                     placeholder="Ej: Cra 15 #93-47, Chapinero" required autocomplete="street-address">
             </div>
 
-            <div class="chk-fila-2">
-              <div class="chk-campo">
-                <label for="inv-ciudad">Ciudad <span class="chk-req">*</span></label>
-                <input id="inv-ciudad" type="text" name="ciudad"
-                       placeholder="Bogotá" required autocomplete="address-level2">
-              </div>
-              <div class="chk-campo">
-                <label for="inv-pais">País</label>
-                <input id="inv-pais" type="text" name="pais"
-                       value="Colombia" autocomplete="country-name">
-              </div>
+            <div class="chk-campo">
+              <label for="inv-barrio">Barrio (opcional)</label>
+              <input id="inv-barrio" type="text" name="barrio"
+                     placeholder="Ej: Chapinero, Usaquén, Suba..." autocomplete="address-level3">
             </div>
 
             <p id="inv-error" class="chk-error oculto"></p>
@@ -223,16 +216,18 @@ export function initCheckoutModal(getItems: () => CartItem[]): void {
     const nombre    = (document.getElementById('inv-nombre') as HTMLInputElement).value.trim();
     const telefono  = (document.getElementById('inv-telefono') as HTMLInputElement).value.trim();
     const direccion = (document.getElementById('inv-direccion') as HTMLInputElement).value.trim();
-    const ciudad    = (document.getElementById('inv-ciudad') as HTMLInputElement).value.trim();
-    const pais      = (document.getElementById('inv-pais') as HTMLInputElement).value.trim();
+    const barrio    = (document.getElementById('inv-barrio') as HTMLInputElement).value.trim();
 
-    if (!email || !direccion || !ciudad) {
+    if (!email || !direccion) {
       mostrarError(errEl, 'Por favor completa los campos obligatorios (*)');
       return;
     }
 
     setLoading(submitBtn, true, 'Procesando...');
     ocultarError(errEl);
+
+    // Compone la dirección completa incluyendo el barrio si se proporcionó
+    const direccionCompleta = barrio ? `${direccion}, ${barrio}` : direccion;
 
     try {
       const items = buildItems(getItems());
@@ -245,9 +240,7 @@ export function initCheckoutModal(getItems: () => CartItem[]): void {
           name:    nombre || 'Invitado',
           email,
           phone:   telefono || undefined,
-          address: direccion,
-          city:    ciudad,
-          country: pais || 'Colombia',
+          address: direccionCompleta,
         },
       });
       cerrar();
@@ -369,9 +362,7 @@ async function procesarConCuenta(
       items,
       shippingAddress: {
         name:    'Usuario',
-        address: 'Pendiente',
-        city:    'Colombia',
-        country: 'Colombia',
+        address: 'Bogotá, Colombia',
       },
     },
     token

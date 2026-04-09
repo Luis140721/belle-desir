@@ -20,20 +20,16 @@ export interface GuestCheckoutPayload {
   shippingAddress: {
     name:    string;
     email:   string;
-    address: string;
-    city:    string;
-    country: string;
+    address: string;  // Solo la dirección; ciudad/país los fija el backend
     phone?:  string;
   };
 }
 
 export interface AuthCheckoutPayload {
-  items?:          CartItemPayload[];   // opcional: si el carrito DB está vacío
+  items?:          CartItemPayload[];
   shippingAddress: {
     name:    string;
-    address: string;
-    city:    string;
-    country: string;
+    address: string;  // Solo la dirección; ciudad/país los fija el backend
     phone?:  string;
   };
 }

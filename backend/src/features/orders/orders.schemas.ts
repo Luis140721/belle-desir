@@ -12,10 +12,8 @@ const shippingAddressSchema = z.object({
   name:    z.string().min(2),
   email:   z.string().email().optional(),
   phone:   z.string().optional(),
+  // Solo se recibe la dirección; ciudad y país son fijos
   address: z.string().min(5),
-  city:    z.string().min(2),
-  country: z.string().min(2).default('Colombia'),
-  zip:     z.string().optional().default(''),
 });
 
 // ─── Crear orden ─────────────────────────────────────────────

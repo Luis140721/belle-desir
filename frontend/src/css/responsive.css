@@ -5,9 +5,6 @@
 /* ---- Celular ≤ 768px ---- */
 @media (max-width: 768px) {
 
-  .chk-fila-2 {
-    grid-template-columns: 1fr;
-  }
   .chk-caja { border-radius: var(--radius-md); }
   .chk-tabs { grid-template-columns: 1fr; }
 
