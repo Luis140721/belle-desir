@@ -538,8 +538,19 @@
 
 /* Variables locales del cubo */
 :root {
-  --cubo-size: 120px;
-  --cubo-half: 60px;    /* = cubo-size / 2 */
+  --cubo-size: 200px;
+  --cubo-half: 100px;    /* = cubo-size / 2 */
+}
+
+/* Sección dedicada al cubo 3D */
+.seccion-cubo {
+  height: 100vh;
+  background: var(--negro-ciruela);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Contenedor escena — establece la perspectiva */

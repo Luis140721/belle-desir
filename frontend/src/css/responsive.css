@@ -5,13 +5,13 @@
 /* ---- Celular ≤ 768px ---- */
 @media (max-width: 768px) {
 
-  /* Cubo 3D — reducido a 80px */
+  /* Cubo 3D — reducido a 140px */
   :root {
-    --cubo-size: 80px;
-    --cubo-half: 40px;
+    --cubo-size: 140px;
+    --cubo-half: 70px;
   }
   .hero-cubo-escena {
-    margin-bottom: 1.8rem;
+    margin-bottom: 0;
   }
 
   .navbar-hamburguesa {

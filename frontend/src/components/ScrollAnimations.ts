@@ -27,7 +27,7 @@ export function initScrollAnimations(): void {
   // Pequeño rAF para que el DOM esté pintado antes de que GSAP mida
   requestAnimationFrame(() => {
     initCubeScrollPin();
-    initStaggerReveal();
+    // initStaggerReveal(); // Se comenta temporalmente para restaurar visibilidad
     initParallax();
     initNavbarEnhanced();
   });
@@ -38,11 +38,11 @@ export function initScrollAnimations(): void {
 // ─────────────────────────────────────────────────────────────
 
 function initCubeScrollPin(): void {
-  const hero  = document.querySelector<HTMLElement>('.hero');
-  const cubo  = document.querySelector<HTMLElement>('.hero-cubo');
-  const escena = document.querySelector<HTMLElement>('.hero-cubo-escena');
+  const triggerEl = document.querySelector<HTMLElement>('#seccion-cubo');
+  const cubo      = document.querySelector<HTMLElement>('.hero-cubo');
+  const escena    = document.querySelector<HTMLElement>('.hero-cubo-escena');
 
-  if (!hero || !cubo || !escena) return;
+  if (!triggerEl || !cubo || !escena) return;
 
   // En móvil: la animación CSS se mantiene, sin pin
   if (window.innerWidth < DESKTOP) return;
@@ -57,7 +57,7 @@ function initCubeScrollPin(): void {
   // Timeline principal: el cubo gira 360° mientras dura el pin
   gsap.timeline({
     scrollTrigger: {
-      trigger: hero,
+      trigger: triggerEl,
       start:   'top top',
       end:     '+=2400',      // 2 400 px de scroll = 1 vuelta completa
       pin:     true,
@@ -110,7 +110,7 @@ function actualizarEtiquetas(els: HTMLElement[], progress: number): void {
 // 2. STAGGER REVEAL — fade + slide-up en cascada
 // ─────────────────────────────────────────────────────────────
 
-function initStaggerReveal(): void {
+export function initStaggerReveal(): void {
 
   // Títulos de sección — cada uno con su propio trigger
   gsap.utils
@@ -125,13 +125,12 @@ function initStaggerReveal(): void {
       });
     });
 
-  // Tarjetas de valores — stagger de 0.18 s
+  // Tarjetas de valores — solo opacidad para no romper el grid
   gsap.from('.valor-tarjeta', {
     opacity : 0,
-    y       : 50,
     duration: 0.7,
-    stagger : 0.18,
-    ease    : 'power3.out',
+    stagger : 0.2,
+    ease    : 'power1.out',
     scrollTrigger: {
       trigger: '.nosotros-valores',
       start  : 'top 82%',
