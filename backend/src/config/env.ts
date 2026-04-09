@@ -15,7 +15,8 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   WOMPI_PUBLIC_KEY: z.string().min(1).optional(), // Not strictly required for the backend webhook but useful
   WOMPI_EVENTS_SECRET: z.string().min(1),
-  FRONTEND_URL: z.string().url(),
+  // Puede ser una URL o varias separadas por coma: "http://a.com,http://b.com"
+  FRONTEND_URL: z.string().min(1),
   STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('local'),
 });
 
