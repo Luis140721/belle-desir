@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 // Load initial .env file
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env'), override: true });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -17,7 +17,12 @@ const envSchema = z.object({
   WOMPI_EVENTS_SECRET: z.string().min(1),
   // Puede ser una URL o varias separadas por coma: "http://a.com,http://b.com"
   FRONTEND_URL: z.string().min(1),
+  ALLOWED_ORIGINS: z.string().default('http://localhost:5173'),
   STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('local'),
+  
+  // Bold
+  BOLD_API_KEY: z.string().min(1),
+  BOLD_INTEGRITY_SECRET: z.string().min(1),
 });
 
 const _env = envSchema.safeParse(process.env);

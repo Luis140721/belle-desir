@@ -10,22 +10,15 @@ import './css/components.css';
 import './css/layout.css';
 import './css/responsive.css';
 
-// ── Componentes ───────────────────────────────────────────────
 import { initAgeVerification } from './components/AgeVerification.js';
-import { initNavbar }          from './components/Navbar.js';
-import { initCatalogo }        from './components/Catalog.js';
-import { initCartSidebar }     from './components/CartSidebar.js';
-import { initScrollAnimations } from './components/ScrollAnimations.js';
 import { on }                  from './utils/events.js';
+import { initRouter } from './router.js';
 
 // AgeVerification siempre se inicializa primero
 initAgeVerification();
 
 function initApp(): void {
-  initNavbar();
-  initCartSidebar();
-  initCatalogo();       // async: carga el catálogo en paralelo
-  initScrollAnimations(); // GSAP: se auto-aplaza con rAF interno
+  initRouter();
 }
 
 // Si ya verificó la edad en localStorage, arrancamos directamente

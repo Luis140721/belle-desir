@@ -71,3 +71,34 @@ Content-Type: application/json
     "zip": "110111"
   }
 }
+
+### ==========================================
+### [BOLD] Simular webhook pago APROBADO 
+### (reemplaza REEMPLAZA_CON_ORDER_ID_REAL con el id de la orden)
+### ==========================================
+POST {{baseUrl}}/payments/bold-webhook 
+Content-Type: application/json 
+  
+{ 
+  "transaction": { 
+    "id": "TRX_TEST_001", 
+    "status": "APPROVED", 
+    "order_reference": "REEMPLAZA_CON_ORDER_ID_REAL", 
+    "amount": 120000 
+  } 
+} 
+
+### ==========================================
+### [BOLD] Simular webhook pago DECLINADO 
+### ==========================================
+POST {{baseUrl}}/payments/bold-webhook 
+Content-Type: application/json 
+  
+{ 
+  "transaction": { 
+    "id": "TRX_TEST_002", 
+    "status": "DECLINED", 
+    "order_reference": "REEMPLAZA_CON_ORDER_ID_REAL", 
+    "amount": 120000 
+  } 
+} 

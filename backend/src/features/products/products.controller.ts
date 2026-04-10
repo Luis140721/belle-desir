@@ -56,6 +56,11 @@ export class ProductController {
     sendResponse(res, 200, result);
   }
 
+  static async getById(req: Request, res: Response) {
+    const result = await ProductService.getById((req.params.id as string));
+    sendResponse(res, 200, result);
+  }
+
   /**
    * @swagger
    * /products:
@@ -106,7 +111,16 @@ export class ProductController {
     
     const imagePaths = files.map((file) => `${hostUrl}/uploads/${file.filename}`);
 
-    const result = await ProductService.addImages((req.params.id as string), imagePaths);
-    sendResponse(res, 200, result);
+    const product = await ProductService.addImages((req.params.id as string), imagePaths);
+    sendResponse(res, 200, product);
+  }
+
+  static async removeImage(req: Request, res: Response) {
+    const { imageUrl } = req.body;
+    if (!imageUrl) {
+      return sendResponse(res, 400, { message: 'ImageUrl is required' });
+    }
+    const product = await ProductService.removeImage((req.params.id as string), imageUrl);
+    sendResponse(res, 200, product);
   }
 }

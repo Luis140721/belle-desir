@@ -10,7 +10,7 @@ import type { CartItem } from '../types/index.js';
 import {
   createGuestOrder,
   createAuthOrder,
-  abrirWidgetWompi,
+  redirigirABold,
   type CartItemPayload,
 } from '../services/checkoutService.js';
 import {
@@ -95,7 +95,7 @@ export function inyectarCheckoutModal(): void {
             <p id="inv-error" class="chk-error oculto"></p>
 
             <button type="submit" class="btn-primario chk-btn-submit" id="inv-submit">
-              Ir a pagar con Wompi
+              Ir a pagar con Bold
             </button>
           </form>
         </div>
@@ -244,11 +244,11 @@ export function initCheckoutModal(getItems: () => CartItem[]): void {
         },
       });
       cerrar();
-      abrirWidgetWompi(data);
+      redirigirABold(data);
     } catch (err) {
       mostrarError(errEl, err instanceof Error ? err.message : 'Error al procesar el pedido');
     } finally {
-      setLoading(submitBtn, false, 'Ir a pagar con Wompi');
+      setLoading(submitBtn, false, 'Ir a pagar con Bold');
     }
   });
 
@@ -363,12 +363,15 @@ async function procesarConCuenta(
       shippingAddress: {
         name:    'Usuario',
         address: 'Bogotá, Colombia',
+        city: 'Bogotá',
+        country: 'Colombia',
+        zip: '110111',
       },
     },
     token
   );
   cerrar();
-  abrirWidgetWompi(data);
+  redirigirABold(data);
 }
 
 function mostrarError(el: HTMLElement, msg: string): void {

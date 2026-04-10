@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bd-dark text-bd-text font-['Inter',_sans-serif] antialiased;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bd-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-bd-purple rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-bd-purple-hover;
+  }
+}

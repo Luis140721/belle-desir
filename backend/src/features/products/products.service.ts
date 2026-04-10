@@ -82,6 +82,30 @@ export class ProductService {
     return { ...product, avgRating };
   }
 
+  static async getById(id: string) {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        reviews: {
+          include: {
+            user: { select: { name: true } },
+          },
+        },
+      },
+    });
+
+    if (!product) throw new AppError('Product not found', 404);
+
+    // Calculate avg rating
+    const avgRating =
+      product.reviews.length > 0
+        ? product.reviews.reduce((acc, rev) => acc + rev.rating, 0) / product.reviews.length
+        : 0;
+
+    return { ...product, avgRating };
+  }
+
   static async create(data: CreateProductInput) {
     const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     
@@ -122,6 +146,18 @@ export class ProductService {
     if (!product) throw new AppError('Product not found', 404);
 
     const newImages = [...product.images, ...imagePaths].slice(0, 5); // Max 5
+
+    return prisma.product.update({
+      where: { id },
+      data: { images: newImages },
+    });
+  }
+
+  static async removeImage(id: string, imageUrl: string) {
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product) throw new AppError('Product not found', 404);
+
+    const newImages = product.images.filter((img) => img !== imageUrl);
 
     return prisma.product.update({
       where: { id },

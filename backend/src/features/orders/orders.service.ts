@@ -3,6 +3,8 @@ import { AppError } from '../../shared/errors/AppError';
 import { env } from '../../config/env';
 import { getPagination, getPagingData } from '../../shared/utils/pagination';
 import { CreateOrderInput, UpdateOrderStatusInput } from './orders.schemas';
+import axios from 'axios';
+import { BOLD_API_URL, getBoldHeaders } from '../../config/bold';
 
 export class OrderService {
 
@@ -144,13 +146,48 @@ export class OrderService {
       return newOrder;
     });
 
-    return {
-      orderId:       order.id,
-      amountInCents: total * 100,
-      currency:      'COP',
-      publicKey:     env.WOMPI_PUBLIC_KEY ?? '',
-      redirectUrl:   `${env.FRONTEND_URL.split(',')[0]}/checkout/success?orderId=${order.id}`,
-    };
+    // ── 4. Generar link de pago Bold ─────────────────────────
+    try {
+      const { data: boldResponse } = await axios.post(
+        `${BOLD_API_URL}/online/link/v1`,
+        {
+          amount_type: 'CLOSE',
+          amount: {
+            currency: 'COP',
+            total_amount: Math.floor(total),
+            tip_amount: 0,
+          },
+          reference: order.id,
+          description: `Pedido Belle Désir #${order.id.slice(0, 8).toUpperCase()}`,
+          expiration_date: Math.floor((Date.now() + 30 * 60 * 1000) * 1e6),
+          payment_methods: ['CREDIT_CARD', 'PSE', 'NEQUI', 'BOTON_BANCOLOMBIA'],
+          callback_url: `${env.FRONTEND_URL.split(',')[0]}/pedido-confirmado`,
+        },
+        { headers: getBoldHeaders() }
+      );
+
+      const paymentLink = boldResponse.payload.payment_link;
+      const checkoutUrl = boldResponse.payload.url;
+
+      // Guardar el link en stripeSessionId (reutilizando campo)
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { stripeSessionId: paymentLink },
+      });
+
+      return {
+        orderId: order.id,
+        checkoutUrl,
+        paymentLink,
+      };
+    } catch (error) {
+      console.error('Error generating Bold payment link:', error);
+      return {
+        orderId: order.id,
+        checkoutUrl: null,
+        paymentLink: null,
+      };
+    }
   }
 
   static async getUserOrders(userId: string, query: any) {
@@ -202,12 +239,41 @@ export class OrderService {
   }
 
   static async updateOrderStatus(orderId: string, data: UpdateOrderStatusInput) {
-    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
     if (!order) throw new AppError('Order not found', 404);
 
-    return prisma.order.update({
-      where: { id: orderId },
-      data:  { status: data.status },
+    // Si el nuevo estado es el mismo, no hacer nada
+    if (order.status === data.status) return order;
+
+    return await prisma.$transaction(async (tx) => {
+      // Caso 1: La orden pasa de PAID a CANCELLED o REFUNDED -> Devolvemos stock
+      if (order.status === 'PAID' && ['CANCELLED', 'REFUNDED'].includes(data.status)) {
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      // Caso 2: La orden pasa de PENDING/CANCELLED a PAID -> Reducimos stock
+      // (Útil para cambios manuales del admin)
+      if (order.status !== 'PAID' && data.status === 'PAID') {
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { id: orderId },
+        data: { status: data.status },
+      });
     });
   }
 }

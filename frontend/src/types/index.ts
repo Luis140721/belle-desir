@@ -34,24 +34,46 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface ShippingAddress {
+  name: string;
+  address: string;
+  city: string;
+  country: string;
+  zip: string;
+  phone?: string;
+  notes?: string;
+}
+
 // Payload que enviamos al backend /api/orders
 export interface CheckoutPayload {
-  shippingAddress: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-  };
+  items?: Array<{
+    productId: string;
+    quantity: number;
+  }>;
+  shippingAddress: ShippingAddress;
+}
+
+export interface CartResponse {
+  items: Array<{
+    id: string;
+    productId: string;
+    quantity: number;
+    product: Product;
+  }>;
+  total: number;
 }
 
 // Respuesta del backend al crear una orden
 export interface CheckoutResponse {
   orderId: string;
-  amountInCents: number;
-  currency: string;
-  publicKey: string;
-  redirectUrl: string;
+  checkoutUrl: string | null;
+  paymentLink: string | null;
+}
+
+export interface OrderResponse {
+  orderId: string;
+  checkoutUrl: string | null;
+  paymentLink: string | null;
 }
 
 // Respuesta paginada de /api/products

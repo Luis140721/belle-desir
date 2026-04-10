@@ -103,6 +103,32 @@
     width: 100vw;
     right: -100vw;
   }
+
+  .checkout-page {
+    padding-top: 5rem;
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .checkout-summary-section {
+    position: static;
+    order: -1;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .confirmacion-card h1 {
+    font-size: 2rem;
+  }
 }
 
 /* ---- Móvil extra pequeño ≤ 480px ---- */

@@ -1,3 +1,52 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment (NUNCA subir)
+.env
+.env.local
+.env.production
+.env.staging
+**/.env
+**/.env.local
+**/.env.production
+**/.env.staging
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+
+# Uploads locales
+backend/uploads/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-error.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma
+*.db
+*.db-journal
+
+# Coverage
+coverage/
 # Backend
 backend/node_modules/
 backend/dist/

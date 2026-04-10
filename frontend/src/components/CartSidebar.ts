@@ -8,7 +8,7 @@
 import type { CartItem } from '../types/index.js';
 import { on, emit } from '../utils/events.js';
 import { formatCOP } from '../utils/currency.js';
-import { initCheckoutModal, abrirCheckoutModal } from './CheckoutModal.js';
+import { isLoggedIn } from '../services/authService.js';
 
 let items: CartItem[] = [];
 
@@ -24,9 +24,6 @@ export function initCartSidebar(): void {
   const contEl   = document.getElementById('contador-carrito') as HTMLElement | null;
 
   if (!sidebar) return;
-
-  // ── Inicializa el modal de checkout (inyecta el HTML) ────
-  initCheckoutModal(() => [...items]);
 
   // ── Apertura y cierre del sidebar ────────────────────────
   function abrir(): void {
@@ -90,14 +87,19 @@ export function initCartSidebar(): void {
     }
   });
 
-  // ── "Ir a pagar" → abre el modal de checkout ─────────────
+  // ── "Ir a pagar" → Redirige a Checkout ─────────────
   btnPagar?.addEventListener('click', () => {
     if (!items.length) {
       alert('Tu carrito está vacío');
       return;
     }
-    cerrar();                   // cierra el sidebar
-    abrirCheckoutModal();       // abre el modal de checkout
+    
+    if (!isLoggedIn()) {
+      window.location.href = '/login?redirect=/checkout';
+      return;
+    }
+
+    window.location.href = '/checkout';
   });
 }
 

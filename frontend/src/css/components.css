@@ -661,6 +661,279 @@
 }
 
 /* ======================================================
+   CHECKOUT PAGE
+   ====================================================== */
+.checkout-page {
+  min-height: 100vh;
+  background: var(--negro-ciruela);
+  padding: 6rem 1.5rem 2rem;
+}
+
+.checkout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  gap: 2rem;
+  align-items: start;
+}
+
+.checkout-form-section,
+.summary-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 168, 232, 0.12);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  color: var(--lila-claro);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(196, 168, 232, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--champana);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  padding: 0.7rem 0.9rem;
+  outline: none;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--lila-claro);
+  background: rgba(196, 168, 232, 0.06);
+}
+
+.error-inline {
+  min-height: 1rem;
+  font-size: 0.82rem;
+  color: #ff8f8f;
+}
+
+.error-mensaje {
+  background: rgba(229, 115, 115, 0.12);
+  border: 1px solid rgba(229, 115, 115, 0.35);
+  color: #ffb1b1;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+}
+
+.btn-pago-final {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 52px;
+}
+
+.btn-pago-final .spinner {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+}
+
+.checkout-summary-section {
+  position: sticky;
+  top: 6.5rem;
+}
+
+.summary-title {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  color: var(--champana);
+}
+
+.summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.summary-item {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(196, 168, 232, 0.08);
+}
+
+.summary-item-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--ciruela-medio);
+}
+
+.summary-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-nombre {
+  color: var(--champana);
+  font-size: 0.93rem;
+}
+
+.item-meta {
+  color: var(--texto-gris);
+  font-size: 0.78rem;
+}
+
+.summary-item-total {
+  color: var(--lila-claro);
+  font-size: 0.86rem;
+}
+
+.summary-totals {
+  margin-top: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--texto-gris);
+  margin-top: 0.5rem;
+}
+
+.summary-row.total {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(196, 168, 232, 0.15);
+  color: var(--champana);
+  font-size: 1.06rem;
+}
+
+.envio-gratis {
+  color: #78d687;
+}
+
+.pago-seguro {
+  margin-top: 1rem;
+  color: var(--texto-gris);
+  font-size: 0.84rem;
+}
+
+.checkout-vacio {
+  max-width: 540px;
+  margin: 12vh auto 0;
+  text-align: center;
+}
+
+.checkout-success-manual {
+  max-width: 700px;
+  margin: 10vh auto 0;
+  text-align: center;
+}
+
+.success-actions {
+  margin-top: 1.3rem;
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+}
+
+/* ======================================================
+   PEDIDO CONFIRMADO
+   ====================================================== */
+.confirmacion-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--negro-ciruela);
+  padding: 1.2rem;
+}
+
+.confirmacion-card {
+  width: min(640px, 100%);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 168, 232, 0.14);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.confirmacion-card h1 {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--champana);
+  margin-bottom: 0.8rem;
+}
+
+.confirmacion-card p {
+  color: var(--texto-gris);
+  margin-bottom: 0.8rem;
+}
+
+.confirmacion-check {
+  width: 94px;
+  height: 94px;
+  margin: 0 auto 0.8rem;
+  border-radius: 999px;
+  background: rgba(120, 214, 135, 0.16);
+  border: 1px solid rgba(120, 214, 135, 0.55);
+  display: grid;
+  place-items: center;
+  color: #78d687;
+  font-size: 2.3rem;
+  transform: scale(0);
+  animation: check-enter 520ms ease-out forwards;
+}
+
+@keyframes check-enter {
+  to { transform: scale(1); }
+}
+
+.confirmacion-ref {
+  color: var(--champana) !important;
+}
+
+.confirmacion-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.7rem;
+}
+
+/* ======================================================
    ETIQUETAS FLOTANTES DEL CUBO 3D (GSAP ScrollTrigger)
    ====================================================== */
 

@@ -11,6 +11,7 @@ export const productRoutes = Router();
 
 // Public
 productRoutes.get('/', asyncHandler(ProductController.getAll));
+productRoutes.get('/id/:id', asyncHandler(ProductController.getById));
 // We place /:slug after any static paths, but here there are no other GET routes
 productRoutes.get('/:slug', asyncHandler(ProductController.getBySlug));
 
@@ -21,5 +22,6 @@ productRoutes.post('/', validate(createProductSchema), asyncHandler(ProductContr
 productRoutes.put('/:id', validate(updateProductSchema), asyncHandler(ProductController.update));
 productRoutes.delete('/:id', asyncHandler(ProductController.delete));
 
-// Image upload
+// Image upload/remove
 productRoutes.post('/:id/images', upload.array('images', 5), asyncHandler(ProductController.uploadImages));
+productRoutes.delete('/:id/images', asyncHandler(ProductController.removeImage));
