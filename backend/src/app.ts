@@ -46,13 +46,19 @@ app.use(helmet());
 
 // --- 2. CORS ---
 const allowedOrigins = [
-  ...env.FRONTEND_URL.split(','),
-  ...env.ALLOWED_ORIGINS.split(','),
-].map((o) => o.trim()).filter(Boolean);
+  process.env.FRONTEND_URL || 'http://localhost:5175',
+  process.env.ADMIN_URL || 'http://localhost:5174',
+];
 
 app.use(
   cors({
-    origin: true, // Permitir TODO en cualquier entorno temporalmente para desbloquear al usuario
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

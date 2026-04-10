@@ -5,6 +5,7 @@ import { getPagination, getPagingData } from '../../shared/utils/pagination';
 import { CreateOrderInput, UpdateOrderStatusInput } from './orders.schemas';
 import axios from 'axios';
 import { BOLD_API_URL, getBoldHeaders } from '../../config/bold';
+import { sendOrderConfirmation, sendOrderStatusUpdate, OrderData } from '../../services/emailService';
 
 export class OrderService {
 
@@ -55,6 +56,20 @@ export class OrderService {
       throw new AppError('Uno o más productos no están disponibles', 400);
     }
 
+    // Validar stock de TODOS los items antes de crear la orden
+    for (const item of resolvedItems) {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) {
+        throw new AppError(`Producto ${item.productId} no encontrado`, 400);
+      }
+      if (product.stock === 0) {
+        throw new AppError(`Producto "${product.name}" está agotado`, 400);
+      }
+      if (item.quantity > product.stock) {
+        throw new AppError(`Stock insuficiente para "${product.name}". Solo ${product.stock} unidades disponibles.`, 400);
+      }
+    }
+
     const subtotal = resolvedItems.reduce((sum, item) => {
       const product = products.find((p) => p.id === item.productId)!;
       return sum + Number(product.price) * item.quantity;
@@ -70,6 +85,7 @@ export class OrderService {
       // Ciudad y país fijos — la tienda solo despacha en Bogotá, Colombia
       city:    'Bogotá',
       country: 'Colombia',
+      zip: (data.shippingAddress as any).zip || '000000',
       // Enriquecemos con datos del invitado si no vienen en shippingAddress
       email: data.shippingAddress.email ?? data.guestEmail,
       name:  data.shippingAddress.name  || data.guestName  || 'Invitado',
@@ -146,23 +162,49 @@ export class OrderService {
       return newOrder;
     });
 
-    // ── 4. Generar link de pago Bold ─────────────────────────
+    // 4. Enviar email de confirmación de orden
+    const orderData: OrderData = {
+      id: order.id,
+      items: order.items.map(item => ({
+        name: (item.productSnapshot as any).name as string,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+      })),
+      total: Number(order.total),
+      shippingAddress: {
+        ...shippingAddressData,
+        zip: shippingAddressData.zip || '000000',
+      },
+    };
+
+    // Obtener email del usuario
+    const userEmail = userId 
+      ? (await prisma.user.findUnique({ where: { id: userId } }))?.email
+      : data.guestEmail || shippingAddressData.email;
+
+    if (userEmail) {
+      await sendOrderConfirmation(userEmail, orderData);
+    }
+
+    // 5. Generar link de pago Bold ─────────────────────────
+    const boldPayload = {
+      amount_type: 'CLOSE',
+      amount: {
+        currency: 'COP',
+        total_amount: Math.floor(total),
+        tip_amount: 0,
+      },
+      reference: order.id,
+      description: `Pedido Belle Désir #${order.id.slice(0, 8).toUpperCase()}`,
+      expiration_date: Math.floor((Date.now() + 30 * 60 * 1000) * 1e6),
+      payment_methods: ['CREDIT_CARD', 'PSE', 'NEQUI', 'BOTON_BANCOLOMBIA'],
+      callback_url: `${env.FRONTEND_URL.split(',')[0]}/pedido-confirmado`,
+    };
+
     try {
       const { data: boldResponse } = await axios.post(
         `${BOLD_API_URL}/online/link/v1`,
-        {
-          amount_type: 'CLOSE',
-          amount: {
-            currency: 'COP',
-            total_amount: Math.floor(total),
-            tip_amount: 0,
-          },
-          reference: order.id,
-          description: `Pedido Belle Désir #${order.id.slice(0, 8).toUpperCase()}`,
-          expiration_date: Math.floor((Date.now() + 30 * 60 * 1000) * 1e6),
-          payment_methods: ['CREDIT_CARD', 'PSE', 'NEQUI', 'BOTON_BANCOLOMBIA'],
-          callback_url: `${env.FRONTEND_URL.split(',')[0]}/pedido-confirmado`,
-        },
+        boldPayload,
         { headers: getBoldHeaders() }
       );
 
@@ -180,8 +222,16 @@ export class OrderService {
         checkoutUrl,
         paymentLink,
       };
-    } catch (error) {
-      console.error('Error generating Bold payment link:', error);
+    } catch (error: any) {
+      console.error('Error generating Bold payment link', {
+        orderId: order.id,
+        message: error?.message,
+        status: error?.response?.status,
+        responseData: error?.response?.data,
+        responseHeaders: error?.response?.headers,
+        requestUrl: `${BOLD_API_URL}/online/link/v1`,
+        requestPayload: boldPayload,
+      });
       return {
         orderId: order.id,
         checkoutUrl: null,

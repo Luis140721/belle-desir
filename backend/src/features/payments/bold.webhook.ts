@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../config/database';
+import { sendOrderStatusUpdate, OrderData } from '../../services/emailService';
 
 export const boldWebhookHandler = async (req: Request, res: Response) => {
   try {
@@ -34,6 +35,22 @@ export const boldWebhookHandler = async (req: Request, res: Response) => {
             where: { id: item.productId },
             data: { stock: { decrement: item.quantity } },
           });
+        }
+
+        // Enviar email de confirmación de pago
+        const user = await tx.user.findUnique({ where: { id: order.userId } });
+        if (user?.email) {
+          const orderData: OrderData = {
+            id: order.id,
+            items: order.items.map((item: any) => ({
+              name: (item.productSnapshot as any).name as string,
+              quantity: item.quantity,
+              unitPrice: Number(item.unitPrice),
+            })),
+            total: Number(order.total),
+            shippingAddress: order.shippingAddress as any,
+          };
+          await sendOrderStatusUpdate(user.email, orderData, 'PAID');
         }
       });
 

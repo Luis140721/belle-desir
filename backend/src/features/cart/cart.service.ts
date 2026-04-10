@@ -29,9 +29,15 @@ export class CartService {
   }
 
   static async addItem(userId: string, data: CartItemInput) {
+    // Validar stock real del producto antes de agregar al carrito
     const product = await prisma.product.findUnique({ where: { id: data.productId } });
     if (!product || !product.isActive) {
       throw new AppError('Product not found or inactive', 404);
+    }
+
+    // Validar stock disponible
+    if (product.stock === 0) {
+      throw new AppError('Producto agotado', 400);
     }
 
     let cart = await prisma.cart.findUnique({ where: { userId } });
@@ -45,7 +51,7 @@ export class CartService {
 
     const totalQuantity = (existingItem?.quantity || 0) + data.quantity;
     if (totalQuantity > product.stock) {
-      throw new AppError(`Not enough stock. Only ${product.stock} available.`, 400);
+      throw new AppError(`Stock insuficiente. Solo ${product.stock} unidades disponibles.`, 400);
     }
 
     if (existingItem) {
@@ -80,8 +86,11 @@ export class CartService {
     if (data.quantity === 0) {
       await prisma.cartItem.delete({ where: { id: existingItem.id } });
     } else {
+      if (existingItem.product.stock === 0) {
+        throw new AppError('Producto agotado', 400);
+      }
       if (data.quantity > existingItem.product.stock) {
-        throw new AppError(`Not enough stock. Only ${existingItem.product.stock} available.`, 400);
+        throw new AppError(`Stock insuficiente. Solo ${existingItem.product.stock} unidades disponibles.`, 400);
       }
       await prisma.cartItem.update({
         where: { id: existingItem.id },

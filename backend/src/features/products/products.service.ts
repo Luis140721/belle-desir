@@ -52,8 +52,14 @@ export class ProductService {
       prisma.product.count({ where }),
     ]);
 
+    // Add inStock field virtually
+    const productsWithStock = products.map(product => ({
+      ...product,
+      inStock: product.stock > 0,
+    }));
+
     return {
-      data: products,
+      data: productsWithStock,
       meta: getPagingData(total, page ? +page : 1, limit ? +limit : 10),
     };
   }
@@ -64,22 +70,23 @@ export class ProductService {
       include: {
         category: true,
         reviews: {
-          include: {
-            user: { select: { name: true } },
-          },
+          where: { isVerifiedPurchase: true },
+          include: { user: { select: { name: true } } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
         },
       },
     });
 
-    if (!product) throw new AppError('Product not found', 404);
+    if (!product) {
+      throw new AppError('Product not found', 404);
+    }
 
-    // Calculate avg rating
-    const avgRating =
-      product.reviews.length > 0
-        ? product.reviews.reduce((acc, rev) => acc + rev.rating, 0) / product.reviews.length
-        : 0;
-
-    return { ...product, avgRating };
+    // Add inStock field virtually
+    return {
+      ...product,
+      inStock: product.stock > 0,
+    };
   }
 
   static async getById(id: string) {
