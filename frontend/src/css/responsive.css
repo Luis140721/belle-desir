@@ -1,0 +1,179 @@
+/* ============================================
+   RESPONSIVE.CSS — Media queries
+   ============================================ */
+
+/* ---- Celular ≤ 768px ---- */
+@media (max-width: 768px) {
+
+  /* Cubo 3D — reducido a 140px */
+  :root {
+    --cubo-size: 140px;
+    --cubo-half: 70px;
+  }
+  .hero-cubo-escena {
+    margin-bottom: 0;
+  }
+
+  .navbar-hamburguesa {
+    display: flex !important;
+  }
+
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .navbar-right {
+    gap: 0.75rem;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+  .navbar-menu.abierto {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 64px; left: 0;
+    width: 100%;
+    background: rgba(18, 11, 24, 0.97);
+    backdrop-filter: blur(20px);
+    padding: 1.5rem;
+    gap: 1.2rem;
+    z-index: 999;
+    border-bottom: 1px solid rgba(196, 168, 232, 0.1);
+  }
+
+  .navbar-hamburguesa.abierto span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .navbar-hamburguesa.abierto span:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar-hamburguesa.abierto span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .navbar-logo { font-size: 1.3rem; }
+
+  .hero {
+    padding: 7rem 1.5rem 3rem;
+    min-height: 100svh;
+  }
+  .hero-titulo { font-size: 3rem; }
+  .hero-subtitulo { font-size: 0.95rem; }
+
+  .catalogo {
+    padding: var(--space-8) var(--space-4);
+  }
+  .catalogo-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  .nosotros { padding: 4rem 1.5rem; }
+  .seccion-titulo { font-size: 2.2rem; }
+  .nosotros-valores {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  .nosotros-texto-grande { font-size: 1.3rem; }
+
+  .contacto { padding: 4rem 1.5rem; }
+  .contacto-contenido {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer { padding: 3rem 1.5rem 2rem; }
+  .footer-contenido {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .footer-descripcion { max-width: 100%; }
+  .footer-inferior {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .verificacion-caja {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  .verificacion-logo { font-size: 2rem; }
+  .verificacion-titulo { font-size: 1.3rem; }
+
+  .carrito-sidebar {
+    width: 100vw;
+    right: -100vw;
+  }
+
+  .checkout-page {
+    padding-top: 5rem;
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .checkout-summary-section {
+    position: static;
+    order: -1;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .confirmacion-card h1 {
+    font-size: 2rem;
+  }
+}
+
+/* ---- Móvil extra pequeño ≤ 480px ---- */
+@media (max-width: 480px) {
+  .catalogo-grid {
+    grid-template-columns: 1fr;
+  }
+  .producto-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  .btn-agregar-carrito {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ---- Tablet 769px – 1024px ---- */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .hero-titulo { font-size: 3.5rem; }
+  .hero { padding: 7rem 2rem 3rem; }
+
+  .nosotros-valores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .nosotros,
+  .contacto {
+    padding: 5rem 2rem;
+  }
+
+  .catalogo {
+    padding: var(--space-12) var(--space-8);
+  }
+  .catalogo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}

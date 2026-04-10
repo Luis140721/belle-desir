@@ -1,0 +1,897 @@
+/* ============================================
+   BELLE DÉSIR — Hoja de estilos principal
+   Versión 2.0 — Diseño Editorial Premium
+   ============================================ */
+
+/* --- VARIABLES DE COLOR --- */
+:root {
+  --negro-ciruela:  #120B18;
+  --violeta-premium: #5B2A86;
+  --ciruela-medio:  #2A163A;
+  --morado-oscuro:  #2D1B69;
+  --lila-medio:     #7B5EA7;
+  --lila-claro:     #C4A8E8;
+  --champana:       #F5EDE1;
+  --gris-perla:     #F0EAF8;
+  --blanco:         #FFFFFF;
+  --texto-oscuro:   #1a1a2e;
+  --texto-gris:     #9a8fb0;
+}
+
+/* --- RESET --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- BASE --- */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--negro-ciruela);
+  color: var(--champana);
+  line-height: 1.6;
+}
+
+/* --- CLASE OCULTO --- */
+.oculto {
+  display: none;
+}
+
+
+/* ============================================
+   VERIFICACIÓN DE EDAD
+   ============================================ */
+
+.verificacion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, #2A163A 0%, #120B18 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.verificacion-caja {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(196, 168, 232, 0.15);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+}
+
+.verificacion-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--champana);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.verificacion-linea {
+  width: 50px;
+  height: 1px;
+  background-color: var(--lila-claro);
+  margin: 0.8rem auto 1.5rem;
+}
+
+.verificacion-subtitulo {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 0.8rem;
+}
+
+.verificacion-titulo {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--champana);
+  margin-bottom: 1rem;
+}
+
+.verificacion-texto {
+  font-size: 0.9rem;
+  color: var(--texto-gris);
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+
+.verificacion-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn-primario {
+  background: linear-gradient(135deg, var(--violeta-premium), var(--morado-oscuro));
+  color: var(--champana);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primario::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primario:hover::before {
+  left: 100%;
+}
+
+.btn-primario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(91, 42, 134, 0.5);
+}
+
+.btn-secundario {
+  background-color: transparent;
+  color: var(--texto-gris);
+  border: 1px solid rgba(196, 168, 232, 0.2);
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secundario:hover {
+  border-color: var(--lila-claro);
+  color: var(--lila-claro);
+}
+
+
+/* ============================================
+   NAVBAR — glassmorphism
+   ============================================ */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(18, 11, 24, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196, 168, 232, 0.1);
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+}
+
+.navbar-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--champana);
+  letter-spacing: 0.1em;
+}
+
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+}
+
+.navbar-menu a {
+  color: rgba(196, 168, 232, 0.7);
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.navbar-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--lila-claro);
+  transition: width 0.3s ease;
+}
+
+.navbar-menu a:hover {
+  color: var(--champana);
+}
+
+.navbar-menu a:hover::after {
+  width: 100%;
+}
+
+.navbar-carrito {
+  color: var(--lila-claro);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.navbar-carrito:hover {
+  transform: scale(1.15);
+}
+
+
+/* ============================================
+   HERO
+   ============================================ */
+
+.hero {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(91, 42, 134, 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(45, 27, 105, 0.3) 0%, transparent 50%),
+    var(--negro-ciruela);
+  display: flex;
+  align-items: center;
+  padding: 8rem 3rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de luz decorativa de fondo */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(91, 42, 134, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-contenido {
+  max-width: 650px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 1.5rem;
+}
+
+.hero-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5rem;
+  font-weight: 300;
+  color: var(--champana);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.hero-titulo em {
+  color: var(--lila-claro);
+  font-style: italic;
+}
+
+.hero-subtitulo {
+  font-size: 1rem;
+  color: var(--texto-gris);
+  margin-bottom: 2.5rem;
+  max-width: 480px;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+
+/* ============================================
+   SECCIÓN NOSOTROS
+   ============================================ */
+
+.nosotros {
+  background: linear-gradient(180deg, var(--negro-ciruela) 0%, var(--ciruela-medio) 50%, var(--negro-ciruela) 100%);
+  padding: 7rem 3rem;
+  position: relative;
+}
+
+.nosotros-encabezado {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.seccion-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 1rem;
+}
+
+.seccion-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--champana);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.seccion-titulo em {
+  color: var(--lila-claro);
+  font-style: italic;
+}
+
+.seccion-linea {
+  width: 50px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lila-claro), transparent);
+  margin: 0 auto;
+}
+
+.nosotros-mision {
+  max-width: 720px;
+  margin: 0 auto 5rem;
+  text-align: center;
+}
+
+.nosotros-texto-grande {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  font-weight: 300;
+  color: var(--champana);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.nosotros-texto {
+  font-size: 0.95rem;
+  color: var(--texto-gris);
+  line-height: 1.9;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
+
+/* Tarjetas de valores */
+.nosotros-valores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.valor-tarjeta {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(196, 168, 232, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+.valor-tarjeta:hover {
+  background: rgba(91, 42, 134, 0.15);
+  border-color: rgba(196, 168, 232, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(91, 42, 134, 0.2);
+}
+
+.valor-icono {
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.valor-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--champana);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.05em;
+}
+
+.valor-texto {
+  font-size: 0.9rem;
+  color: var(--texto-gris);
+  line-height: 1.8;
+}
+
+
+/* ============================================
+   SECCIÓN CONTACTO
+   ============================================ */
+
+.contacto {
+  background: var(--negro-ciruela);
+  padding: 7rem 3rem;
+  position: relative;
+}
+
+.contacto::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(91, 42, 134, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.contacto-contenido {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.contacto-descripcion {
+  font-size: 0.95rem;
+  color: var(--texto-gris);
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+
+.contacto-lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contacto-lista li {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--champana);
+  letter-spacing: 0.02em;
+}
+
+.contacto-lista-icono {
+  font-size: 1.1rem;
+  width: 28px;
+  text-align: center;
+}
+
+/* Tarjeta WhatsApp */
+.whatsapp-tarjeta {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(196, 168, 232, 0.12);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.whatsapp-header {
+  background: linear-gradient(135deg, #075E54, #128C7E);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.whatsapp-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(196, 168, 232, 0.3);
+  color: var(--champana);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+.whatsapp-nombre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--blanco);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+}
+
+.whatsapp-estado {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.75);
+  margin-top: 2px;
+}
+
+.whatsapp-burbuja {
+  background-color: #1a0f24;
+  padding: 1.5rem;
+  min-height: 120px;
+}
+
+.whatsapp-burbuja p {
+  background: rgba(91, 42, 134, 0.3);
+  border: 1px solid rgba(196, 168, 232, 0.1);
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  border-radius: 0 12px 12px 12px;
+  font-size: 0.9rem;
+  color: var(--champana);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  max-width: 90%;
+}
+
+.whatsapp-hora {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--texto-gris);
+  text-align: right;
+  margin-top: 4px;
+}
+
+.whatsapp-btn {
+  display: block;
+  background: linear-gradient(135deg, #25D366, #20BA5A);
+  color: var(--blanco);
+  text-align: center;
+  padding: 1.1rem;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+  background: linear-gradient(135deg, #20BA5A, #1aa34a);
+  letter-spacing: 0.12em;
+}
+
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.footer {
+  background: #0a0610;
+  padding: 4rem 3rem 2rem;
+  border-top: 1px solid rgba(196, 168, 232, 0.08);
+}
+
+.footer-contenido {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  padding-bottom: 3rem;
+}
+
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--champana);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.footer-linea {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--lila-claro), transparent);
+  margin: 0.8rem 0;
+}
+
+.footer-slogan {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lila-claro);
+  margin-bottom: 1rem;
+}
+
+.footer-descripcion {
+  font-size: 0.85rem;
+  color: var(--texto-gris);
+  line-height: 1.8;
+  max-width: 260px;
+}
+
+.footer-titulo-col {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--champana);
+  font-weight: 500;
+  margin-bottom: 1.2rem;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.footer-links a {
+  color: var(--texto-gris);
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.footer-links a:hover {
+  color: var(--lila-claro);
+  padding-left: 8px;
+}
+
+.footer-contacto-info li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  color: var(--texto-gris);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.footer-divisor {
+  max-width: 1100px;
+  margin: 0 auto 1.5rem;
+  height: 1px;
+  background: rgba(196, 168, 232, 0.08);
+}
+
+.footer-inferior {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: rgba(154, 143, 176, 0.4);
+  letter-spacing: 0.05em;
+}
+
+.footer-aviso {
+  font-size: 0.8rem;
+  color: rgba(154, 143, 176, 0.4);
+}
+
+.footer-pagos {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pago-badge {
+  background: rgba(196, 168, 232, 0.06);
+  border: 1px solid rgba(196, 168, 232, 0.12);
+  color: var(--texto-gris);
+  font-size: 0.7rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================
+   MENÚ HAMBURGUESA
+   ============================================ */
+
+.navbar-hamburguesa {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  min-width: 30px;
+}
+
+.navbar-hamburguesa span {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background-color: var(--lila-claro);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+
+/* ============================================
+   RESPONSIVE — Celular
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  .navbar-hamburguesa {
+    display: flex !important;
+  }
+
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .navbar-menu.abierto {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    background: rgba(18, 11, 24, 0.97);
+    backdrop-filter: blur(20px);
+    padding: 1.5rem;
+    gap: 1.2rem;
+    z-index: 999;
+    border-bottom: 1px solid rgba(196, 168, 232, 0.1);
+  }
+
+  .navbar-hamburguesa.abierto span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .navbar-hamburguesa.abierto span:nth-child(2) {
+    opacity: 0;
+  }
+  .navbar-hamburguesa.abierto span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .navbar-logo {
+    font-size: 1.3rem;
+  }
+
+  .hero {
+    padding: 7rem 1.5rem 3rem;
+    min-height: 100svh;
+  }
+
+  .hero-titulo {
+    font-size: 3rem;
+  }
+
+  .hero-subtitulo {
+    font-size: 0.95rem;
+  }
+
+  .nosotros {
+    padding: 4rem 1.5rem;
+  }
+
+  .seccion-titulo {
+    font-size: 2.2rem;
+  }
+
+  .nosotros-valores {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .nosotros-texto-grande {
+    font-size: 1.3rem;
+  }
+
+  .contacto {
+    padding: 4rem 1.5rem;
+  }
+
+  .contacto-contenido {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .footer {
+    padding: 3rem 1.5rem 2rem;
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer-descripcion {
+    max-width: 100%;
+  }
+
+  .footer-inferior {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .verificacion-caja {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .verificacion-logo {
+    font-size: 2rem;
+  }
+
+  .verificacion-titulo {
+    font-size: 1.3rem;
+  }
+}
+
+
+/* ============================================
+   Tablets — entre 769px y 1024px
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .hero-titulo {
+    font-size: 3.5rem;
+  }
+
+  .nosotros-valores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-contenido {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .hero {
+    padding: 7rem 2rem 3rem;
+  }
+
+  .nosotros,
+  .contacto {
+    padding: 5rem 2rem;
+  }
+}
