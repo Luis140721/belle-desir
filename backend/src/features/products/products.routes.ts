@@ -5,7 +5,7 @@ import { authenticate } from '../../middleware/authenticate';
 import { authorize } from '../../middleware/authorize';
 import { createProductSchema, updateProductSchema } from './products.schemas';
 import { asyncHandler } from '../../shared/utils/asyncHandler';
-import { upload } from '../../middleware/uploadMiddleware';
+import { upload } from '../../config/multer';
 
 export const productRoutes = Router();
 

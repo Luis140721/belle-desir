@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { ProductService } from './products.service';
 import { sendResponse } from '../../shared/utils/response';
-import { env } from '../../config/env';
+import { upload } from '../../config/multer';
+import cloudinary from '../../config/cloudinary';
 
 export class ProductController {
   
@@ -106,12 +107,11 @@ export class ProductController {
     }
 
     const files = req.files as Express.Multer.File[];
-    const baseUrl = env.FRONTEND_URL.replace('5173', '3001'); // Simple local url fallback if needed. In prod, map appropriately
-    const hostUrl = req.protocol + '://' + req.get('host');
     
-    const imagePaths = files.map((file) => `${hostUrl}/uploads/${file.filename}`);
+    // Cloudinary returns path (which contains the secure_url)
+    const imageUrls = files.map((file) => file.path);
 
-    const product = await ProductService.addImages((req.params.id as string), imagePaths);
+    const product = await ProductService.addImages((req.params.id as string), imageUrls);
     sendResponse(res, 200, product);
   }
 
@@ -120,6 +120,18 @@ export class ProductController {
     if (!imageUrl) {
       return sendResponse(res, 400, { message: 'ImageUrl is required' });
     }
+
+    // Extract public_id from Cloudinary URL to delete from Cloudinary
+    const publicId = imageUrl.split('/').pop()?.split('.')[0];
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (error) {
+        console.error('Error deleting from Cloudinary:', error);
+        // Continue with database removal even if Cloudinary deletion fails
+      }
+    }
+
     const product = await ProductService.removeImage((req.params.id as string), imageUrl);
     sendResponse(res, 200, product);
   }
