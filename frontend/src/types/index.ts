@@ -34,6 +34,12 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface GuestInfo {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export interface ShippingAddress {
   name: string;
   address: string;
@@ -74,6 +80,12 @@ export interface OrderResponse {
   orderId: string;
   checkoutUrl: string | null;
   paymentLink: string | null;
+}
+
+export interface GuestOrderPayload {
+  guestInfo: GuestInfo;
+  shippingAddress: ShippingAddress;
+  items: CartItem[];
 }
 
 // Respuesta paginada de /api/products

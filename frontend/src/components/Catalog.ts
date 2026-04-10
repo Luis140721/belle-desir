@@ -9,6 +9,7 @@ import { getAllProducts, getProductsByCategory } from '../services/productServic
 import { ProductCard } from './ProductCard.js';
 import { emit } from '../utils/events.js';
 import { toNumber } from '../utils/currency.js';
+import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
 
 export async function initCatalogo(): Promise<void> {
   const grid     = document.getElementById('catalogo-grid') as HTMLDivElement | null;
@@ -41,6 +42,13 @@ export async function initCatalogo(): Promise<void> {
       id: string; nombre: string; precio: string; imagen: string;
     };
 
+    // Ejecutar animación fly-to-cart desde el botón
+    const cartIconEl = findCartIcon();
+    
+    if (cartIconEl) {
+      flyToCart(btn, cartIconEl);
+    }
+
     emit('cart:add', {
       id,
       name: nombre,
@@ -50,7 +58,7 @@ export async function initCatalogo(): Promise<void> {
     });
 
     // Feedback visual momentáneo
-    btn.textContent = '✓ Agregado';
+    btn.textContent = '¡Agregado!';
     btn.classList.add('agregado');
     btn.disabled = true;
     setTimeout(() => {

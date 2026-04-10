@@ -695,6 +695,40 @@
   gap: 1rem;
 }
 
+.guest-login-banner {
+  background: rgba(196, 168, 232, 0.08);
+  border: 1px solid rgba(196, 168, 232, 0.16);
+  border-radius: var(--radius-sm);
+  color: var(--texto-gris);
+  font-size: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.guest-login-banner a {
+  color: var(--lila-claro);
+  text-decoration: none;
+}
+
+.guest-login-banner a:hover {
+  text-decoration: underline;
+}
+
+.guest-info-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(196, 168, 232, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+
+.guest-info-title {
+  color: var(--lila-claro);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

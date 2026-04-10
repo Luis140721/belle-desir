@@ -8,9 +8,9 @@
 import type { CartItem } from '../types/index.js';
 import { on, emit } from '../utils/events.js';
 import { formatCOP } from '../utils/currency.js';
-import { isLoggedIn } from '../services/authService.js';
 
 let items: CartItem[] = [];
+const CART_STORAGE_KEY = 'belle-desir-cart';
 
 // ── API pública ───────────────────────────────────────────────
 
@@ -24,6 +24,9 @@ export function initCartSidebar(): void {
   const contEl   = document.getElementById('contador-carrito') as HTMLElement | null;
 
   if (!sidebar) return;
+  items = loadCartFromStorage();
+  actualizarContador(contEl);
+  renderItems(itemsEl, totalEl);
 
   // ── Apertura y cierre del sidebar ────────────────────────
   function abrir(): void {
@@ -50,7 +53,7 @@ export function initCartSidebar(): void {
   overlay?.addEventListener('click', cerrar);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(); });
 
-  // ── Agregar ítems ─────────────────────────────────────────
+  // ── Agregar ítems ─────────────────────────────────────────// Agregar ítems (sin abrir automáticamente el sidebar)
   on('cart:add', (item) => {
     const existe = items.find((i) => i.id === item.id);
     if (existe) {
@@ -60,7 +63,9 @@ export function initCartSidebar(): void {
     }
     actualizarContador(contEl);
     renderItems(itemsEl, totalEl);
-    abrir();
+    saveCartToStorage();
+    // Ya no se abre automáticamente el sidebar al agregar productos
+    // abrir();
   });
 
   // ── Delegación de clics dentro del carrito ────────────────
@@ -76,6 +81,7 @@ export function initCartSidebar(): void {
       if (item.quantity <= 0) items = items.filter((i) => i.id !== id);
       actualizarContador(contEl);
       renderItems(itemsEl, totalEl);
+      saveCartToStorage();
       return;
     }
 
@@ -84,6 +90,7 @@ export function initCartSidebar(): void {
       items = items.filter((i) => i.id !== btnElim.dataset.eliminar);
       actualizarContador(contEl);
       renderItems(itemsEl, totalEl);
+      saveCartToStorage();
     }
   });
 
@@ -94,20 +101,42 @@ export function initCartSidebar(): void {
       return;
     }
     
-    if (!isLoggedIn()) {
-      window.location.href = '/login?redirect=/checkout';
-      return;
-    }
-
     window.location.href = '/checkout';
   });
+}
+
+function saveCartToStorage(): void {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+}
+
+function loadCartFromStorage(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as CartItem[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item) =>
+      Boolean(item?.id) &&
+      Boolean(item?.name) &&
+      Number.isFinite(Number(item?.price)) &&
+      Number.isFinite(Number(item?.quantity))
+    );
+  } catch {
+    return [];
+  }
 }
 
 // ── Helpers privados ──────────────────────────────────────────
 
 function actualizarContador(el: HTMLElement | null): void {
   if (!el) return;
-  el.textContent = String(items.reduce((s, i) => s + i.quantity, 0));
+  const totalItems = items.reduce((s, i) => s + i.quantity, 0);
+  
+  if (totalItems === 0) {
+    el.textContent = ''; // Ocultar el badge cuando está vacío
+  } else {
+    el.textContent = String(totalItems); // Mostrar el número de items
+  }
 }
 
 function renderItems(

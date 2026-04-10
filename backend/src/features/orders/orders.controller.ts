@@ -11,6 +11,13 @@ export class OrderController {
   static async createOrder(req: Request, res: Response) {
     // req.user puede ser undefined si vino sin JWT (invitado)
     const userId = req.user?.id ?? null;
+    console.log('[orders] createOrder request', {
+      userId,
+      hasAuthHeader: Boolean(req.headers.authorization),
+      hasGuestEmail: Boolean(req.body?.guestEmail),
+      itemsCount: Array.isArray(req.body?.items) ? req.body.items.length : 0,
+      path: req.path,
+    });
     const result = await OrderService.createOrder(userId, req.body);
     sendResponse(res, 201, result);
   }

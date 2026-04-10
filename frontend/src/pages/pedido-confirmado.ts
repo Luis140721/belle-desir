@@ -1,7 +1,7 @@
 const SOPORTE_WHATSAPP = '573159739914';
 
 function limpiarCarritoLocal(): void {
-  const keys = ['cart', 'carrito', 'cartItems', 'checkoutCart', 'belle_cart'];
+  const keys = ['belle-desir-cart', 'cart', 'carrito', 'cartItems', 'checkoutCart', 'belle_cart'];
   keys.forEach((key) => localStorage.removeItem(key));
 }
 
