@@ -136,4 +136,63 @@ export class AuthController {
     const result = await AuthService.getMe(req.user!.id);
     sendResponse(res, 200, result);
   }
+
+  /**
+   * @swagger
+   * /auth/forgot-password:
+   *   post:
+   *     summary: Request password reset
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *     responses:
+   *       200:
+   *         description: Password reset email sent
+   */
+  static async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    await AuthService.forgotPassword(email);
+    sendResponse(res, 200, { message: 'Password reset instructions sent to your email' });
+  }
+
+  /**
+   * @swagger
+   * /auth/reset-password:
+   *   post:
+   *     summary: Reset password with token
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - token
+   *               - password
+   *             properties:
+   *               token:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *                 minLength: 8
+   *     responses:
+   *       200:
+   *         description: Password reset successfully
+   */
+  static async resetPassword(req: Request, res: Response) {
+    const { token, password } = req.body;
+    await AuthService.resetPassword(token, password);
+    sendResponse(res, 200, { message: 'Password reset successfully' });
+  }
 }

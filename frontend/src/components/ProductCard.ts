@@ -15,6 +15,8 @@ export function ProductCard(product: Product): string {
   const precio = formatCOP(toNumber(product.price));
   const imagen = product.images?.[0];
   const categoria = product.category?.name ?? '';
+  const inStock = (product as any).inStock ?? product.stock > 0;
+  const stockBajo = product.stock > 0 && product.stock <= 5;
 
   const imgHtml = imagen
     ? `<img src="${imagen}" alt="${escapeHtml(product.name)}" loading="lazy">`
@@ -24,11 +26,19 @@ export function ProductCard(product: Product): string {
     <article class="producto-card" data-product-id="${product.id}">
       <div class="producto-card-imagen">
         ${imgHtml}
+        ${!inStock ? '<div class="out-of-stock-overlay">Agotado</div>' : ''}
       </div>
       <div class="producto-card-info">
         ${categoria ? `<span class="seccion-eyebrow" style="font-size:0.65rem">${escapeHtml(categoria)}</span>` : ''}
         <h3 class="producto-card-nombre">${escapeHtml(product.name)}</h3>
         <p class="producto-card-descripcion">${escapeHtml(product.description)}</p>
+        
+        <!-- Stock indicators -->
+        <div class="stock-indicators">
+          ${!inStock ? '<span class="stock-badge out-of-stock">Agotado</span>' : ''}
+          ${stockBajo ? `<span class="stock-badge low-stock">Últimas ${product.stock} unidades</span>` : ''}
+        </div>
+        
         <div class="producto-card-footer">
           <span class="producto-card-precio">${precio}</span>
           <button
@@ -38,8 +48,9 @@ export function ProductCard(product: Product): string {
             data-precio="${toNumber(product.price)}"
             data-imagen="${imagen ?? ''}"
             aria-label="Agregar ${escapeHtml(product.name)} al carrito"
+            ${!inStock ? 'disabled' : ''}
           >
-            + Agregar
+            ${!inStock ? 'Agotado' : '+ Agregar'}
           </button>
         </div>
       </div>

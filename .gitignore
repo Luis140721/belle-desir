@@ -19,11 +19,14 @@ build/
 **/build/
 
 # Uploads locales
-backend/uploads/
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Logs
 logs/
 *.log
+*.tmp
+*.bak
 npm-debug.log*
 yarn-error.log
 
@@ -47,6 +50,8 @@ desktop.ini
 
 # Coverage
 coverage/
+.cache/
+
 # Backend
 backend/node_modules/
 backend/dist/
@@ -55,6 +60,24 @@ backend/.env
 # Frontend
 frontend/assets/uploads/
 
+# Test and QA files
+TEST_REPORT.md
+*.ps1
+test_*.ps1
+debug_*.ps1
+final_*.ps1
+*_test.txt
+access_token.txt
+product_id.txt
+product_slug.txt
+
+# HTTP test files
+*.http
+*.rest
+
 # General
 .DS_Store
+Thumbs.db
 *.log
+*.tmp
+*.bak

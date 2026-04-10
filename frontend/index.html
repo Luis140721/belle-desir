@@ -72,8 +72,19 @@
         <li><a href="#contacto">Contacto</a></li>
       </ul>
 
-      <div class="navbar-carrito" role="button" tabindex="0" aria-label="Abrir carrito">
-        🛒 <span id="contador-carrito">0</span>
+      <!-- Right side elements -->
+      <div class="navbar-right">
+        <!-- Search button with navbar style -->
+        <a href="#" id="btn-search" aria-label="Buscar productos" class="navbar-search-link">Buscar</a>
+
+        <!-- User menu -->
+        <div class="navbar-user" id="navbar-user">
+          <!-- Content will be dynamically inserted based on auth state -->
+        </div>
+
+        <div class="navbar-carrito" role="button" tabindex="0" aria-label="Abrir carrito">
+          🛒 <span id="contador-carrito">0</span>
+        </div>
       </div>
     </nav>
     <!-- FIN navbar -->

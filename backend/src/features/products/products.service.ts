@@ -45,7 +45,19 @@ export class ProductService {
         take,
         skip,
         orderBy,
-        include: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          price: true,
+          comparePrice: true,
+          stock: true,
+          sku: true,
+          images: true,
+          isFeatured: true,
+          isActive: true,
+          categoryId: true,
           category: { select: { name: true, slug: true } },
         },
       }),
@@ -67,7 +79,19 @@ export class ProductService {
   static async getBySlug(slug: string) {
     const product = await prisma.product.findUnique({
       where: { slug, isActive: true },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        price: true,
+        comparePrice: true,
+        stock: true,
+        sku: true,
+        images: true,
+        isFeatured: true,
+        isActive: true,
+        categoryId: true,
         category: true,
         reviews: {
           where: { isVerifiedPurchase: true },

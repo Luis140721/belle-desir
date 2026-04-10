@@ -4,8 +4,20 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Check if API key is available
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@belledesir.com';
+
+let resend: Resend | null = null;
+let emailServiceEnabled = false;
+
+if (RESEND_API_KEY) {
+  resend = new Resend(RESEND_API_KEY);
+  emailServiceEnabled = true;
+  console.log('[EmailService] Email service enabled with Resend');
+} else {
+  console.warn('[EmailService] RESEND_API_KEY not found. Email service disabled.');
+}
 
 export interface OrderData {
   id: string;
@@ -26,6 +38,11 @@ export interface OrderData {
 }
 
 export async function sendOrderConfirmation(to: string, orderData: OrderData): Promise<void> {
+  if (!emailServiceEnabled || !resend) {
+    console.warn('[EmailService] Email service disabled, skipping order confirmation');
+    return;
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -111,6 +128,11 @@ export async function sendOrderConfirmation(to: string, orderData: OrderData): P
 }
 
 export async function sendPasswordReset(to: string, resetLink: string): Promise<void> {
+  if (!emailServiceEnabled || !resend) {
+    console.warn('[EmailService] Email service disabled, skipping password reset');
+    return;
+  }
+
   try {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -172,6 +194,11 @@ export async function sendPasswordReset(to: string, resetLink: string): Promise<
 }
 
 export async function sendOrderStatusUpdate(to: string, orderData: OrderData, newStatus: string): Promise<void> {
+  if (!emailServiceEnabled || !resend) {
+    console.warn('[EmailService] Email service disabled, skipping order status update');
+    return;
+  }
+
   try {
     let subject: string;
     let statusMessage: string;

@@ -3,6 +3,8 @@
 // Maneja el menú hamburguesa y la clase "scrolled"
 // ============================================================
 
+import { initUserMenu } from './UserMenu.js';
+
 export function initNavbar(): void {
   const btnMenu = document.getElementById('btn-menu') as HTMLButtonElement | null;
   const menu    = document.getElementById('navbar-menu') as HTMLUListElement | null;
@@ -46,4 +48,7 @@ export function initNavbar(): void {
       { passive: true }
     );
   }
+
+  // Inicializar menú de usuario
+  initUserMenu();
 }

@@ -22,6 +22,10 @@
     padding: 1rem 1.5rem;
   }
 
+  .navbar-right {
+    gap: 0.75rem;
+  }
+
   .navbar-menu {
     display: none;
   }
