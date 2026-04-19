@@ -158,6 +158,33 @@
     width: 100%;
     justify-content: space-between;
   }
+  
+  /* Auth Pages & Misc Pages Padding fixing (behind navbar) */
+  .login-page,
+  .register-page,
+  .forgot-password-page,
+  .reset-password-page,
+  .order-history-page,
+  .order-detail-page {
+    padding: 6rem 1.2rem 3rem;
+  }
+  
+  /* Order pages tweaks */
+  .order-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .order-card-header,
+  .order-summary {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  .order-card-body {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
 }
 
 /* ---- Móvil extra pequeño ≤ 480px ---- */
