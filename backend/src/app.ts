@@ -51,7 +51,9 @@ const allowedOrigins = [
   'http://localhost:5175',
   env.FRONTEND_URL,
   env.ADMIN_URL,
-].filter(Boolean);
+].filter(Boolean) as string[];
+
+console.log('🔒 CORS allowed origins:', allowedOrigins);
 
 app.use(
   cors({
@@ -59,7 +61,8 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        console.warn(`⛔ CORS blocked origin: "${origin}"`);
+        callback(null, false);
       }
     },
     credentials: true,
