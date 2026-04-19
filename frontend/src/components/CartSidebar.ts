@@ -46,14 +46,15 @@ export function initCartSidebar(): void {
   on('cart:open', abrir);
   on('cart:close', cerrar);
 
-  // Icono del carrito en navbar
+  // Icono del carrito en navbar y FAB
   document.querySelector('.navbar-carrito')?.addEventListener('click', () => emit('cart:open'));
+  document.getElementById('floating-cart-btn')?.addEventListener('click', () => emit('cart:open'));
 
   btnCerra?.addEventListener('click', cerrar);
   overlay?.addEventListener('click', cerrar);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(); });
 
-  // ── Agregar ítems ─────────────────────────────────────────// Agregar ítems (sin abrir automáticamente el sidebar)
+  // ── Agregar ítems ─────────────────────────────────────────
   on('cart:add', (item) => {
     const existe = items.find((i) => i.id === item.id);
     if (existe) {
@@ -65,7 +66,6 @@ export function initCartSidebar(): void {
     renderItems(itemsEl, totalEl);
     saveCartToStorage();
     // Ya no se abre automáticamente el sidebar al agregar productos
-    // abrir();
   });
 
   // ── Delegación de clics dentro del carrito ────────────────
@@ -129,13 +129,26 @@ function loadCartFromStorage(): CartItem[] {
 // ── Helpers privados ──────────────────────────────────────────
 
 function actualizarContador(el: HTMLElement | null): void {
-  if (!el) return;
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
   
-  if (totalItems === 0) {
-    el.textContent = ''; // Ocultar el badge cuando está vacío
-  } else {
-    el.textContent = String(totalItems); // Mostrar el número de items
+  if (el) {
+    if (totalItems === 0) {
+      el.textContent = ''; // Ocultar el badge cuando está vacío
+    } else {
+      el.textContent = String(totalItems); // Mostrar el número de items
+    }
+  }
+
+  // Update FAB badge as well
+  const fabBadge = document.getElementById('floating-contador-carrito');
+  if (fabBadge) {
+    if (totalItems === 0) {
+      fabBadge.textContent = '';
+      fabBadge.style.display = 'none';
+    } else {
+      fabBadge.textContent = String(totalItems);
+      fabBadge.style.display = 'flex';
+    }
   }
 }
 
