@@ -9,20 +9,33 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('3001'),
   DATABASE_URL: z.string().url(),
-  JWT_ACCESS_SECRET: z.string().min(1),
-  JWT_REFRESH_SECRET: z.string().min(1),
+  
+  // JWT Configuration
+  JWT_SECRET: z.string().min(32),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-  WOMPI_PUBLIC_KEY: z.string().min(1).optional(), // Not strictly required for the backend webhook but useful
-  WOMPI_EVENTS_SECRET: z.string().min(1),
-  // Puede ser una URL o varias separadas por coma: "http://a.com,http://b.com"
-  FRONTEND_URL: z.string().min(1),
-  ALLOWED_ORIGINS: z.string().default('http://localhost:5173'),
-  STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('local'),
   
-  // Bold
+  // CORS URLs
+  FRONTEND_URL: z.string().url(),
+  ADMIN_URL: z.string().url(),
+  
+  // Storage Provider
+  STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('cloudinary'),
+  
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
+  
+  // Bold Colombia Payments
   BOLD_API_KEY: z.string().min(1),
   BOLD_INTEGRITY_SECRET: z.string().min(1),
+  
+  // Resend Email Service
+  RESEND_API_KEY: z.string().min(1).optional(),
+  FROM_EMAIL: z.string().email().optional(),
 });
 
 const _env = envSchema.safeParse(process.env);

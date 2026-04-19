@@ -1,6 +1,8 @@
 // ============================================================
-// SERVICE — Auth: registro, login, gestión del token
+// SERVICE - Auth: registro, login, gestión del token
 // ============================================================
+
+import { buildApiUrl } from '../config/api';
 
 export interface AuthPayload {
   id: string;
@@ -16,7 +18,7 @@ export interface AuthResponse {
 }
 
 export async function login(email: string, password: string): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/login', {
+  const res = await fetch(buildApiUrl('/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -34,7 +36,7 @@ export async function register(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/register', {
+  const res = await fetch(buildApiUrl('/auth/register'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),

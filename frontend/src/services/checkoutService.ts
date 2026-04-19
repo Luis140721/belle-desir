@@ -13,6 +13,7 @@ import type {
   CartItem,
 } from '../types/index.js';
 import { getAccessToken } from './authService.js';
+import { buildApiUrl } from '../config/api.js';
 
 // ── Tipos ─────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ export async function createOrder(
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuario no autenticado');
 
-  const res = await fetch('/api/orders', {
+  const res = await fetch(buildApiUrl('/orders'), {
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
@@ -62,7 +63,7 @@ export async function getCart(): Promise<CartResponse> {
   const token = localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuario no autenticado');
 
-  const res = await fetch('/api/cart', {
+  const res = await fetch(buildApiUrl('/cart'), {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -99,7 +100,7 @@ export async function createAuthOrder(
   const token = tokenOverride ?? getAccessToken();
   if (!token) throw new Error('Usuario no autenticado');
 
-  const res = await fetch('/api/orders', {
+  const res = await fetch(buildApiUrl('/orders'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -153,7 +154,7 @@ export async function createGuestOrder(payload: GuestOrderPayload | Record<strin
     },
   });
 
-  const res = await fetch('/api/orders', {
+  const res = await fetch(buildApiUrl('/orders'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
