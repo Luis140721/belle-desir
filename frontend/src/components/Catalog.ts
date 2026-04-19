@@ -99,7 +99,7 @@ function renderError(grid: HTMLElement, loading: HTMLElement | null): void {
   grid.innerHTML = /* html */ `
     <div class="catalogo-error">
       <p>No pudimos cargar los productos.</p>
-      <p class="hint">¿El backend está corriendo en <strong>http://localhost:3001</strong>?</p>
+      <p class="hint">¿El backend está corriendo?</p>
       <button onclick="location.reload()" class="btn-secundario">
         Reintentar
       </button>
