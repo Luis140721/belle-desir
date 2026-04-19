@@ -3,7 +3,6 @@
 // Formulario para restablecer contraseña con token
 // ============================================================
 
-import { getAccessToken } from '../utils/auth';
 import { buildApiUrl } from '../config/api';
 
 export function initResetPasswordPage(): void {

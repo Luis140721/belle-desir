@@ -12,7 +12,7 @@ import type {
   ShippingAddress,
   CartItem,
 } from '../types/index.js';
-import { getAccessToken } from '../utils/auth';
+// TODO: centralizar lectura del token en un helper (utils/auth) cuando se cree
 import { buildApiUrl } from '../config/api.js';
 
 // ── Tipos ─────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ export async function createAuthOrder(
   payload: CheckoutPayload,
   tokenOverride?: string
 ): Promise<CheckoutResponse> {
-  const token = tokenOverride ?? getAccessToken();
+  const token = tokenOverride ?? localStorage.getItem('accessToken');
   if (!token) throw new Error('Usuario no autenticado');
 
   const res = await fetch(buildApiUrl('/orders'), {

@@ -3,9 +3,7 @@
 // Funcionalidad de búsqueda con dropdown y debounce
 // ============================================================
 
-import { debounce } from '../utils/debounce.js';
-import { formatCOP } from '../utils/currency.js';
-import { emit } from '../utils/events.js';
+import { formatCOP, toNumber } from '../utils/currency.js';
 import { buildApiUrl } from '../config/api';
 
 interface SearchResult {
