@@ -133,6 +133,31 @@
   .confirmacion-card h1 {
     font-size: 2rem;
   }
+  
+  /* Product Detail Page Responsive Constraints */
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .product-detail-page {
+    padding-top: 5rem;
+  }
+  .product-gallery {
+    position: static;
+  }
+  .product-title {
+    font-size: 2rem;
+  }
+  .product-price {
+    font-size: 1.7rem;
+  }
+  .product-actions {
+    grid-template-columns: 1fr;
+  }
+  .quantity-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 /* ---- Móvil extra pequeño ≤ 480px ---- */
