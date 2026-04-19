@@ -70,19 +70,48 @@ export async function initCatalogo(): Promise<void> {
 
   // ── Delegación de eventos: botones de carrusel ──────────────
   grid.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.carousel-btn');
-    if (!btn) return;
+    const target = e.target as HTMLElement;
     
-    const carousel = btn.closest('.card-carousel');
-    const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
-    if (!carousel || !track) return;
+    // Capturar clics en prev/next
+    const btn = target.closest<HTMLButtonElement>('.carousel-btn');
+    if (btn) {
+      // Prevents event from bubbling and maybe causing Catalog bugs
+      e.stopPropagation();
+      e.preventDefault();
+      
+      const carousel = btn.closest('.card-carousel');
+      const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
+      if (!carousel || !track) return;
+      
+      const scrollAmount = track.clientWidth;
+      if (btn.classList.contains('next-btn')) {
+        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      } else if (btn.classList.contains('prev-btn')) {
+        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }
+      return;
+    }
     
-    // Asumimos que cada imagen ocupa el 100% del track
-    const scrollAmount = track.clientWidth;
-    if (btn.classList.contains('next-btn')) {
-      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    } else if (btn.classList.contains('prev-btn')) {
-      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    // Capturar clics en los indicadores (puntitos)
+    const indicator = target.closest<HTMLElement>('.indicator');
+    if (indicator) {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      const indicatorSpan = indicator as HTMLElement;
+      const carousel = indicatorSpan.closest('.card-carousel');
+      const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
+      
+      if (!carousel || !track) return;
+      
+      const dotsContainer = indicatorSpan.parentElement;
+      if (dotsContainer) {
+        const dotsArray = Array.from(dotsContainer.children);
+        const index = dotsArray.indexOf(indicatorSpan);
+        if (index !== -1) {
+          track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
+        }
+      }
     }
   });
   
