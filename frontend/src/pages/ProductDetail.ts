@@ -183,8 +183,12 @@ function initGallery(): void {
       const imageUrl = thumb.dataset.image;
       if (!imageUrl) return;
 
-      // Actualizar imagen principal
-      mainImage.src = imageUrl;
+      // Crossfade logic
+      mainImage.classList.add('fade');
+      setTimeout(() => {
+        mainImage.src = imageUrl;
+        mainImage.classList.remove('fade');
+      }, 200);
 
       // Actualizar estado activo
       thumbnails.forEach(t => t.classList.remove('active'));
