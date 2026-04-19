@@ -1,5 +1,9 @@
 import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { config } from 'dotenv';
+
+// Load environment variables
+config();
 
 const prisma = new PrismaClient();
 
