@@ -2168,6 +2168,109 @@
 }
 
 /* ======================================================
+   CARD CAROUSEL (PRODUCT CATALOG MULTI-IMAGE)
+   ====================================================== */
+.card-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth;
+}
+
+.card-carousel-track::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.card-carousel-track img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: center;
+}
+
+.card-carousel-indicators {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.card-carousel-indicators .indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(2px);
+  transition: all var(--transition-fast);
+}
+
+.card-carousel-indicators .indicator.active {
+  background: var(--lila-claro);
+  transform: scale(1.2);
+}
+
+/* Hide navigation buttons on mobile, show on hover on desktop */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(18, 11, 24, 0.4);
+  backdrop-filter: blur(4px);
+  color: var(--champana);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: 10;
+  line-height: 1;
+}
+
+.card-carousel:hover .carousel-btn {
+  opacity: 1;
+}
+
+.carousel-btn:hover {
+  background: var(--violeta-premium);
+}
+
+.carousel-btn.prev-btn {
+  left: 8px;
+}
+
+.carousel-btn.next-btn {
+  right: 8px;
+}
+
+@media (max-width: 768px) {
+  .carousel-btn {
+    display: none; /* Rely entirely on swiping on mobile */
+  }
+}
+
+/* ======================================================
    ORDER HISTORY & ORDER DETAIL DESIGNS
    ====================================================== */
 .order-history-page,

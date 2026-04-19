@@ -67,6 +67,41 @@ export async function initCatalogo(): Promise<void> {
       btn.disabled = false;
     }, 1500);
   });
+
+  // ── Delegación de eventos: botones de carrusel ──────────────
+  grid.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.carousel-btn');
+    if (!btn) return;
+    
+    const carousel = btn.closest('.card-carousel');
+    const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
+    if (!carousel || !track) return;
+    
+    // Asumimos que cada imagen ocupa el 100% del track
+    const scrollAmount = track.clientWidth;
+    if (btn.classList.contains('next-btn')) {
+      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else if (btn.classList.contains('prev-btn')) {
+      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    }
+  });
+  
+  // ── Delegación de eventos: Scroll para indicadores ──────────
+  grid.addEventListener('scroll', (e) => {
+    // Si el scroll proviene de un track de carrusel
+    const track = e.target as HTMLElement;
+    if (!track.classList?.contains('card-carousel-track')) return;
+    
+    const carousel = track.closest('.card-carousel');
+    const indicators = carousel?.querySelectorAll('.indicator');
+    if (!carousel || !indicators) return;
+    
+    const index = Math.round(track.scrollLeft / track.clientWidth);
+    indicators.forEach((ind, i) => {
+      if (i === index) ind.classList.add('active');
+      else ind.classList.remove('active');
+    });
+  }, { capture: true }); // Usamos capture porque 'scroll' no burbujea
 }
 
 // ── Helpers ──────────────────────────────────────────────────
