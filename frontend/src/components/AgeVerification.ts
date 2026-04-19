@@ -15,14 +15,12 @@ export function initAgeVerification(): void {
   if (!overlay || !contenido || !btnEntrar || !btnSalir) return;
 
   function mostrarContenido(): void {
-    document.documentElement.classList.add('age-verified');
-    // For legacy/safety, also do manual hiding
-    if (overlay) overlay.style.display = 'none';
-    if (contenido) contenido.classList.remove('oculto');
+    overlay!.style.display = 'none';
+    contenido!.classList.remove('oculto');
     emit('age:verified');
   }
 
-  // Si ya había verificado antes, avisamos a la app y salimos
+  // Si ya había verificado antes, mostramos el contenido directamente
   if (localStorage.getItem('edadVerificada') === 'true') {
     mostrarContenido();
     return;
