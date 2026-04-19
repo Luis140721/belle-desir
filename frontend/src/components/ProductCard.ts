@@ -18,9 +18,32 @@ export function ProductCard(product: Product): string {
   const inStock = (product as any).inStock ?? product.stock > 0;
   const stockBajo = product.stock > 0 && product.stock <= 5;
 
-  const imgHtml = imagen
-    ? `<img src="${imagen}" alt="${escapeHtml(product.name)}" loading="lazy">`
-    : '✨';
+  const imagenes = product.images && product.images.length > 0 ? product.images : [];
+  
+  let imgHtml = '✨';
+  if (imagenes.length > 0) {
+    if (imagenes.length === 1) {
+      imgHtml = `<img src="${imagenes[0]}" alt="${escapeHtml(product.name)}" loading="lazy">`;
+    } else {
+      // CSS-based scrollable carousel
+      const imagesHtml = imagenes.map((img, i) => 
+        `<img src="${img}" alt="${escapeHtml(product.name)} - vista ${i + 1}" loading="lazy">`
+      ).join('');
+      
+      imgHtml = `
+        <div class="card-carousel">
+          <div class="card-carousel-track">
+            ${imagesHtml}
+          </div>
+          <div class="card-carousel-indicators">
+            ${imagenes.map((_, i) => `<div class="indicator ${i === 0 ? 'active' : ''}"></div>`).join('')}
+          </div>
+          <button class="carousel-btn prev-btn" aria-label="Anterior">‹</button>
+          <button class="carousel-btn next-btn" aria-label="Siguiente">›</button>
+        </div>
+      `;
+    }
+  }
 
   return /* html */ `
     <article class="producto-card" data-product-id="${product.id}">
