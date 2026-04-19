@@ -273,14 +273,6 @@ npm start
 ```
 
 ### Frontend (Producción)
-```bash
-# Build
-cd frontend
-npm run build
-
-# Servir archivos estáticos
-# Usar nginx, Apache, o Vercel/Netlify
-```
 
 ## Servicios Externos Requeridos
 
@@ -353,3 +345,5 @@ Proyecto privado - Todos los derechos reservados.
 - **Repository**: https://github.com/Luis140721/belle-desir
 - **Issues**: Reportar en GitHub Issues
 - **Email**: soporte@belledesir.com
+#   V e r c e l   d e p l o y   t r i g g e r   0 4 / 1 8 / 2 0 2 6   2 3 : 0 9 : 4 4  
+ 
