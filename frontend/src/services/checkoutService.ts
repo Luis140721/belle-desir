@@ -12,7 +12,7 @@ import type {
   ShippingAddress,
   CartItem,
 } from '../types/index.js';
-import { getAccessToken } from './authService.js';
+import { getAccessToken } from '../utils/auth';
 import { buildApiUrl } from '../config/api.js';
 
 // ── Tipos ─────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export async function createGuestOrder(payload: GuestOrderPayload | Record<strin
 
   // En backend actual no existe /api/orders/guest; invitados se procesan por /api/orders sin JWT.
   console.info('[checkout] guest order request', {
-    endpoint: '/api/orders',
+    endpoint: buildApiUrl('orders'),
     payload: {
       guestEmail: normalized.guestInfo.email,
       itemsCount: normalized.items.length,
@@ -154,7 +154,7 @@ export async function createGuestOrder(payload: GuestOrderPayload | Record<strin
     },
   });
 
-  const res = await fetch(buildApiUrl('/orders'), {
+  const res = await fetch(buildApiUrl('orders'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

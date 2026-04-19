@@ -4,6 +4,7 @@
 // ============================================================
 
 import { getAccessToken, isLoggedIn } from '../services/authService.js';
+import { buildApiUrl } from '../config/api.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 
 interface Order {
@@ -38,7 +39,7 @@ export async function initOrderHistoryPage(): Promise<void> {
   try {
     // Obtener pedidos del usuario
     const token = getAccessToken();
-    const res = await fetch('/api/orders', {
+    const res = await fetch(buildApiUrl('orders'), {
       headers: {
         'Authorization': `Bearer ${token}`
       }

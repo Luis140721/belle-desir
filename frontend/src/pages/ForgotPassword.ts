@@ -3,6 +3,8 @@
 // Formulario para solicitar recuperación de contraseña
 // ============================================================
 
+import { buildApiUrl } from '../config/api';
+
 export function initForgotPasswordPage(): void {
   const container = document.getElementById('contenido-principal');
   if (!container) return;
@@ -82,7 +84,7 @@ function initForgotPasswordForm(): void {
     try {
       const email = emailInput.value.trim();
 
-      const res = await fetch('/api/auth/forgot-password', {
+      const res = await fetch(buildApiUrl('auth/forgot-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

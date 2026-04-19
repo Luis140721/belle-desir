@@ -3,6 +3,9 @@
 // Formulario para restablecer contraseña con token
 // ============================================================
 
+import { getAccessToken } from '../utils/auth';
+import { buildApiUrl } from '../config/api';
+
 export function initResetPasswordPage(): void {
   const container = document.getElementById('contenido-principal');
   if (!container) return;
@@ -143,14 +146,13 @@ function initResetPasswordForm(): void {
 
     try {
       const password = passwordInput.value;
-      const token = tokenInput.value;
 
-      const res = await fetch('/api/auth/reset-password', {
+      const res = await fetch(buildApiUrl('auth/reset-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token: tokenInput.value, password }),
       });
 
       if (!res.ok) {

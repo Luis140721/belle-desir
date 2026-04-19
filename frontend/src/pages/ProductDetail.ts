@@ -7,6 +7,7 @@ import type { Product } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
 import { emit } from '../utils/events.js';
+import { buildApiUrl } from '../config/api';
 
 export async function initProductDetailPage(): Promise<void> {
   const container = document.getElementById('contenido-principal');
@@ -23,7 +24,7 @@ export async function initProductDetailPage(): Promise<void> {
 
   try {
     // Obtener datos del producto
-    const res = await fetch(`/api/products/${slug}`);
+    const res = await fetch(buildApiUrl(`products/${slug}`));
     if (!res.ok) {
       if (res.status === 404) {
         renderNotFound(container);

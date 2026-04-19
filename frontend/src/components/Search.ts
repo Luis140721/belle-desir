@@ -3,7 +3,10 @@
 // Funcionalidad de búsqueda con dropdown y debounce
 // ============================================================
 
-import { formatCOP, toNumber } from '../utils/currency.js';
+import { debounce } from '../utils/debounce.js';
+import { formatCOP } from '../utils/currency.js';
+import { emit } from '../utils/events.js';
+import { buildApiUrl } from '../config/api';
 
 interface SearchResult {
   id: string;
@@ -102,7 +105,7 @@ export function initSearch(): void {
   // Realizar búsqueda
   async function performSearch(query: string): Promise<void> {
     try {
-      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}&limit=5`);
+      const res = await fetch(buildApiUrl(`products?search=${encodeURIComponent(query)}&limit=5`));
       if (!res.ok) throw new Error('Search failed');
       
       const data = await res.json();

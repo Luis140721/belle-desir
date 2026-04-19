@@ -4,6 +4,7 @@
 // ============================================================
 
 import { isLoggedIn, getAccessToken, clearSession } from '../services/authService.js';
+import { buildApiUrl } from '../config/api';
 
 export function initUserMenu(): void {
   const userMenuContainer = document.getElementById('navbar-user');
@@ -111,7 +112,7 @@ async function handleLogout(): Promise<void> {
     // Llamar al endpoint de logout si hay token
     const token = getAccessToken();
     if (token) {
-      await fetch('/api/auth/logout', {
+      await fetch(buildApiUrl('auth/logout'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
