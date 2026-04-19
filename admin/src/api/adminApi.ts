@@ -11,7 +11,7 @@ import {
 import { API_BASE_URL } from '../config/api';
 
 const adminApi = axios.create({
-  baseURL: API_BASE_URL ? `${API_BASE_URL}/api` : '/api',
+  baseURL: `${API_BASE_URL}/api`,
 });
 
 // Request Interceptor

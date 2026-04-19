@@ -4,6 +4,7 @@
 // ============================================================
 
 import { getAccessToken, isLoggedIn } from '../services/authService.js';
+import { buildApiUrl } from '../config/api.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 
 interface OrderDetail {
@@ -57,7 +58,7 @@ export async function initOrderDetailPage(): Promise<void> {
   try {
     // Obtener detalles de la orden
     const token = getAccessToken();
-    const res = await fetch(`/api/orders/${orderId}`, {
+    const res = await fetch(buildApiUrl(`orders/${orderId}`), {
       headers: {
         'Authorization': `Bearer ${token}`
       }
