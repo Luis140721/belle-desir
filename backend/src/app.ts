@@ -1,5 +1,6 @@
 // ============================================================
-console.log('[App] Loading app.ts...');
+// APP.TS — Configuración principal de Express
+// Punto de entrada de middlewares, seguridad, CORS y rutas.
 // ============================================================
 
 import express from 'express';
@@ -19,7 +20,6 @@ import { orderRoutes } from './features/orders/orders.routes';
 import { paymentRoutes } from './features/payments/payments.routes';
 import { adminRoutes } from './features/admin/admin.routes';
 import { reviewRoutes } from './features/reviews/reviews.routes';
-import { multimediaRoutes } from './features/multimedia/multimedia.routes';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -132,7 +132,6 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/products/:productId/reviews', reviewRoutes);
-app.use('/api/multimedia', multimediaRoutes);
 
 // ── Manejo de rutas no encontradas ───────────────────────────
 app.use((_req, res) => {
