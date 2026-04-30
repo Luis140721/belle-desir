@@ -1,6 +1,5 @@
 // ============================================================
-// APP.TS — Configuración principal de Express
-// Punto de entrada de middlewares, seguridad, CORS y rutas.
+console.log('[App] Loading app.ts...');
 // ============================================================
 
 import express from 'express';

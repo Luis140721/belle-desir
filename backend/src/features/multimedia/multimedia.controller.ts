@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { multimediaService } from './multimedia.service.js';
-import { createMultimediaSchema, updateMultimediaSchema } from './multimedia.schemas.js';
+import { multimediaService } from './multimedia.service';
+import { createMultimediaSchema, updateMultimediaSchema } from './multimedia.schemas';
 
 export const getAllMultimedia = async (req: Request, res: Response) => {
   try {
@@ -13,7 +13,7 @@ export const getAllMultimedia = async (req: Request, res: Response) => {
 
 export const getMultimediaById = async (req: Request, res: Response) => {
   try {
-    const multimedia = await multimediaService.getById(req.params.id);
+    const multimedia = await multimediaService.getById(req.params.id as string);
     if (!multimedia) {
       return res.status(404).json({ message: 'Multimedia not found' });
     }
@@ -39,7 +39,7 @@ export const createMultimedia = async (req: Request, res: Response) => {
 export const updateMultimedia = async (req: Request, res: Response) => {
   try {
     const validatedData = updateMultimediaSchema.parse(req.body);
-    const multimedia = await multimediaService.update(req.params.id, validatedData);
+    const multimedia = await multimediaService.update(req.params.id as string, validatedData);
     res.json(multimedia);
   } catch (error: any) {
     if (error.name === 'ZodError') {
@@ -51,7 +51,7 @@ export const updateMultimedia = async (req: Request, res: Response) => {
 
 export const deleteMultimedia = async (req: Request, res: Response) => {
   try {
-    await multimediaService.delete(req.params.id);
+    await multimediaService.delete(req.params.id as string);
     res.status(204).send();
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -61,7 +61,7 @@ export const deleteMultimedia = async (req: Request, res: Response) => {
 export const getMultimediaByPageAndSection = async (req: Request, res: Response) => {
   try {
     const { page, section } = req.params;
-    const multimedia = await multimediaService.getByPageAndSection(page, section);
+    const multimedia = await multimediaService.getByPageAndSection(req.params.page as string, req.params.section as string);
     res.json(multimedia);
   } catch (error: any) {
     res.status(500).json({ message: error.message });

@@ -1,4 +1,4 @@
-import { prisma } from '../../config/database.js';
+import { prisma } from '../../config/database';
 import { MediaType } from '@prisma/client';
 
 export const multimediaService = {

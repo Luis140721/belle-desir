@@ -1,7 +1,7 @@
 // API Configuration for Belle Désir Frontend
 // Always uses VITE_API_URL for backend API calls
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL;
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 // Helper function to build API URLs
 export function buildApiUrl(endpoint: string): string {

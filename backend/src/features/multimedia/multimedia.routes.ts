@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import * as MultimediaController from './multimedia.controller.js';
-import { authenticate } from '../../middleware/authenticate.js';
-import { authorize } from '../../middleware/authorize.js';
-import { asyncHandler } from '../../shared/utils/asyncHandler.js';
+import * as MultimediaController from './multimedia.controller';
+import { authenticate } from '../../middleware/authenticate';
+import { authorize } from '../../middleware/authorize';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 export const multimediaRoutes = Router();
 
