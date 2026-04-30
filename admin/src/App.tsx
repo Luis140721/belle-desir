@@ -11,6 +11,8 @@ import { ProductForm } from './pages/products/ProductForm';
 import { OrdersList } from './pages/orders/OrdersList';
 import { OrderDetail } from './pages/orders/OrderDetail';
 import { CategoriesList } from './pages/categories/CategoriesList';
+import { MultimediaList } from './pages/multimedia/MultimediaList';
+import { MultimediaForm } from './pages/multimedia/MultimediaForm';
 
 function App() {
   return (
@@ -36,8 +38,13 @@ function App() {
                 <Route path="orders" element={<OrdersList />} />
                 <Route path="orders/:id" element={<OrderDetail />} />
                 
-                {/* Categories */}
+                 {/* Categories */}
                 <Route path="categories" element={<CategoriesList />} />
+                
+                {/* Multimedia */}
+                <Route path="multimedia" element={<MultimediaList />} />
+                <Route path="multimedia/new" element={<MultimediaForm mode="create" />} />
+                <Route path="multimedia/:id" element={<MultimediaForm mode="edit" />} />
               </Route>
             </Route>
 

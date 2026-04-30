@@ -8,7 +8,8 @@ import {
   LogOut, 
   Menu, 
   X,
-  User as UserIcon
+  User as UserIcon,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -30,6 +31,7 @@ export const AdminLayout: React.FC = () => {
     if (path.includes('/products')) return 'Productos';
     if (path.includes('/orders')) return 'Órdenes';
     if (path.includes('/categories')) return 'Categorías';
+    if (path.includes('/multimedia')) return 'Multimedia';
     return 'Panel de Administración';
   };
 
@@ -38,6 +40,7 @@ export const AdminLayout: React.FC = () => {
     { to: '/admin/products', label: 'Productos', icon: <Package size={18} /> },
     { to: '/admin/orders', label: 'Órdenes', icon: <ShoppingBag size={18} /> },
     { to: '/admin/categories', label: 'Categorías', icon: <Tag size={18} /> },
+    { to: '/admin/multimedia', label: 'Multimedia', icon: <ImageIcon size={18} /> },
   ];
 
   const formattedTime = time.toLocaleTimeString('es-CO', {

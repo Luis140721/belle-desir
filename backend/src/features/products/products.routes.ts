@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { ProductController } from './products.controller.js';
-import { validate } from '../../middleware/validate.js';
-import { authenticate } from '../../middleware/authenticate.js';
-import { authorize } from '../../middleware/authorize.js';
-import { createProductSchema, updateProductSchema } from './products.schemas.js';
-import { asyncHandler } from '../../shared/utils/asyncHandler.js';
-import { upload } from '../../config/multer.js';
+import { ProductController } from './products.controller';
+import { validate } from '../../middleware/validate';
+import { authenticate } from '../../middleware/authenticate';
+import { authorize } from '../../middleware/authorize';
+import { createProductSchema, updateProductSchema } from './products.schemas';
+import { asyncHandler } from '../../shared/utils/asyncHandler';
+import { upload } from '../../config/multer';
 import multer from 'multer';
 
 export const productRoutes = Router();

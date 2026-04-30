@@ -13,12 +13,14 @@ import './css/responsive.css';
 import { initAgeVerification } from './components/AgeVerification.js';
 import { on }                  from './utils/events.js';
 import { initRouter } from './router.js';
+import { initMultimedia } from './utils/multimediaManager.js';
 
 // AgeVerification siempre se inicializa primero
 initAgeVerification();
 
 function initApp(): void {
   initRouter();
+  void initMultimedia();
 }
 
 // Si ya verificó la edad en localStorage, arrancamos directamente

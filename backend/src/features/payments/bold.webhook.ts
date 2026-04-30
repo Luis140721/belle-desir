@@ -13,8 +13,8 @@
 // ============================================================
 
 import { Request, Response } from 'express';
-import { prisma } from '../../config/database.js';
-import { sendOrderStatusUpdate, OrderData } from '../../services/emailService.js';
+import { prisma } from '../../config/database';
+import { sendOrderStatusUpdate, OrderData } from '../../services/emailService';
 
 /**
  * boldWebhookHandler

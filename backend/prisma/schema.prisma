@@ -127,3 +127,30 @@ model Review {
 
   @@unique([userId, productId])
 }
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  BACKGROUND
+  SUPPORT
+}
+
+model MultimediaContent {
+  id              String    @id @default(cuid())
+  title           String?
+  alt             String?
+  type            MediaType @default(IMAGE)
+  url             String
+  page            String
+  section         String
+  position        String?
+  priority        Int       @default(0)
+  isActive        Boolean   @default(true)
+  overlayOpacity  Float     @default(0)
+  alignment       String?
+  size            String?
+  desktopVisible  Boolean   @default(true)
+  mobileVisible   Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

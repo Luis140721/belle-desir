@@ -11,12 +11,12 @@
 
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
-import { prisma } from '../../config/database.js';
+import { prisma } from '../../config/database';
 import { Role } from '@prisma/client';
-import { AppError } from '../../shared/errors/AppError.js';
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt.utils.js';
-import { sendPasswordReset } from '../../services/emailService.js';
-import { RegisterInput, LoginInput } from './auth.schemas.js';
+import { AppError } from '../../shared/errors/AppError';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt.utils';
+import { sendPasswordReset } from '../../services/emailService';
+import { RegisterInput, LoginInput } from './auth.schemas';
 
 export class AuthService {
 
