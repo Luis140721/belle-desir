@@ -20,6 +20,11 @@ export function initRouter(): void {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
   warmBackend();
 
+  // Core components shared across pages
+  initNavbar();
+  initSearch();
+  initCartSidebar();
+
   // Protected routes - redirect to login if not authenticated
   const protectedRoutes = ['/checkout', '/mis-pedidos', '/mis-pedidos/:id'];
   const isProtectedRoute = protectedRoutes.some(route => {
@@ -79,9 +84,6 @@ export function initRouter(): void {
   }
 
   // Default route - home page
-  initNavbar();
-  initSearch();
-  initCartSidebar();
   void initCatalogo();
   scheduleLazyTask(() => void initSiteMedia(), 500);
   initScrollAnimations();

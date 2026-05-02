@@ -43,7 +43,7 @@ export async function createOrder(payload: CheckoutPayload): Promise<CheckoutRes
 
 export async function getCart(): Promise<CartResponse> {
   const token = localStorage.getItem('accessToken');
-  if (!token) throw new Error('Debes iniciar sesion para ver tu carrito');
+  if (!token) throw new Error('Debes iniciar sesión para comprar');
 
   const res = await fetch(buildApiUrl('/cart'), {
     method: 'GET',
@@ -52,14 +52,45 @@ export async function getCart(): Promise<CartResponse> {
 
   const body = await safeJson(res);
   if (!res.ok) {
-    console.error('[checkout] getCart error', {
-      status: res.status,
-      response: body,
-    });
+    console.error('[checkout] getCart error', { status: res.status, response: body });
     throw new Error(body?.message ?? `Error ${res.status} al obtener el carrito`);
   }
 
   return body.data as CartResponse;
+}
+
+/**
+ * Sincroniza el carrito local con el backend.
+ * Se usa antes de ir al checkout para asegurar que el backend tenga los mismos items.
+ */
+export async function syncCart(localItems: CartItem[]): Promise<void> {
+  const token = localStorage.getItem('accessToken');
+  if (!token || !localItems.length) return;
+
+  // Limpiar carrito actual en el backend para evitar duplicados o basura
+  await fetch(buildApiUrl('/cart'), {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  // Agregar cada item uno por uno (según las rutas actuales del backend)
+  for (const item of localItems) {
+    try {
+      await fetch(buildApiUrl('/cart/items'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: item.id,
+          quantity: item.quantity,
+        }),
+      });
+    } catch (err) {
+      console.error(`[checkout] Error al sincronizar item ${item.id}`, err);
+    }
+  }
 }
 
 export async function createOrderWithShipping(

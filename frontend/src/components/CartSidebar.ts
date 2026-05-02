@@ -2,6 +2,7 @@ import type { CartItem } from '../types/index.js';
 import { on, emit } from '../utils/events.js';
 import { formatCOP } from '../utils/currency.js';
 import { isLoggedIn } from '../services/authService.js';
+import { syncCart } from '../services/checkoutService.js';
 
 let items: CartItem[] = [];
 const CART_STORAGE_KEY = 'belle-desir-cart';
@@ -14,6 +15,7 @@ export function initCartSidebar(): void {
   const btnCerrar = document.getElementById('btn-cerrar-carrito') as HTMLButtonElement | null;
   const btnPagar = document.getElementById('btn-checkout') as HTMLButtonElement | null;
   const contEl = document.getElementById('contador-carrito') as HTMLElement | null;
+  const floatingBtn = document.getElementById('floating-cart-btn');
 
   if (!sidebar) return;
 
@@ -25,6 +27,7 @@ export function initCartSidebar(): void {
     sidebar!.classList.add('abierto');
     sidebar!.setAttribute('aria-hidden', 'false');
     overlay?.classList.remove('oculto');
+    floatingBtn?.classList.add('oculto-sidebar');
     renderItems(itemsEl, totalEl);
   }
 
@@ -32,13 +35,14 @@ export function initCartSidebar(): void {
     sidebar!.classList.remove('abierto');
     sidebar!.setAttribute('aria-hidden', 'true');
     overlay?.classList.add('oculto');
+    floatingBtn?.classList.remove('oculto-sidebar');
   }
 
   on('cart:open', abrir);
   on('cart:close', cerrar);
 
   document.querySelector('.navbar-carrito')?.addEventListener('click', () => emit('cart:open'));
-  document.getElementById('floating-cart-btn')?.addEventListener('click', () => emit('cart:open'));
+  floatingBtn?.addEventListener('click', () => emit('cart:open'));
 
   btnCerrar?.addEventListener('click', cerrar);
   overlay?.addEventListener('click', cerrar);
@@ -84,13 +88,30 @@ export function initCartSidebar(): void {
     }
   });
 
-  btnPagar?.addEventListener('click', () => {
+  btnPagar?.addEventListener('click', async () => {
     if (!items.length) {
-      alert('Tu carrito esta vacio');
+      alert('Tu carrito está vacío');
       return;
     }
 
-    window.location.href = isLoggedIn() ? '/checkout' : '/login?redirect=/checkout';
+    if (!isLoggedIn()) {
+      window.location.href = '/login?redirect=/checkout';
+      return;
+    }
+
+    // Sincronizar con el backend antes de ir al checkout
+    btnPagar.disabled = true;
+    btnPagar.textContent = 'Sincronizando...';
+    
+    try {
+      await syncCart(items);
+      window.location.href = '/checkout';
+    } catch (err) {
+      console.error('Error al sincronizar carrito:', err);
+      alert('Hubo un problema al preparar tu pedido. Intenta de nuevo.');
+      btnPagar.disabled = false;
+      btnPagar.textContent = 'Proceder al pago';
+    }
   });
 }
 
@@ -105,12 +126,13 @@ function loadCartFromStorage(): CartItem[] {
     const parsed = JSON.parse(raw) as CartItem[];
     if (!Array.isArray(parsed)) return [];
 
-    return parsed.filter((item) =>
-      Boolean(item?.id) &&
-      Boolean(item?.name) &&
-      Number.isFinite(Number(item?.price)) &&
-      Number.isFinite(Number(item?.quantity))
-    );
+    return parsed.filter((item) => {
+      const hasId = item && (typeof item.id === 'string' || typeof item.id === 'number');
+      const hasName = item && typeof item.name === 'string';
+      const hasPrice = item && !isNaN(parseFloat(String(item.price)));
+      const hasQty = item && !isNaN(parseInt(String(item.quantity)));
+      return hasId && hasName && hasPrice && hasQty;
+    });
   } catch {
     return [];
   }
@@ -138,17 +160,34 @@ function actualizarContador(el: HTMLElement | null): void {
 function renderItems(contenedor: HTMLElement | null, totalEl: HTMLElement | null): void {
   if (!contenedor) return;
 
-  if (!items.length) {
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  if (totalEl) totalEl.textContent = formatCOP(total);
+
+  const btnPagar = document.getElementById('btn-checkout') as HTMLButtonElement | null;
+  const policyEl = document.getElementById('carrito-politicas');
+  const minOrder = 20000;
+  const isUnderMin = total < minOrder;
+
+  if (totalItems === 0) {
     contenedor.innerHTML = /* html */ `
       <div class="carrito-vacio">
-        <p>Carrito</p>
-        <p>Tu carrito esta vacio</p>
+        <p>Tu carrito está vacío</p>
+        <p style="font-size: 0.8rem; margin-top: 1rem; color: var(--texto-gris);">
+          ¡Explora nuestro catálogo y descubre algo especial!
+        </p>
       </div>
     `;
-    if (totalEl) totalEl.textContent = formatCOP(0);
+    if (btnPagar) {
+      btnPagar.disabled = true;
+      btnPagar.style.opacity = '0.5';
+      btnPagar.textContent = 'Ir a pagar';
+    }
+    if (policyEl) policyEl.innerHTML = '';
     return;
   }
 
+  // Renderizar items
   contenedor.innerHTML = items.map((item) => /* html */ `
     <div class="carrito-item">
       <div class="carrito-item-imagen">
@@ -159,14 +198,36 @@ function renderItems(contenedor: HTMLElement | null, totalEl: HTMLElement | null
         <p class="carrito-item-precio">${formatCOP(item.price)}</p>
       </div>
       <div class="carrito-cantidad">
-        <button data-accion="restar" data-id="${item.id}" aria-label="Quitar uno">-</button>
+        <button data-id="${item.id}" data-accion="restar" aria-label="Quitar uno">-</button>
         <span>${item.quantity}</span>
-        <button data-accion="sumar" data-id="${item.id}" aria-label="Agregar uno">+</button>
+        <button data-id="${item.id}" data-accion="sumar" aria-label="Agregar uno">+</button>
       </div>
-      <button class="btn-eliminar-item" data-eliminar="${item.id}" aria-label="Eliminar ${item.name}">x</button>
+      <button class="btn-eliminar-item" data-eliminar="${item.id}" aria-label="Eliminar ${item.name}">×</button>
     </div>
   `).join('');
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  if (totalEl) totalEl.textContent = formatCOP(total);
+  // Actualizar UI del botón de pago y mensajes de política
+  if (btnPagar) {
+    if (isUnderMin) {
+      btnPagar.disabled = true;
+      btnPagar.style.opacity = '0.5';
+      btnPagar.textContent = `Mínimo ${formatCOP(minOrder)} para envío`;
+    } else {
+      btnPagar.disabled = false;
+      btnPagar.style.opacity = '1';
+      btnPagar.textContent = 'Proceder al pago';
+    }
+  }
+
+  if (policyEl) {
+    policyEl.innerHTML = `
+      <ul class="carrito-politicas-lista">
+        <li class="politica-item">No cobramos comisión por el pago.</li>
+        <li class="politica-item ${isUnderMin ? 'politica-alerta' : ''}">
+          Para envío, compras superiores a ${formatCOP(minOrder)}.
+        </li>
+      </ul>
+    `;
+  }
 }
+

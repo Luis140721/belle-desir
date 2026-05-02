@@ -7,6 +7,7 @@ import { formatCOP } from '../utils/currency.js';
 import type { CartResponse, ShippingAddress } from '../types/index.js';
 
 const SOPORTE_WHATSAPP = '573159739914';
+const MIN_ORDER = 20000;
 
 export async function initCheckoutPage(): Promise<void> {
   const container = document.getElementById('contenido-principal');
@@ -17,25 +18,52 @@ export async function initCheckoutPage(): Promise<void> {
     return;
   }
 
+  // Estado de carga inicial
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+      <div class="spinner"></div>
+      <p style="margin-top: 1rem; color: var(--lila-claro);">Preparando tu pedido...</p>
+    </div>
+  `;
+
   let cart: CartResponse | null = null;
 
   try {
     cart = await getCart();
   } catch (err) {
     console.error('Error al cargar carrito:', err);
-    container.innerHTML = `<p class="error-mensaje">Error al cargar el carrito. Por favor inicia sesion nuevamente e intenta de nuevo.</p>`;
+    container.innerHTML = `<p class="error-mensaje">Error al cargar el carrito. Por favor inicia sesión nuevamente e intenta de nuevo.</p>`;
     return;
   }
 
-  const total = cart?.total ?? 0;
+  // Calcular el total manualmente ya que el backend no lo envía en el objeto raíz
+  const total = cart?.items?.reduce((sum, item) => {
+    const price = Number(item.product.price);
+    return sum + (price * item.quantity);
+  }, 0) ?? 0;
 
   if (!cart?.items?.length) {
     container.innerHTML = `
       <main class="checkout-page">
         <div class="checkout-vacio">
-          <h2 class="seccion-titulo">Tu carrito esta <em>vacio</em></h2>
+          <h2 class="seccion-titulo">Tu carrito está <em>vacío</em></h2>
           <p class="verificacion-texto">Agrega algunos productos antes de proceder al pago.</p>
           <a href="/" class="btn-primario">Volver a la tienda</a>
+        </div>
+      </main>
+    `;
+    return;
+  }
+
+  // Validar mínimo de compra en el checkout por si acaso
+  if (total < MIN_ORDER) {
+    container.innerHTML = `
+      <main class="checkout-page">
+        <div class="checkout-vacio">
+          <h2 class="seccion-titulo">Mínimo de <em>Compra</em></h2>
+          <p class="verificacion-texto">El pedido mínimo para envío es de ${formatCOP(MIN_ORDER)}.</p>
+          <p class="verificacion-texto">Tu total actual es de ${formatCOP(total)}.</p>
+          <a href="/" class="btn-primario">Seguir comprando</a>
         </div>
       </main>
     `;
@@ -62,9 +90,9 @@ export async function initCheckoutPage(): Promise<void> {
       <div class="checkout-container">
         <div class="checkout-layout">
           <div class="checkout-form-section">
-            <h2 class="seccion-titulo">Informacion de <em>Envio</em></h2>
+            <h2 class="seccion-titulo">Información de <em>Envío</em></h2>
             <div class="auth-required-banner">
-              Para comprar en Belle Desir debes tener una cuenta e iniciar sesion. Esto protege tu pedido, tu historial y la trazabilidad del pago.
+              Tu privacidad es nuestra prioridad. Los envíos se realizan de forma 100% discreta, sin logos ni descripciones del contenido.
             </div>
 
             <form id="checkout-form" class="checkout-form">
@@ -75,8 +103,8 @@ export async function initCheckoutPage(): Promise<void> {
                   <span class="error-inline" id="err-nombre"></span>
                 </div>
                 <div class="form-group full">
-                  <label for="direccion">Direccion de Entrega</label>
-                  <input type="text" id="direccion" name="direccion" required placeholder="Calle, numero, apto/casa">
+                  <label for="direccion">Dirección de Entrega</label>
+                  <input type="text" id="direccion" name="direccion" required placeholder="Calle, número, apto/casa">
                   <span class="error-inline" id="err-direccion"></span>
                 </div>
                 <div class="form-group">
@@ -90,12 +118,12 @@ export async function initCheckoutPage(): Promise<void> {
                   <span class="error-inline" id="err-departamento"></span>
                 </div>
                 <div class="form-group">
-                  <label for="zip">Codigo Postal</label>
+                  <label for="zip">Código Postal</label>
                   <input type="text" id="zip" name="zip" required placeholder="110111">
                   <span class="error-inline" id="err-zip"></span>
                 </div>
                 <div class="form-group">
-                  <label for="telefono">Telefono de Contacto</label>
+                  <label for="telefono">Teléfono de Contacto</label>
                   <input type="tel" id="telefono" name="telefono" required placeholder="300 123 4567">
                   <span class="error-inline" id="err-telefono"></span>
                 </div>
@@ -124,15 +152,18 @@ export async function initCheckoutPage(): Promise<void> {
                   <span>${formatCOP(total)}</span>
                 </div>
                 <div class="summary-row">
-                  <span>Envio</span>
-                  <span class="envio-gratis">GRATIS</span>
+                  <span>Envío</span>
+                  <span>Calculado al pagar</span>
                 </div>
                 <div class="summary-row total">
                   <span>Total a Pagar</span>
                   <span>${formatCOP(total)}</span>
                 </div>
               </div>
-              <p class="pago-seguro">Pago 100% seguro procesado por Bold Colombia</p>
+              <div class="checkout-politicas-resumen">
+                <p>• No cobramos comisión por el pago.</p>
+                <p>• Envío 100% discreto y seguro.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -187,9 +218,9 @@ export async function initCheckoutPage(): Promise<void> {
             <div class="success-icon">!</div>
             <h2 class="seccion-titulo">Pedido <em>Creado</em></h2>
             <p class="verificacion-texto">
-              Tu pedido #${response.orderId.slice(0, 8).toUpperCase()} fue registrado, pero tuvimos un problema tecnico al generar el link de pago.
+              Tu pedido #${response.orderId.slice(0, 8).toUpperCase()} fue registrado, pero tuvimos un problema técnico al generar el link de pago.
             </p>
-            <p class="verificacion-texto">Contactanos por WhatsApp para coordinar el pago.</p>
+            <p class="verificacion-texto">Contáctanos por WhatsApp para coordinar el pago.</p>
             <div class="success-actions">
               <a href="https://wa.me/${SOPORTE_WHATSAPP}?text=Hola,%20necesito%20pagar%20mi%20pedido%20${response.orderId}" class="btn-primario" target="_blank" rel="noopener noreferrer">Contactar por WhatsApp</a>
               <a href="/" class="btn-secundario">Volver al inicio</a>
@@ -202,7 +233,7 @@ export async function initCheckoutPage(): Promise<void> {
       if (errorGeneral) {
         const message = err instanceof Error ? err.message : 'Error al procesar el pedido';
         errorGeneral.textContent = /401|autenticado|unauthorized/i.test(message)
-          ? 'Tu sesion expiro. Inicia sesion nuevamente para continuar.'
+          ? 'Tu sesión expiró. Inicia sesión nuevamente para continuar.'
           : message;
         errorGeneral.classList.remove('oculto');
       }
@@ -212,3 +243,4 @@ export async function initCheckoutPage(): Promise<void> {
     }
   });
 }
+
