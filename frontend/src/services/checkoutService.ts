@@ -124,6 +124,33 @@ export function getCartItems(): CartItem[] {
   return [];
 }
 
+export async function getLastOrderAddress(): Promise<ShippingAddress | null> {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return null;
+
+  try {
+    const res = await fetch(buildApiUrl('/orders'), {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const body = await safeJson(res);
+    if (!res.ok || !Array.isArray(body.data) || body.data.length === 0) {
+      return null;
+    }
+
+    // El backend suele devolver las órdenes ordenadas por fecha descendente o podemos buscar la más reciente
+    const lastOrder = body.data[0];
+    if (lastOrder && lastOrder.shippingAddress) {
+      return lastOrder.shippingAddress as ShippingAddress;
+    }
+  } catch (err) {
+    console.error('[checkout] Error al obtener última dirección:', err);
+  }
+
+  return null;
+}
+
 async function safeJson(res: Response): Promise<any> {
   try {
     return await res.json();

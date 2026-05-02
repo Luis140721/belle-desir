@@ -1,6 +1,7 @@
 import {
   createOrderWithShipping,
   getCart,
+  getLastOrderAddress,
 } from '../services/checkoutService.js';
 import { isLoggedIn } from '../services/authService.js';
 import { formatCOP } from '../utils/currency.js';
@@ -18,6 +19,10 @@ export async function initCheckoutPage(): Promise<void> {
     return;
   }
 
+  // Obtener datos del usuario para autocompletar
+  const userRaw = localStorage.getItem('user');
+  const user = userRaw ? JSON.parse(userRaw) : null;
+
   // Estado de carga inicial
   container.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
@@ -27,16 +32,22 @@ export async function initCheckoutPage(): Promise<void> {
   `;
 
   let cart: CartResponse | null = null;
+  let lastAddress: ShippingAddress | null = null;
 
   try {
-    cart = await getCart();
+    // Cargar carrito y última dirección en paralelo
+    const [cartRes, addrRes] = await Promise.all([
+      getCart(),
+      getLastOrderAddress(),
+    ]);
+    cart = cartRes;
+    lastAddress = addrRes;
   } catch (err) {
-    console.error('Error al cargar carrito:', err);
-    container.innerHTML = `<p class="error-mensaje">Error al cargar el carrito. Por favor inicia sesión nuevamente e intenta de nuevo.</p>`;
+    console.error('Error al cargar datos del checkout:', err);
+    container.innerHTML = `<p class="error-mensaje">Error al cargar el checkout. Por favor intenta de nuevo.</p>`;
     return;
   }
 
-  // Calcular el total manualmente ya que el backend no lo envía en el objeto raíz
   const total = cart?.items?.reduce((sum, item) => {
     const price = Number(item.product.price);
     return sum + (price * item.quantity);
@@ -99,32 +110,44 @@ export async function initCheckoutPage(): Promise<void> {
               <div class="form-grid">
                 <div class="form-group full">
                   <label for="nombre">Nombre Completo</label>
-                  <input type="text" id="nombre" name="nombre" required placeholder="Ej. Juan Perez">
+                  <input type="text" id="nombre" name="nombre" required 
+                    value="${lastAddress?.name || user?.name || ''}" 
+                    placeholder="Ej. Juan Perez">
                   <span class="error-inline" id="err-nombre"></span>
                 </div>
                 <div class="form-group full">
                   <label for="direccion">Dirección de Entrega</label>
-                  <input type="text" id="direccion" name="direccion" required placeholder="Calle, número, apto/casa">
+                  <input type="text" id="direccion" name="direccion" required 
+                    value="${lastAddress?.address || ''}" 
+                    placeholder="Calle, número, apto/casa">
                   <span class="error-inline" id="err-direccion"></span>
                 </div>
                 <div class="form-group">
                   <label for="ciudad">Ciudad</label>
-                  <input type="text" id="ciudad" name="ciudad" required placeholder="Ej. Bogota">
+                  <input type="text" id="ciudad" name="ciudad" required 
+                    value="${lastAddress?.city || ''}" 
+                    placeholder="Ej. Bogota">
                   <span class="error-inline" id="err-ciudad"></span>
                 </div>
                 <div class="form-group">
                   <label for="departamento">Departamento</label>
-                  <input type="text" id="departamento" name="departamento" required placeholder="Ej. Cundinamarca">
+                  <input type="text" id="departamento" name="departamento" required 
+                    value="${(lastAddress as any)?.department || ''}" 
+                    placeholder="Ej. Cundinamarca">
                   <span class="error-inline" id="err-departamento"></span>
                 </div>
                 <div class="form-group">
                   <label for="zip">Código Postal</label>
-                  <input type="text" id="zip" name="zip" required placeholder="110111">
+                  <input type="text" id="zip" name="zip" required 
+                    value="${lastAddress?.zip || ''}" 
+                    placeholder="110111">
                   <span class="error-inline" id="err-zip"></span>
                 </div>
                 <div class="form-group">
                   <label for="telefono">Teléfono de Contacto</label>
-                  <input type="tel" id="telefono" name="telefono" required placeholder="300 123 4567">
+                  <input type="tel" id="telefono" name="telefono" required 
+                    value="${lastAddress?.phone || ''}" 
+                    placeholder="300 123 4567">
                   <span class="error-inline" id="err-telefono"></span>
                 </div>
                 <div class="form-group full">
