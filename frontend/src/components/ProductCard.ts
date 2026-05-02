@@ -16,7 +16,8 @@ export function ProductCard(product: Product): string {
   const imagen = product.images?.[0];
   const categoria = product.category?.name ?? '';
   const inStock = (product as any).inStock ?? product.stock > 0;
-  const stockBajo = product.stock > 0 && product.stock <= 5;
+  
+  // Quitamos la variable stockBajo ya que la MEJORA-008 pide eliminar "unidades disponibles"
 
   const imagenes = product.images && product.images.length > 0 ? product.images : [];
   
@@ -56,10 +57,9 @@ export function ProductCard(product: Product): string {
         <h3 class="producto-card-nombre">${escapeHtml(product.name)}</h3>
         <p class="producto-card-descripcion">${escapeHtml(product.description)}</p>
         
-        <!-- Stock indicators -->
+        <!-- Stock indicators: Solo muestra Agotado según MEJORA-008 -->
         <div class="stock-indicators">
           ${!inStock ? '<span class="stock-badge out-of-stock">Agotado</span>' : ''}
-          ${stockBajo ? `<span class="stock-badge low-stock">Últimas ${product.stock} unidades</span>` : ''}
         </div>
         
         <div class="producto-card-footer">

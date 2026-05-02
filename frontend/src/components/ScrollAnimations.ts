@@ -61,7 +61,6 @@ export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}):
   if (!options.cardsOnly && filters?.length && !catalog.dataset.filtersAnimated) {
     catalog.dataset.filtersAnimated = 'true';
     gsap.from(filters, {
-      autoAlpha: 0,
       y: 16,
       duration: 0.55,
       stagger: 0.06,
