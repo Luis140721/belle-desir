@@ -125,16 +125,41 @@ function initCubeScrollPin(): void {
 
   const labelEls = isDesktop ? crearEtiquetas(escena) : [];
 
+  // ── Helper: forzar que la sección pineada ocupe el viewport real ──
+  // El navegador mobile cambia el viewport al colapsar la barra de direcciones.
+  // GSAP cachea la altura al inicio → queda mal en scroll-down.
+  let pinActive = false;
+
+  function syncHeight() {
+    if (!isDesktop && pinActive) {
+      triggerEl.style.height = window.innerHeight + 'px';
+    }
+  }
+
   gsap.timeline({
     scrollTrigger: {
       trigger: triggerEl,
       start: 'top top',
-      end: isDesktop ? '+=2400' : '+=1300',
+      end: isDesktop ? '+=2400' : '+=800',
       pin: true,
-      scrub: isDesktop ? 1.5 : 1.1,
+      pinSpacing: true,
+      scrub: isDesktop ? 1.5 : 1,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      onToggle(self) {
+        pinActive = self.isActive;
+        if (!isDesktop) {
+          if (self.isActive) {
+            syncHeight();
+          }
+        }
+      },
       onUpdate(self) {
+        // En mobile, sincronizar altura en cada frame de scroll
+        // para seguir el cambio del viewport (barra de direcciones)
+        if (!isDesktop && self.isActive) {
+          syncHeight();
+        }
         if (labelEls.length) actualizarEtiquetas(labelEls, self.progress);
       },
     },
@@ -144,6 +169,11 @@ function initCubeScrollPin(): void {
     ease: 'none',
     duration: 1,
   });
+
+  // Escuchar cambios del visual viewport (barra de direcciones)
+  if (!isDesktop && window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncHeight, { passive: true });
+  }
 }
 
 // ── Etiquetas flotantes ───────────────────────────────────────

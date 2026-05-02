@@ -91,7 +91,8 @@
 }
 
 .navbar > * {
-  flex-shrink: 0;
+  /* Allow shrinking to fit mobile viewports */
+  flex-shrink: 1;
 }
 
 .navbar-menu {
@@ -136,6 +137,18 @@
 }
 .navbar-menu a:hover { color: var(--champana); }
 .navbar-menu a:hover::after { width: 100%; }
+
+.navbar-search-link {
+  color: var(--lila-claro);
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  transition: color var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.navbar-search-link:hover { color: var(--champana); }
 
 .navbar-carrito {
   color: var(--lila-claro);
@@ -878,8 +891,8 @@
   perspective: 500px;
   margin-bottom: 2.5rem;
   cursor: default;
-  position: relative;   /* necesario para las etiquetas flotantes (GSAP) */
-  overflow: visible;    /* las etiquetas salen fuera del bounding box del cubo */
+  position: relative;
+  overflow: visible;
 }
 
 /* Cubo — mantiene el espacio 3D y gira */
@@ -893,7 +906,7 @@
   transform: rotateX(-15deg) rotateY(0deg);
 }
 
-/* ── Caras comunes ── */
+/* -- Caras comunes -- */
 .hero-cubo-cara {
   position: absolute;
   width: var(--cubo-size);
@@ -909,7 +922,7 @@
     0 4px 16px rgba(0, 0, 0, 0.3);
   border-radius: 4px;
 
-  /* Gradiente sutil diferente por cara — se sobreescribe abajo */
+  /* Gradiente sutil diferente por cara */
   background: linear-gradient(
     135deg,
     rgba(91, 42, 134, 0.18) 0%,
@@ -946,12 +959,12 @@
   opacity: 1;
 }
 
-/* ── Posición de cada cara ── */
+/* -- Posicion de cada cara -- */
 
 /* frente: Z+ */
 .hero-cubo-frente  { transform: translateZ(var(--cubo-half)); }
 
-/* detrás: Z- */
+/* detras: Z- */
 .hero-cubo-detras  { transform: rotateY(180deg) translateZ(var(--cubo-half)); }
 
 /* izquierda: -X */
@@ -963,7 +976,6 @@
 /* arriba: -Y */
 .hero-cubo-arriba  {
   transform: rotateX(90deg) translateZ(var(--cubo-half));
-  /* cara superior un poco más brillante */
   background: linear-gradient(
     135deg,
     rgba(196, 168, 232, 0.18) 0%,
@@ -975,7 +987,6 @@
 /* abajo: +Y */
 .hero-cubo-abajo   {
   transform: rotateX(-90deg) translateZ(var(--cubo-half));
-  /* cara inferior más oscura */
   background: linear-gradient(
     135deg,
     rgba(18, 11, 24, 0.4) 0%,
@@ -983,7 +994,7 @@
   );
 }
 
-/* ── Keyframe: solo rota en Y para que se vea el tilt X inicial ── */
+/* Keyframe: solo rota en Y para que se vea el tilt X inicial */
 @keyframes cubo-girar {
   0%   { transform: rotateX(-15deg) rotateY(0deg); }
   100% { transform: rotateX(-15deg) rotateY(360deg); }

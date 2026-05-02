@@ -5,13 +5,19 @@
 /* ---- Celular ≤ 768px ---- */
 @media (max-width: 768px) {
 
-  /* Cubo 3D — reducido a 140px */
+  /* Cubo 3D — reducido para caber en pantallas reales */
   :root {
-    --cubo-size: 140px;
-    --cubo-half: 70px;
+    --cubo-size: 120px;
+    --cubo-half: 60px;
   }
+
+  .seccion-cubo {
+    overflow: visible;
+  }
+
   .hero-cubo-escena {
     margin-bottom: 0;
+    perspective: 400px;
   }
 
   .navbar-hamburguesa {
@@ -36,12 +42,21 @@
 
   /* Shrink user actions to fit */
   .navbar-search-link {
-    display: none; /* Hide text link */
+    display: flex;
+    align-items: center;
+    color: var(--lila-claro);
   }
-  .btn-login, .btn-register {
+  .navbar-search-link .search-text {
+    display: none; /* Only hide text on mobile */
+  }
+  .btn-login {
     padding: 6px 10px;
     font-size: 0.7rem;
     letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .btn-register {
+    display: none; /* Hide register on mobile to save space, they can register from login page */
   }
   .user-name {
     display: none; /* Only show avatar on mobile */
