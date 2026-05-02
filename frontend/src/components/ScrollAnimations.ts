@@ -131,7 +131,7 @@ function initCubeScrollPin(): void {
   let pinActive = false;
 
   function syncHeight() {
-    if (!isDesktop && pinActive) {
+    if (!isDesktop && pinActive && triggerEl) {
       triggerEl.style.height = window.innerHeight + 'px';
     }
   }
