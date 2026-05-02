@@ -23,11 +23,11 @@ export function ProductCard(product: Product): string {
   let imgHtml = '✨';
   if (imagenes.length > 0) {
     if (imagenes.length === 1) {
-      imgHtml = `<img src="${imagenes[0]}" alt="${escapeHtml(product.name)}" loading="lazy">`;
+      imgHtml = `<img src="${imagenes[0]}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">`;
     } else {
       // CSS-based scrollable carousel
       const imagesHtml = imagenes.map((img, i) => 
-        `<img src="${img}" alt="${escapeHtml(product.name)} - vista ${i + 1}" loading="lazy">`
+        `<img src="${img}" alt="${escapeHtml(product.name)} - vista ${i + 1}" loading="lazy" decoding="async">`
       ).join('');
       
       imgHtml = `

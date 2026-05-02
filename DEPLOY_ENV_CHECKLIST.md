@@ -6,23 +6,23 @@
 
 | Variable | Para qué sirve | De dónde la saco | Valor específico |
 |----------|----------------|------------------|------------------|
-| `DATABASE_URL` | Conexión a PostgreSQL | Neon dashboard | `postgresql://neondb_owner:npg_JTt5cNFjKh4U@ep-autumn-flower-a43r15dj.us-east-1.aws.neon.tech/neondb?sslmode=require` |
+| `DATABASE_URL` | Conexión a PostgreSQL | Neon dashboard | `postgresql://USER:PASSWORD@HOST/DB?sslmode=require` |
 | `JWT_SECRET` | Clave maestra JWT | Generar tú mismo | Mínimo 32 caracteres únicos |
 | `JWT_ACCESS_SECRET` | Clave para tokens de acceso | Generar tú mismo | Mínimo 32 caracteres únicos |
 | `JWT_REFRESH_SECRET` | Clave para tokens de refresh | Generar tú mismo | Mínimo 32 caracteres únicos |
 | `FRONTEND_URL` | CORS - URL tienda | Cloudflare Pages | `https://tu-tienda.pages.dev` |
 | `ADMIN_URL` | CORS - URL admin | Cloudflare Pages | `https://tu-admin.pages.dev` |
-| `CLOUDINARY_CLOUD_NAME` | Storage de imágenes | Cloudinary dashboard | `515977735966422` |
-| `CLOUDINARY_API_KEY` | API key Cloudinary | Cloudinary dashboard | `5I_RJbSADOW5Agqcu3Fkp7iSd7M` |
+| `CLOUDINARY_CLOUD_NAME` | Storage de imágenes | Cloudinary dashboard | `tu_cloud_name` |
+| `CLOUDINARY_API_KEY` | API key Cloudinary | Cloudinary dashboard | `tu_cloudinary_api_key` |
 | `CLOUDINARY_API_SECRET` | API secret Cloudinary | Cloudinary dashboard | Tu API secret real |
-| `BOLD_API_KEY` | Pagos Bold Colombia | Bold dashboard (test) | `F5Qr6cY_pRw4MwaDyzxmvlU1RoRnF4oghFnNDSG18x0` |
-| `BOLD_INTEGRITY_SECRET` | Webhook Bold Colombia | Bold dashboard (test) | `J_wadDN1A7VsCfBb5ZIaig` |
+| `BOLD_API_KEY` | Pagos Bold Colombia | Bold dashboard (test) | `tu_bold_api_key_test` |
+| `BOLD_INTEGRITY_SECRET` | Webhook Bold Colombia | Bold dashboard (test) | `tu_bold_integrity_secret_test` |
 
 ### OPCIONALES - El backend funciona sin estas
 
 | Variable | Para qué sirve | De dónde la saco | Valor específico |
 |----------|----------------|------------------|------------------|
-| `RESEND_API_KEY` | Envío de emails | Resend dashboard | `re_cQR3UiJh_AMHUHZqhdS3Ci3WcVUUPkasu` |
+| `RESEND_API_KEY` | Envío de emails | Resend dashboard | `re_tu_api_key` |
 | `FROM_EMAIL` | Email remitente | Configurar tú mismo | `noreply@belledesir.com` |
 
 ### CON VALORES POR DEFECTO - No es necesario configurar
@@ -59,8 +59,8 @@
 1. Ir a https://cloudinary.com
 2. Dashboard > Account Details
 3. Copiar:
-   - Cloud name: `515977735966422`
-   - API key: `5I_RJbSADOW5Agqcu3Fkp7iSd7M`
+   - Cloud name: `tu_cloud_name`
+   - API key: `tu_cloudinary_api_key`
    - API secret: tu secret real
 4. Configurar en Render
 
@@ -68,14 +68,14 @@
 1. Ir a https://bold.co
 2. Panel > Integraciones > API
 3. Modo test:
-   - API key: `F5Qr6cY_pRw4MwaDyzxmvlU1RoRnF4oghFnNDSG18x0`
-   - Integrity secret: `J_wadDN1A7VsCfBb5ZIaig`
+   - API key: `tu_bold_api_key_test`
+   - Integrity secret: `tu_bold_integrity_secret_test`
 4. Configurar webhook URL después de deploy
 
 ### 4. Resend (Emails - Opcional)
 1. Ir a https://resend.com
 2. API Keys > Create API Key
-3. Copiar key: `re_cQR3UiJh_AMHUHZqhdS3Ci3WcVUUPkasu`
+3. Copiar key: `re_tu_api_key`
 4. Configurar en Render
 
 ### 5. JWT Keys (Seguridad)

@@ -15,8 +15,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
-import { AppError } from '../shared/errors/AppError.js';
-import { env } from '../config/env.js';
+import { AppError } from '../shared/errors/AppError';
+import { env } from '../config/env';
 
 /**
  * errorHandler

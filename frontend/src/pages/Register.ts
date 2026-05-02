@@ -3,7 +3,7 @@
 // Formulario de registro de nuevos usuarios
 // ============================================================
 
-import { register, saveSession } from '../services/authService.js';
+import { register, saveSession, renderGoogleSignInButton } from '../services/authService.js';
 
 export function initRegisterPage(): void {
   const container = document.getElementById('contenido-principal');
@@ -13,11 +13,12 @@ export function initRegisterPage(): void {
     <main class="register-page">
       <div class="register-container">
         <section class="register-form-section" style="max-width: 540px; margin: 10vh auto 0;">
-          <h2 class="seccion-titulo">Crea tu cuenta en <em>Belle Désir</em></h2>
+          <h2 class="seccion-titulo">Crea tu cuenta en <em>Belle Desir</em></h2>
           <p class="verificacion-texto" style="margin-bottom: 1rem;">
-            Regístrate para disfrutar de una experiencia de compra personalizada.
+            Para comprar debes crear una cuenta o iniciar sesion. Asi protegemos tu pedido y el seguimiento del pago.
           </p>
-          
+          <div id="google-register-button" class="google-auth-button"></div>
+          <div class="auth-divider"><span>o crea tu cuenta con correo</span></div>
           <form id="register-form" class="checkout-form" novalidate>
             <div class="form-group full">
               <label for="register-name">Nombre completo</label>
@@ -115,6 +116,12 @@ function initRegisterForm(): void {
   const errorDiv = document.getElementById('register-error') as HTMLDivElement;
   
   if (!form || !submitBtn || !errorDiv) return;
+
+  void renderGoogleSignInButton(
+    'google-register-button',
+    () => { window.location.href = '/'; },
+    (message) => showError(message)
+  );
 
   // Toggle password visibility
   const togglePasswordBtn = document.getElementById('toggle-password') as HTMLButtonElement;

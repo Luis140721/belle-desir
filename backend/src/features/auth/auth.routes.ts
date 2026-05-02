@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { AuthController } from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { authenticate } from '../../middleware/authenticate';
-import { registerSchema, loginSchema, refreshSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schemas';
+import { registerSchema, loginSchema, refreshSchema, googleLoginSchema, forgotPasswordSchema, resetPasswordSchema } from './auth.schemas';
 import { asyncHandler } from '../../shared/utils/asyncHandler';
 import rateLimit from 'express-rate-limit';
 
@@ -17,6 +17,7 @@ const authLimiter = rateLimit({
 
 authRoutes.post('/register', authLimiter, validate(registerSchema), asyncHandler(AuthController.register));
 authRoutes.post('/login', authLimiter, validate(loginSchema), asyncHandler(AuthController.login));
+authRoutes.post('/google', authLimiter, validate(googleLoginSchema), asyncHandler(AuthController.googleLogin));
 authRoutes.post('/refresh', validate(refreshSchema), asyncHandler(AuthController.refresh));
 authRoutes.post('/logout', authenticate(), asyncHandler(AuthController.logout));
 authRoutes.get('/me', authenticate(), asyncHandler(AuthController.getMe));

@@ -1,0 +1,1 @@
+ALTER TYPE "SiteMediaPlacement" ADD VALUE 'CUBE_FACE';

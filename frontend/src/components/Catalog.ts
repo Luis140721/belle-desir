@@ -10,6 +10,7 @@ import { ProductCard } from './ProductCard.js';
 import { emit } from '../utils/events.js';
 import { toNumber } from '../utils/currency.js';
 import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
+import { initCatalogScrollEffects } from './ScrollAnimations.js';
 
 export async function initCatalogo(): Promise<void> {
   const grid     = document.getElementById('catalogo-grid') as HTMLDivElement | null;
@@ -28,8 +29,8 @@ export async function initCatalogo(): Promise<void> {
     todosLosProductos = await getAllProducts();
     renderProductos(todosLosProductos, grid, loading, vacio);
     initFiltros(todosLosProductos, filtros, grid, loading, vacio);
+    requestAnimationFrame(() => initCatalogScrollEffects());
   } catch (err) {
-    console.error('[Belle Désir] Error al cargar catálogo:', err);
     renderError(grid, loading);
   }
 
@@ -162,8 +163,8 @@ function renderError(grid: HTMLElement, loading: HTMLElement | null): void {
   setLoading(false, loading);
   grid.innerHTML = /* html */ `
     <div class="catalogo-error">
-      <p>No pudimos cargar los productos.</p>
-      <p class="hint">¿El backend está corriendo?</p>
+      <p>El catalogo esta tardando un poco en cargar.</p>
+      <p class="hint">Intenta de nuevo en unos segundos.</p>
       <button onclick="location.reload()" class="btn-secundario">
         Reintentar
       </button>
@@ -217,6 +218,7 @@ function initFiltros(
       const slug = btn.dataset.slug ?? 'todos';
       const filtrados = await getProductsByCategory(slug);
       renderProductos(filtrados, grid, loading, vacio);
+      requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
     } catch {
       renderError(grid, loading);
     }

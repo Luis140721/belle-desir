@@ -20,6 +20,7 @@ import { orderRoutes } from './features/orders/orders.routes';
 import { paymentRoutes } from './features/payments/payments.routes';
 import { adminRoutes } from './features/admin/admin.routes';
 import { reviewRoutes } from './features/reviews/reviews.routes';
+import { siteMediaRoutes } from './features/siteMedia/siteMedia.routes';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -49,8 +50,26 @@ if (env.NODE_ENV !== 'production') {
 }
 
 // ── 1. Seguridad: Helmet ─────────────────────────────────────
-// Helmet configura headers HTTP de seguridad (CSP, X-Frame, etc.)
-app.use(helmet());
+// Helmet configura headers HTTP de seguridad. Permitimos que frontend/admin
+// consuman imagenes y videos servidos por /uploads desde otro puerto/dominio.
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'blob:', 'http://localhost:*', 'https://res.cloudinary.com'],
+      mediaSrc: ["'self'", 'blob:', 'http://localhost:*', 'https://res.cloudinary.com'],
+      objectSrc: ["'none'"],
+      scriptSrc: ["'self'"],
+      scriptSrcAttr: ["'none'"],
+      styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+    },
+  },
+}));
 
 // ── 2. CORS ──────────────────────────────────────────────────
 // Podría fallar si FRONTEND_URL o ADMIN_URL tienen formato incorrecto
@@ -132,6 +151,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/products/:productId/reviews', reviewRoutes);
+app.use('/api/site-media', siteMediaRoutes);
 
 // ── Manejo de rutas no encontradas ───────────────────────────
 app.use((_req, res) => {

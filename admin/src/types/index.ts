@@ -101,3 +101,27 @@ export interface AdminStats {
   topSellingProducts: { productId: string; name: string; quantitySold: number }[];
   revenueByDay: { date: string; revenue: number }[];
 }
+
+export type SiteMediaType = 'IMAGE' | 'VIDEO';
+
+export type SiteMediaPlacement =
+  | 'HERO_BACKGROUND'
+  | 'CATALOG_SUPPORT'
+  | 'ABOUT_SUPPORT'
+  | 'CONTACT_SUPPORT'
+  | 'CUBE_FACE';
+
+export interface SiteMedia {
+  id: string;
+  placement: SiteMediaPlacement;
+  type: SiteMediaType;
+  title: string;
+  subtitle?: string | null;
+  url: string;
+  posterUrl?: string | null;
+  altText?: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}

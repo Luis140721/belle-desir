@@ -3,6 +3,7 @@ import { initCartSidebar } from './components/CartSidebar.js';
 import { initNavbar } from './components/Navbar.js';
 import { initSearch } from './components/Search.js';
 import { initScrollAnimations } from './components/ScrollAnimations.js';
+import { initSiteMedia } from './components/SiteMedia.js';
 import { initCheckoutPage } from './pages/checkout.js';
 import { initLoginPage } from './pages/login.js';
 import { initRegisterPage } from './pages/Register.js';
@@ -13,12 +14,14 @@ import { initOrderDetailPage } from './pages/OrderDetail.js';
 import { initForgotPasswordPage } from './pages/ForgotPassword.js';
 import { initResetPasswordPage } from './pages/ResetPassword.js';
 import { isLoggedIn } from './services/authService.js';
+import { scheduleLazyTask, warmBackend } from './utils/lazyApi.js';
 
 export function initRouter(): void {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  warmBackend();
 
   // Protected routes - redirect to login if not authenticated
-  const protectedRoutes = ['/mis-pedidos', '/mis-pedidos/:id'];
+  const protectedRoutes = ['/checkout', '/mis-pedidos', '/mis-pedidos/:id'];
   const isProtectedRoute = protectedRoutes.some(route => {
     if (route.includes(':id')) {
       return path.startsWith(route.split(':')[0]);
@@ -80,5 +83,6 @@ export function initRouter(): void {
   initSearch();
   initCartSidebar();
   void initCatalogo();
+  scheduleLazyTask(() => void initSiteMedia(), 500);
   initScrollAnimations();
 }

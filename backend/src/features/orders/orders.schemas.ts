@@ -1,34 +1,28 @@
 import { z } from 'zod';
 import { OrderStatus } from '@prisma/client';
 
-// ─── Ítem de carrito enviado desde el frontend ───────────────
 const cartItemSchema = z.object({
   productId: z.string().cuid(),
   quantity: z.number().int().positive(),
 });
 
-// ─── Dirección de envío ──────────────────────────────────────
 const shippingAddressSchema = z.object({
-  name:    z.string().min(2),
-  email:   z.string().email().optional(),
-  phone:   z.string().optional(),
-  // Solo se recibe la dirección; ciudad y país son fijos
+  name: z.string().min(2),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
   address: z.string().min(5),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  zip: z.string().optional(),
+  notes: z.string().optional(),
 });
 
-// ─── Crear orden ─────────────────────────────────────────────
-// Acepta pedidos autenticados (items viene del carrito DB)
-// Y pedidos de invitado (items viene en el body)
 export const createOrderSchema = z.object({
   body: z.object({
     shippingAddress: shippingAddressSchema,
-    // Invitados envían los items en el body; usuarios autenticados
-    // pueden enviarlos también (el servicio usa DB como fallback)
+    // The authenticated user's database cart is the source of truth. Items are
+    // accepted only as a fallback for older clients that send an authenticated cart.
     items: z.array(cartItemSchema).optional(),
-    // Datos del comprador invitado
-    guestEmail: z.string().email().optional(),
-    guestName:  z.string().optional(),
-    guestPhone: z.string().optional(),
   }),
 });
 
@@ -38,5 +32,5 @@ export const updateOrderStatusSchema = z.object({
   }),
 });
 
-export type CreateOrderInput    = z.infer<typeof createOrderSchema>['body'];
+export type CreateOrderInput = z.infer<typeof createOrderSchema>['body'];
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>['body'];

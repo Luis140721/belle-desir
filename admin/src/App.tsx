@@ -11,6 +11,7 @@ import { ProductForm } from './pages/products/ProductForm';
 import { OrdersList } from './pages/orders/OrdersList';
 import { OrderDetail } from './pages/orders/OrderDetail';
 import { CategoriesList } from './pages/categories/CategoriesList';
+import { SiteMediaPage } from './pages/media/SiteMediaPage';
 
 function App() {
   return (
@@ -38,6 +39,9 @@ function App() {
                 
                 {/* Categories */}
                 <Route path="categories" element={<CategoriesList />} />
+
+                {/* Site media */}
+                <Route path="media" element={<SiteMediaPage />} />
               </Route>
             </Route>
 

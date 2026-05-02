@@ -11,12 +11,13 @@
 
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import { prisma } from '../../config/database';
 import { Role } from '@prisma/client';
 import { AppError } from '../../shared/errors/AppError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt.utils';
 import { sendPasswordReset } from '../../services/emailService';
-import { RegisterInput, LoginInput } from './auth.schemas';
+import { RegisterInput, LoginInput, GoogleLoginInput } from './auth.schemas';
 
 export class AuthService {
 
@@ -107,6 +108,52 @@ export class AuthService {
 
       console.error('[Auth] ❌ Error inesperado durante login de ' + data.email + ':', error);
       throw new AppError('Error al iniciar sesión. Intenta de nuevo.', 500);
+    }
+  }
+
+  static async googleLogin(data: GoogleLoginInput) {
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      throw new AppError('Google login is not configured', 503);
+    }
+
+    try {
+      const client = new OAuth2Client(googleClientId);
+      const ticket = await client.verifyIdToken({
+        idToken: data.credential,
+        audience: googleClientId,
+      });
+
+      const payload = ticket.getPayload();
+      const email = payload?.email;
+      const emailVerified = payload?.email_verified;
+
+      if (!email || !emailVerified) {
+        throw new AppError('Google account email must be verified', 401);
+      }
+
+      const name = payload?.name || email.split('@')[0];
+      let user = await prisma.user.findUnique({ where: { email } });
+
+      if (!user) {
+        const randomPassword = randomBytes(32).toString('hex');
+        const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
+        user = await prisma.user.create({
+          data: {
+            email,
+            name,
+            password: hashedPassword,
+            role: Role.USER,
+          },
+        });
+      }
+
+      return this.generateAuthResponse(user);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      console.error('[Auth] Google login error:', error);
+      throw new AppError('No fue posible iniciar sesion con Google', 401);
     }
   }
 

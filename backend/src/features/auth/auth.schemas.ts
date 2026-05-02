@@ -26,6 +26,12 @@ export const refreshSchema = z.object({
   }),
 });
 
+export const googleLoginSchema = z.object({
+  body: z.object({
+    credential: z.string().min(1, 'Google credential is required'),
+  }),
+});
+
 export const forgotPasswordSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email format'),
@@ -46,5 +52,6 @@ export const resetPasswordSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>['body'];
 export type LoginInput = z.infer<typeof loginSchema>['body'];
 export type RefreshInput = z.infer<typeof refreshSchema>['body'];
+export type GoogleLoginInput = z.infer<typeof googleLoginSchema>['body'];
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>['body'];

@@ -299,8 +299,8 @@ function initBuyNow(product: Product): void {
         quantity: quantity,
       });
 
-      // Redirigir a checkout
-      window.location.href = '/checkout';
+      // Comprar requiere cuenta; si no hay sesion, enviamos al login y volvemos al checkout.
+      window.location.href = localStorage.getItem('accessToken') ? '/checkout' : '/login?redirect=/checkout';
       
     } catch (error) {
       console.error('Error in buy now:', error);

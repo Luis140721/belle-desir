@@ -1,16 +1,11 @@
-// ============================================================
-// COMPONENT — AgeVerification
-// Muestra el overlay de verificación de edad o lo omite
-// si el usuario ya verificó en una sesión anterior.
-// ============================================================
-
 import { emit } from '../utils/events.js';
+import { isLoggedIn } from '../services/authService.js';
 
 export function initAgeVerification(): void {
-  const overlay   = document.getElementById('verificacion-edad') as HTMLDivElement | null;
+  const overlay = document.getElementById('verificacion-edad') as HTMLDivElement | null;
   const contenido = document.getElementById('contenido-principal') as HTMLDivElement | null;
   const btnEntrar = document.getElementById('btn-entrar') as HTMLButtonElement | null;
-  const btnSalir  = document.getElementById('btn-salir') as HTMLButtonElement | null;
+  const btnSalir = document.getElementById('btn-salir') as HTMLButtonElement | null;
 
   if (!overlay || !contenido || !btnEntrar || !btnSalir) return;
 
@@ -20,17 +15,14 @@ export function initAgeVerification(): void {
     emit('age:verified');
   }
 
-  // Si ya había verificado antes, mostramos el contenido directamente
-  if (localStorage.getItem('edadVerificada') === 'true') {
+  // Authenticated users can continue directly. Visitors must confirm age on
+  // every page load; we intentionally do not persist age confirmation locally.
+  if (isLoggedIn()) {
     mostrarContenido();
     return;
   }
 
-  // Si no, esperamos que haga clic
-  btnEntrar.addEventListener('click', () => {
-    localStorage.setItem('edadVerificada', 'true');
-    mostrarContenido();
-  });
+  btnEntrar.addEventListener('click', mostrarContenido);
 
   btnSalir.addEventListener('click', () => {
     window.location.href = 'https://www.google.com';

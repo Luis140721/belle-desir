@@ -33,6 +33,80 @@ export function initScrollAnimations(): void {
   });
 }
 
+export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}): void {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const catalog = document.getElementById('catalogo');
+  const heading = catalog?.querySelector<HTMLElement>('.catalogo-encabezado');
+  const filters = catalog?.querySelectorAll<HTMLElement>('.filtro-btn');
+  const grid = document.getElementById('catalogo-grid');
+  const cards = grid?.querySelectorAll<HTMLElement>('.producto-card');
+
+  if (!catalog || !grid || !cards?.length) return;
+
+  if (!options.cardsOnly && heading && !heading.dataset.scrollAnimated) {
+    heading.dataset.scrollAnimated = 'true';
+    gsap.from(heading, {
+      autoAlpha: 0,
+      y: 36,
+      duration: 0.9,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: heading,
+        start: 'top 84%',
+      },
+    });
+  }
+
+  if (!options.cardsOnly && filters?.length && !catalog.dataset.filtersAnimated) {
+    catalog.dataset.filtersAnimated = 'true';
+    gsap.from(filters, {
+      autoAlpha: 0,
+      y: 16,
+      duration: 0.55,
+      stagger: 0.06,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.catalogo-filtros',
+        start: 'top 88%',
+      },
+    });
+  }
+
+  ScrollTrigger.getAll()
+    .filter((trigger) => trigger.vars.id === 'catalog-cards-reveal')
+    .forEach((trigger) => trigger.kill());
+
+  gsap.set(cards, {
+    autoAlpha: 0,
+    y: 42,
+    scale: 0.96,
+    rotateX: 4,
+    transformOrigin: '50% 80%',
+  });
+
+  gsap.to(cards, {
+    autoAlpha: 1,
+    y: 0,
+    scale: 1,
+    rotateX: 0,
+    duration: 0.7,
+    stagger: {
+      each: 0.055,
+      from: 'start',
+    },
+    ease: 'power3.out',
+    scrollTrigger: {
+      id: 'catalog-cards-reveal',
+      trigger: grid,
+      start: 'top 86%',
+      once: true,
+    },
+  });
+
+  ScrollTrigger.refresh();
+}
+
 // ─────────────────────────────────────────────────────────────
 // 1. CUBO 3D — ScrollTrigger pin + rotación controlada por scroll
 // ─────────────────────────────────────────────────────────────
@@ -44,32 +118,30 @@ function initCubeScrollPin(): void {
 
   if (!triggerEl || !cubo || !escena) return;
 
-  // En móvil: la animación CSS se mantiene, sin pin
-  if (window.innerWidth < DESKTOP) return;
+  const isDesktop = window.innerWidth >= DESKTOP;
 
-  // GSAP toma el control → pausa la animación CSS
   cubo.style.animation = 'none';
-  gsap.set(cubo, { rotateX: -15, rotateY: 0 });
+  gsap.set(cubo, { rotateX: isDesktop ? -15 : -12, rotateY: 0 });
 
-  // Crear etiquetas flotantes y guardar referencias
-  const labelEls = crearEtiquetas(escena);
+  const labelEls = isDesktop ? crearEtiquetas(escena) : [];
 
-  // Timeline principal: el cubo gira 360° mientras dura el pin
   gsap.timeline({
     scrollTrigger: {
       trigger: triggerEl,
-      start:   'top top',
-      end:     '+=2400',      // 2 400 px de scroll = 1 vuelta completa
-      pin:     true,
-      scrub:   1.5,           // suavidad de seguimiento
+      start: 'top top',
+      end: isDesktop ? '+=2400' : '+=1300',
+      pin: true,
+      scrub: isDesktop ? 1.5 : 1.1,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
       onUpdate(self) {
-        actualizarEtiquetas(labelEls, self.progress);
+        if (labelEls.length) actualizarEtiquetas(labelEls, self.progress);
       },
     },
   }).to(cubo, {
-    rotateX: -15,
+    rotateX: isDesktop ? -15 : -12,
     rotateY: 360,
-    ease:    'none',
+    ease: 'none',
     duration: 1,
   });
 }

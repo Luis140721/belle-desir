@@ -5,6 +5,7 @@ import {
   Package, 
   ShoppingBag, 
   Tag, 
+  Images,
   LogOut, 
   Menu, 
   X,
@@ -30,6 +31,7 @@ export const AdminLayout: React.FC = () => {
     if (path.includes('/products')) return 'Productos';
     if (path.includes('/orders')) return 'Órdenes';
     if (path.includes('/categories')) return 'Categorías';
+    if (path.includes('/media')) return 'Contenido visual';
     return 'Panel de Administración';
   };
 
@@ -38,6 +40,7 @@ export const AdminLayout: React.FC = () => {
     { to: '/admin/products', label: 'Productos', icon: <Package size={18} /> },
     { to: '/admin/orders', label: 'Órdenes', icon: <ShoppingBag size={18} /> },
     { to: '/admin/categories', label: 'Categorías', icon: <Tag size={18} /> },
+    { to: '/admin/media', label: 'Contenido visual', icon: <Images size={18} /> },
   ];
 
   const formattedTime = time.toLocaleTimeString('es-CO', {

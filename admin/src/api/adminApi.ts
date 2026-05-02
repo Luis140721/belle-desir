@@ -6,7 +6,8 @@ import {
   Category, 
   Order, 
   AdminStats, 
-  OrderStatus 
+  OrderStatus,
+  SiteMedia
 } from '../types';
 import { API_BASE_URL } from '../config/api';
 
@@ -125,6 +126,31 @@ export const ordersApi = {
 export const dashboardApi = {
   getStats: async (): Promise<ApiResponse<AdminStats>> => {
     const { data } = await adminApi.get('/admin/stats');
+    return data;
+  },
+};
+
+export const siteMediaApi = {
+  getAll: async (): Promise<ApiResponse<SiteMedia[]>> => {
+    const { data } = await adminApi.get('/site-media/admin');
+    return data;
+  },
+  create: async (payload: Partial<SiteMedia>): Promise<ApiResponse<SiteMedia>> => {
+    const { data } = await adminApi.post('/site-media/admin', payload);
+    return data;
+  },
+  update: async (id: string, payload: Partial<SiteMedia>): Promise<ApiResponse<SiteMedia>> => {
+    const { data } = await adminApi.put(`/site-media/admin/${id}`, payload);
+    return data;
+  },
+  delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
+    const { data } = await adminApi.delete(`/site-media/admin/${id}`);
+    return data;
+  },
+  upload: async (formData: FormData): Promise<ApiResponse<{ url: string; mimetype: string; type: 'IMAGE' | 'VIDEO' }>> => {
+    const { data } = await adminApi.post('/site-media/admin/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data;
   },
 };

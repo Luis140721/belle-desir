@@ -22,6 +22,19 @@ enum OrderStatus {
   REFUNDED
 }
 
+enum SiteMediaType {
+  IMAGE
+  VIDEO
+}
+
+enum SiteMediaPlacement {
+  HERO_BACKGROUND
+  CATALOG_SUPPORT
+  ABOUT_SUPPORT
+  CONTACT_SUPPORT
+  CUBE_FACE
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
@@ -126,4 +139,21 @@ model Review {
   createdAt          DateTime @default(now())
 
   @@unique([userId, productId])
+}
+
+model SiteMedia {
+  id          String             @id @default(cuid())
+  placement   SiteMediaPlacement
+  type        SiteMediaType
+  title       String
+  subtitle    String?
+  url         String
+  posterUrl   String?
+  altText     String?
+  isActive    Boolean            @default(true)
+  sortOrder   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([placement, isActive, sortOrder])
 }

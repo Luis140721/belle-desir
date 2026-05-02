@@ -82,6 +82,11 @@ export class AuthController {
     sendResponse(res, 200, result);
   }
 
+  static async googleLogin(req: Request, res: Response) {
+    const result = await AuthService.googleLogin(req.body);
+    sendResponse(res, 200, result);
+  }
+
   /**
    * @swagger
    * /auth/refresh:

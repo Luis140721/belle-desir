@@ -8,6 +8,135 @@
   <meta name="robots" content="noindex">
 
   <title>Belle Désir — Conócete sin límites</title>
+  <style>
+    :root {
+      --critical-bg: #120B18;
+      --critical-panel: rgba(255, 255, 255, 0.05);
+      --critical-border: rgba(196, 168, 232, 0.15);
+      --critical-text: #F5EDE1;
+      --critical-muted: #9a8fb0;
+      --critical-accent: #C4A8E8;
+      --critical-violet: #5B2A86;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--critical-bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--critical-bg);
+      color: var(--critical-text);
+      font-family: 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+    }
+
+    .verificacion-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+      background: radial-gradient(ellipse at center, #2A163A 0%, #120B18 70%);
+    }
+
+    .verificacion-caja {
+      width: min(90vw, 480px);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      border: 1px solid var(--critical-border);
+      border-radius: 24px;
+      background: var(--critical-panel);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .verificacion-logo {
+      margin-bottom: 0.5rem;
+      color: var(--critical-text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2rem, 8vw, 2.5rem);
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+    }
+
+    .verificacion-linea {
+      width: 50px;
+      height: 1px;
+      margin: 0.8rem auto 1.5rem;
+      background: var(--critical-accent);
+    }
+
+    .verificacion-subtitulo {
+      margin: 0 0 0.8rem;
+      color: var(--critical-accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+
+    .verificacion-titulo {
+      margin: 0 0 1rem;
+      color: var(--critical-text);
+      font-size: 1.6rem;
+      font-weight: 400;
+    }
+
+    .verificacion-texto {
+      margin: 0 0 2rem;
+      color: var(--critical-muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    .verificacion-botones {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-primario,
+    .btn-secundario {
+      border-radius: 999px;
+      padding: 0.95rem 1.4rem;
+      cursor: pointer;
+      font: inherit;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .btn-primario {
+      border: 1px solid var(--critical-accent);
+      background: linear-gradient(135deg, var(--critical-violet), #2D1B69);
+      color: var(--critical-text);
+    }
+
+    .btn-secundario {
+      border: 1px solid var(--critical-border);
+      background: transparent;
+      color: var(--critical-accent);
+    }
+  </style>
 
   <!-- Fuente elegante para los títulos -->
   <link
@@ -344,6 +473,22 @@
     </aside>
     <div class="carrito-overlay oculto" id="carrito-overlay"></div>
 
+    <!-- FLOATING CONTACT BUTTONS -->
+    <a
+      class="floating-whatsapp-btn"
+      href="https://wa.me/573159739914?text=Hola%20Belle%20D%C3%A9sir%2C%20me%20gustar%C3%ADa%20recibir%20asesor%C3%ADa%20discreta"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Escribir a Belle Désir por WhatsApp"
+      title="Asesoría discreta por WhatsApp"
+    >
+      <span class="floating-btn-icon" aria-hidden="true">💬</span>
+      <span class="floating-btn-text">
+        <strong>WhatsApp</strong>
+        <small>Asesoria discreta</small>
+      </span>
+    </a>
+
     <!-- FLOATING CART BUTTON -->
     <div 
       class="floating-cart-btn" 
@@ -353,7 +498,11 @@
       aria-label="Abrir carrito flotante"
       title="Ver tu carrito"
     >
-      🛒
+      <span class="floating-btn-icon" aria-hidden="true">🛒</span>
+      <span class="floating-btn-text">
+        <strong>Carrito</strong>
+        <small>Ver compra</small>
+      </span>
       <span class="floating-cart-badge" id="floating-contador-carrito">0</span>
     </div>
 

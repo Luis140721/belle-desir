@@ -8,9 +8,9 @@
 // - Variables de entorno inválidas → env.ts lanza process.exit(1)
 // ============================================================
 
-import app from './app.js';
-import { env } from './config/env.js';
-import { prisma } from './config/database.js';
+import app from './app';
+import { env } from './config/env';
+import { prisma } from './config/database';
 
 /**
  * startServer()

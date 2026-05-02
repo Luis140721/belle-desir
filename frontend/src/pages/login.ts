@@ -1,4 +1,4 @@
-import { login, saveSession } from '../services/authService.js';
+import { login, saveSession, renderGoogleSignInButton } from '../services/authService.js';
 
 export function initLoginPage(): void {
   const container = document.getElementById('contenido-principal');
@@ -11,10 +11,12 @@ export function initLoginPage(): void {
     <main class="checkout-page">
       <div class="checkout-container">
         <section class="checkout-form-section" style="max-width: 540px; margin: 10vh auto 0;">
-          <h2 class="seccion-titulo">Inicia sesión para <em>pagar</em></h2>
+          <h2 class="seccion-titulo">Inicia sesion para <em>comprar</em></h2>
           <p class="verificacion-texto" style="margin-bottom: 1rem;">
-            Necesitas iniciar sesión para continuar con tu compra.
+            Debes iniciar sesion para comprar. No procesamos pedidos sin cuenta.
           </p>
+          <div id="google-login-button" class="google-auth-button"></div>
+          <div class="auth-divider"><span>o entra con correo</span></div>
           <form id="login-form" class="checkout-form" novalidate>
             <div class="form-group full">
               <label for="login-email">Correo</label>
@@ -42,6 +44,15 @@ export function initLoginPage(): void {
   const error = document.getElementById('login-error');
 
   if (!form || !btn || !error) return;
+
+  void renderGoogleSignInButton(
+    'google-login-button',
+    () => { window.location.href = redirect; },
+    (message) => {
+      error.textContent = message;
+      error.classList.remove('oculto');
+    }
+  );
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
