@@ -4,8 +4,9 @@
 // genera filtros por categoría y maneja estados UI
 // ============================================================
 
-import type { Product } from '../types/index.js';
+import type { Product, Category } from '../types/index.js';
 import { getAllProducts, getProductsByCategory } from '../services/productService.js';
+import { getAllCategories } from '../services/categoryService.js';
 import { ProductCard } from './ProductCard.js';
 import { emit } from '../utils/events.js';
 import { toNumber } from '../utils/currency.js';
@@ -17,21 +18,62 @@ export async function initCatalogo(): Promise<void> {
   const loading  = document.getElementById('catalogo-loading') as HTMLDivElement | null;
   const vacio    = document.getElementById('catalogo-vacio') as HTMLDivElement | null;
   const filtros  = document.getElementById('catalogo-filtros') as HTMLDivElement | null;
+  const loadMoreBtn = document.getElementById('btn-load-more') as HTMLButtonElement | null;
+  const loadMoreContainer = document.getElementById('catalogo-load-more') as HTMLDivElement | null;
 
   if (!grid) return;
+
+  let currentPage = 1;
+  let currentSlug = 'todos';
+
+  function updatePagination(meta: any) {
+    // meta.page < meta.totalPages
+    if (meta && meta.page < meta.totalPages) {
+      loadMoreContainer?.classList.remove('oculto');
+    } else {
+      loadMoreContainer?.classList.add('oculto');
+    }
+  }
 
   // ── Estado de carga inicial ───────────────────────────────
   setLoading(true, loading);
 
-  let todosLosProductos: Product[] = [];
-
   try {
-    todosLosProductos = await getAllProducts();
-    renderProductos(todosLosProductos, grid, loading, vacio);
-    initFiltros(todosLosProductos, filtros, grid, loading, vacio);
+    // 1. Cargar Categorías primero para los filtros
+    const categories = await getAllCategories();
+    initFiltros(categories, filtros, grid, loading, vacio, updatePagination, (slug, page) => {
+      currentSlug = slug;
+      currentPage = page;
+    });
+
+    // 2. Cargar primera tanda de productos
+    const paginated = await getAllProducts(1, 10);
+    renderProductos(paginated.data, grid, loading, vacio);
+    updatePagination(paginated.meta);
+    
     requestAnimationFrame(() => initCatalogScrollEffects());
   } catch (err) {
     renderError(grid, loading);
+  }
+
+  // ── Evento Cargar Más ────────────────────────────────────
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', async () => {
+      currentPage++;
+      const oldHtml = loadMoreBtn.innerHTML;
+      loadMoreBtn.innerHTML = 'Cargando...';
+      try {
+        const paginated = await getProductsByCategory(currentSlug, currentPage, 10);
+        const newHtml = paginated.data.map(ProductCard).join('');
+        grid.insertAdjacentHTML('beforeend', newHtml);
+        updatePagination(paginated.meta);
+        requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        loadMoreBtn.innerHTML = oldHtml;
+      }
+    });
   }
 
   // ── Delegación de eventos: botones "Agregar" ──────────────
@@ -73,10 +115,8 @@ export async function initCatalogo(): Promise<void> {
   grid.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     
-    // Capturar clics en prev/next
     const btn = target.closest<HTMLButtonElement>('.carousel-btn');
     if (btn) {
-      // Prevents event from bubbling and maybe causing Catalog bugs
       e.stopPropagation();
       e.preventDefault();
       
@@ -93,7 +133,6 @@ export async function initCatalogo(): Promise<void> {
       return;
     }
     
-    // Capturar clics en los indicadores (puntitos)
     const indicator = target.closest<HTMLElement>('.indicator');
     if (indicator) {
       e.stopPropagation();
@@ -118,7 +157,6 @@ export async function initCatalogo(): Promise<void> {
   
   // ── Delegación de eventos: Scroll para indicadores ──────────
   grid.addEventListener('scroll', (e) => {
-    // Si el scroll proviene de un track de carrusel
     const track = e.target as HTMLElement;
     if (!track.classList?.contains('card-carousel-track')) return;
     
@@ -131,7 +169,8 @@ export async function initCatalogo(): Promise<void> {
       if (i === index) ind.classList.add('active');
       else ind.classList.remove('active');
     });
-  }, { capture: true }); // Usamos capture porque 'scroll' no burbujea
+  }, { capture: true });
+
   // ── Delegación de eventos: Navbar Dropdown Filtros ──────────
   document.querySelectorAll('.nav-filter-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
@@ -148,8 +187,11 @@ export async function initCatalogo(): Promise<void> {
         setLoading(true, loading);
         if (vacio) vacio.classList.add('oculto');
         try {
-          const filtrados = await getProductsByCategory(slug);
-          renderProductos(filtrados, grid, loading, vacio);
+          currentSlug = slug;
+          currentPage = 1;
+          const paginated = await getProductsByCategory(slug, 1, 10);
+          renderProductos(paginated.data, grid, loading, vacio);
+          updatePagination(paginated.meta);
           requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
         } catch {
           renderError(grid, loading);
@@ -198,32 +240,37 @@ function renderError(grid: HTMLElement, loading: HTMLElement | null): void {
 }
 
 function initFiltros(
-  productos: Product[],
+  categories: Category[],
   contenedor: HTMLElement | null,
   grid: HTMLElement,
   loading: HTMLElement | null,
-  vacio: HTMLElement | null
+  vacio: HTMLElement | null,
+  updatePagination: (meta: any) => void,
+  onFilterChange: (slug: string, page: number) => void
 ): void {
   if (!contenedor) return;
 
-  // Extrae categorías únicas
-  const categorias = [
-    ...new Set(
-      productos.map((p) => p.category?.slug).filter((s): s is string => Boolean(s))
-    ),
-  ];
+  // Limpiar filtros existentes excepto "Todos" si ya existe o crearlo si no
+  let todosBtn = contenedor.querySelector('.filtro-btn[data-slug="todos"]');
+  if (!todosBtn) {
+    todosBtn = document.createElement('button');
+    todosBtn.className = 'filtro-btn activo';
+    (todosBtn as HTMLElement).dataset.slug = 'todos';
+    todosBtn.textContent = 'Todos';
+    contenedor.appendChild(todosBtn);
+  }
 
-  const nombres: Record<string, string> = {};
-  productos.forEach((p) => {
-    if (p.category?.slug) nombres[p.category.slug] = p.category.name;
+  // Eliminar otros botones de filtro para regenerarlos
+  contenedor.querySelectorAll('.filtro-btn').forEach(b => {
+    if ((b as HTMLElement).dataset.slug !== 'todos') b.remove();
   });
 
   // Genera botones de categoría
-  categorias.forEach((slug) => {
+  categories.forEach((cat) => {
     const btn = document.createElement('button');
     btn.className = 'filtro-btn';
-    btn.dataset.slug = slug;
-    btn.textContent = nombres[slug] ?? slug;
+    btn.dataset.slug = cat.slug;
+    btn.textContent = cat.name;
     contenedor.appendChild(btn);
   });
 
@@ -241,8 +288,10 @@ function initFiltros(
 
     try {
       const slug = btn.dataset.slug ?? 'todos';
-      const filtrados = await getProductsByCategory(slug);
-      renderProductos(filtrados, grid, loading, vacio);
+      onFilterChange(slug, 1);
+      const paginated = await getProductsByCategory(slug, 1, 10);
+      renderProductos(paginated.data, grid, loading, vacio);
+      updatePagination(paginated.meta);
       requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
     } catch {
       renderError(grid, loading);

@@ -40,9 +40,12 @@ export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}):
   const heading = catalog?.querySelector<HTMLElement>('.catalogo-encabezado');
   const filters = catalog?.querySelectorAll<HTMLElement>('.filtro-btn');
   const grid = document.getElementById('catalogo-grid');
-  const cards = grid?.querySelectorAll<HTMLElement>('.producto-card');
+  // Solo animamos las tarjetas que NO han sido animadas aún si se solicita
+  const cards = options.cardsOnly 
+    ? grid?.querySelectorAll<HTMLElement>('.producto-card:not([data-animated])')
+    : grid?.querySelectorAll<HTMLElement>('.producto-card');
 
-  if (!catalog || !grid || !cards?.length) return;
+  if (!catalog || !grid || !cards || cards.length === 0) return;
 
   if (!options.cardsOnly && heading && !heading.dataset.scrollAnimated) {
     heading.dataset.scrollAnimated = 'true';
@@ -72,6 +75,9 @@ export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}):
     });
   }
 
+  // Marcar como animadas para evitar repetir en futuros "Cargar más"
+  cards.forEach(c => c.dataset.animated = 'true');
+
   ScrollTrigger.getAll()
     .filter((trigger) => trigger.vars.id === 'catalog-cards-reveal')
     .forEach((trigger) => trigger.kill());
@@ -95,10 +101,12 @@ export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}):
       from: 'start',
     },
     ease: 'power3.out',
-    scrollTrigger: {
+    // Si son tarjetas nuevas, las animamos de inmediato sin esperar al scroll
+    // (porque el usuario ya está ahí al darle clic al botón)
+    scrollTrigger: options.cardsOnly ? undefined : {
       id: 'catalog-cards-reveal',
       trigger: grid,
-      start: 'top 86%',
+      start: 'top 82%',
       once: true,
     },
   });
