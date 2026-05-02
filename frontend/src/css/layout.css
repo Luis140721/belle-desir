@@ -138,6 +138,58 @@
 .navbar-menu a:hover { color: var(--champana); }
 .navbar-menu a:hover::after { width: 100%; }
 
+/* ---- DROPDOWN MENU ---- */
+.navbar-dropdown {
+  position: relative;
+}
+.dropdown-arrow {
+  font-size: 0.6rem;
+  margin-left: 2px;
+  display: inline-block;
+  transition: transform var(--transition-normal);
+}
+.navbar-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(18, 11, 24, 0.98);
+  border: 1px solid rgba(196, 168, 232, 0.15);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) 0;
+  list-style: none;
+  min-width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+.navbar-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.dropdown-menu li {
+  width: 100%;
+}
+.dropdown-menu a {
+  display: block;
+  padding: var(--space-2) var(--space-4);
+  width: 100%;
+  text-align: center;
+}
+.dropdown-menu a::after {
+  display: none; /* Sin línea hover abajo */
+}
+.dropdown-menu a:hover {
+  background: rgba(196, 168, 232, 0.1);
+}
+
 .navbar-search-link {
   color: var(--lila-claro);
   text-decoration: none;

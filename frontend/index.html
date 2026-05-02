@@ -196,7 +196,15 @@
 
       <ul class="navbar-menu" id="navbar-menu" role="list">
         <li><a href="#">Inicio</a></li>
-        <li><a href="#catalogo">Catálogo</a></li>
+        <li class="navbar-dropdown">
+          <a href="#catalogo" class="dropdown-toggle" aria-haspopup="true">Catálogo <span class="dropdown-arrow">▼</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#catalogo?cat=juguetes">Juguetes</a></li>
+            <li><a href="#catalogo?cat=lenceria">Lencería</a></li>
+            <li><a href="#catalogo?cat=hombre">Hombre</a></li>
+            <li><a href="#catalogo?cat=mujer">Mujer</a></li>
+          </ul>
+        </li>
         <li><a href="#nosotros">Nosotros</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
