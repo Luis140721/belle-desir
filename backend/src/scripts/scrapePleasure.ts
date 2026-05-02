@@ -37,7 +37,11 @@ async function scrapeProductDetails(productUrl: string) {
     const $ = cheerio.load(data);
     
     // Extraer descripción
-    let descriptionEl = $('.product-single__description, .product-description, .product__description').first();
+    let descriptionEl = $('.product-single__description, .product-description, .product__description, .product--block--description').first();
+    if (!descriptionEl.length) {
+      // Intentar encontrar cualquier div de descripción
+      descriptionEl = $('[class*="desc"]').filter((i, el) => $(el).text().trim().length > 50).first();
+    }
     
     // Transformar <br> y <p> en saltos de línea reales para que no se vea todo pegado
     descriptionEl.find('br').replaceWith('\n');
@@ -49,14 +53,15 @@ async function scrapeProductDetails(productUrl: string) {
 
     // Extraer imágenes secundarias si existen
     const images: string[] = [];
-    $('.product-single__thumbnails img, .product-gallery__image img').each((_, el) => {
-      let src = $(el).attr('src') || $(el).attr('data-src');
-      if (src) {
+    $('img').each((_, el) => {
+      let src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('srcset');
+      if (src && src.includes('cdn.shopify') && !src.includes('data:image')) {
+        src = src.split(' ')[0]; // si es srcset, tomar el primero
         if (src.startsWith('//')) src = 'https:' + src;
-        // Quitar sufijos de Shopify como _800x o _1024x1024 pero de forma más segura
+        // Quitar parámetros de width para mejor resolución
+        src = src.replace(/&width=\d+/g, '');
+        // Quitar sufijos _100x100 de forma segura solo al final antes del punto
         src = src.replace(/_\d+x\d*(?=\.\w+(?:\?|$))/g, '');
-        // A veces hay imágenes muy pequeñas como _50x50, quitar eso:
-        src = src.replace(/_\d+x\d*([._])/g, '$1');
         if (!images.includes(src)) images.push(src);
       }
     });
@@ -149,7 +154,8 @@ async function run() {
         }
         // Limpiar sufijos de tamaño de Shopify
         if (imageSrc) {
-           imageSrc = imageSrc.replace(/_[a-zA-Z0-9x]+(\.[a-zA-Z0-9]+)(\?.*)?$/, '$1');
+           imageSrc = imageSrc.replace(/&width=\d+/g, '');
+           imageSrc = imageSrc.replace(/_\d+x\d*(?=\.\w+(?:\?|$))/g, '');
         }
 
         console.log(`\n[${i+1}/${limit}] Procesando: ${name}`);
