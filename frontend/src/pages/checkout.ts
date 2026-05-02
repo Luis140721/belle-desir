@@ -161,8 +161,20 @@ export async function initCheckoutPage(): Promise<void> {
                 </div>
               </div>
               <div class="checkout-politicas-resumen">
-                <p>• No cobramos comisión por el pago.</p>
-                <p>• Envío 100% discreto y seguro.</p>
+                <div class="checkout-politica-item">
+                  <div class="checkout-politica-icono">🛡️</div>
+                  <div class="checkout-politica-texto">
+                    <strong>Cero Comisiones</strong>
+                    No cobramos cargos adicionales por el método de pago.
+                  </div>
+                </div>
+                <div class="checkout-politica-item">
+                  <div class="checkout-politica-icono">🔒</div>
+                  <div class="checkout-politica-texto">
+                    <strong>Envío 100% Discreto</strong>
+                    Empaque sin logos ni descripciones del contenido.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
