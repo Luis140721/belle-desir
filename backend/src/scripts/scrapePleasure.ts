@@ -106,65 +106,77 @@ async function run() {
     }
 
     try {
-      const { data } = await axios.get(`${BASE_URL}${collection.url}`, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-        }
-      });
-      const $ = cheerio.load(data);
-      
-      // Selectores típicos de Shopify para items de producto
-      const productElements = $('.product-card--root').toArray();
-      console.log(`Se encontraron ${productElements.length} productos en la página principal de la colección.`);
+      let page = 1;
+      let totalScrapedCategory = 0;
+      let hasMore = true;
 
-      // Procesar hasta 50 productos por colección para hacerlo masivo
-      const limit = Math.min(productElements.length, 50);
-      
-      for (let i = 0; i < limit; i++) {
-        const el = productElements[i];
+      while (hasMore && totalScrapedCategory < 100) {
+        console.log(`\n-- Extrayendo página ${page} de ${collection.name} --`);
+        const { data } = await axios.get(`${BASE_URL}${collection.url}?page=${page}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+          }
+        });
+        const $ = cheerio.load(data);
         
-        // Extraer link
-        const link = $(el).find('a.product-card--title-link, a.product-card--image-wrapper').attr('href') || $(el).find('a').first().attr('href');
-        if (!link) continue;
-        
-        const fullUrl = link.startsWith('http') ? link : `${BASE_URL}${link}`;
-        
-        // Extraer nombre
-        let name = $(el).find('.product-card--title-link').text().trim();
-        if (!name) name = $(el).find('.product-card--title').text().trim();
-        if (!name) continue; // Si no hay nombre, saltar
-        
-        // Extraer precio - Buscamos primero si hay precio de oferta, sino el regular
-        let priceEl = $(el).find('.price-item--sale').length ? $(el).find('.price-item--sale') : $(el).find('.price-item--regular');
-        let priceText = priceEl.text().trim();
-        if (!priceText) priceText = $(el).find('.product--price-wrapper').text().trim();
-        
-        // Limpiar el precio: Extraer solo la primera secuencia de números (ej. $100.000 COP $80.000 COP -> 100000)
-        // Para evitar el overflow (10000080000), sacamos el primer número. Si está en oferta, a veces el menor es el último.
-        // Mejor quitamos todo texto y nos quedamos con los últimos dígitos si están juntos, o partimos por el signo $.
-        const rawPrices = priceText.split('$').map(s => s.replace(/[^\d]/g, '')).filter(Boolean);
-        // Si hay varios precios (oferta), tomamos el último (que suele ser el de oferta)
-        const finalPriceStr = rawPrices[rawPrices.length - 1] || '0';
-        const price = parseFloat(finalPriceStr);
-        
-        // Extraer imagen principal
-        let imageSrc = $(el).find('img').attr('data-src') || $(el).find('img').attr('src');
-        if (imageSrc && imageSrc.startsWith('//')) {
-          imageSrc = 'https:' + imageSrc;
-        }
-        // Limpiar sufijos de tamaño de Shopify
-        if (imageSrc) {
-           imageSrc = imageSrc.replace(/&width=\d+/g, '');
-           imageSrc = imageSrc.replace(/_\d+x\d*(?=\.\w+(?:\?|$))/g, '');
+        // Selectores típicos de Shopify para items de producto
+        const productElements = $('.product-card--root').toArray();
+        console.log(`Se encontraron ${productElements.length} productos en la página ${page}.`);
+
+        if (productElements.length === 0) {
+          hasMore = false;
+          break;
         }
 
-        console.log(`\n[${i+1}/${limit}] Procesando: ${name}`);
-        console.log(`Precio extraído: ${price}`);
+        for (let i = 0; i < productElements.length; i++) {
+          if (totalScrapedCategory >= 100) break;
 
-        // Scrapear detalles internos (descripción e imágenes extra)
-        // Para evitar bans, esperamos 2 segundos entre peticiones
-        await delay(2000);
-        const details = await scrapeProductDetails(fullUrl);
+          const el = productElements[i];
+          
+          // Extraer link
+          const link = $(el).find('a.product-card--title-link, a.product-card--image-wrapper').attr('href') || $(el).find('a').first().attr('href');
+          if (!link) continue;
+          
+          const fullUrl = link.startsWith('http') ? link : `${BASE_URL}${link}`;
+          
+          // Extraer nombre
+          let name = $(el).find('.product-card--title-link').text().trim();
+          if (!name) name = $(el).find('.product-card--title').text().trim();
+          if (!name) continue; // Si no hay nombre, saltar
+
+          // Revisar si ya existe en la BD para no duplicar (por recomendados o cross-selling)
+          const exists = await prisma.product.findFirst({ where: { name } });
+          if (exists) {
+            console.log(`(Omitido) El producto ya existe: ${name}`);
+            continue;
+          }
+          
+          // Extraer precio
+          let priceEl = $(el).find('.price-item--sale').length ? $(el).find('.price-item--sale') : $(el).find('.price-item--regular');
+          let priceText = priceEl.text().trim();
+          if (!priceText) priceText = $(el).find('.product--price-wrapper').text().trim();
+          
+          const rawPrices = priceText.split('$').map(s => s.replace(/[^\d]/g, '')).filter(Boolean);
+          const finalPriceStr = rawPrices[rawPrices.length - 1] || '0';
+          const price = parseFloat(finalPriceStr);
+          
+          // Extraer imagen principal
+          let imageSrc = $(el).find('img').attr('data-src') || $(el).find('img').attr('src');
+          if (imageSrc && imageSrc.startsWith('//')) {
+            imageSrc = 'https:' + imageSrc;
+          }
+          if (imageSrc) {
+             imageSrc = imageSrc.replace(/&width=\d+/g, '');
+             imageSrc = imageSrc.replace(/_\d+x\d*(?=\.\w+(?:\?|$))/g, '');
+          }
+
+          console.log(`\n[+] Procesando: ${name}`);
+          console.log(`Precio extraído: ${price}`);
+
+          // Scrapear detalles internos (descripción e imágenes extra)
+          // 800ms para acelerar el proceso pero no quemar el servidor
+          await delay(800);
+          const details = await scrapeProductDetails(fullUrl);
         
         const images = [imageSrc].filter(Boolean) as string[];
         // Agregar imagenes adicionales sin duplicar
@@ -180,7 +192,7 @@ async function run() {
             data: {
               name,
               slug,
-              description: details.description,
+              description: details.description.replace(/(\s*\n\s*)+/g, '\n').replace(/\n/g, '\n\n').trim(),
               price,
               stock: 10, // Stock por defecto
               isActive: true,
@@ -193,6 +205,9 @@ async function run() {
         } catch (dbError) {
           console.error(`❌ Error guardando ${name} en DB:`, (dbError as Error).message);
         }
+          totalScrapedCategory++;
+        }
+        page++;
       }
 
     } catch (error) {
