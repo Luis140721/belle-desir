@@ -19,8 +19,8 @@ export function initNavbar(): void {
       btnMenu.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
     });
 
-    // Cierra el menú al pulsar cualquier enlace
-    menu.querySelectorAll('a').forEach((link) => {
+    // Cierra el menú al pulsar enlaces que NO son dropdown toggles
+    menu.querySelectorAll('a:not(.dropdown-toggle)').forEach((link) => {
       link.addEventListener('click', () => {
         menu.classList.remove('abierto');
         btnMenu.classList.remove('abierto');
@@ -69,22 +69,12 @@ export function initNavbar(): void {
     });
   });
 
-  // Cierra el menú hamburguesa solo al pulsar enlaces que NO son dropdown toggles
-  if (menu && btnMenu) {
-    menu.querySelectorAll('a:not(.dropdown-toggle)').forEach((link) => {
-      link.addEventListener('click', () => {
-        menu.classList.remove('abierto');
-        btnMenu.classList.remove('abierto');
-      });
-    });
-  }
-
   // Cerrar al hacer click fuera
   document.addEventListener('click', () => {
     dropdowns.forEach(d => d.classList.remove('active'));
   });
 
-  // Cerrar al seleccionar opción
+  // Cerrar al seleccionar opción (de la lista de categorías)
   document.querySelectorAll('.dropdown-menu a').forEach(link => {
     link.addEventListener('click', () => {
       dropdowns.forEach(d => d.classList.remove('active'));
