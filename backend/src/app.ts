@@ -82,9 +82,15 @@ const allowedOrigins: string[] = [
   'http://localhost:5175',
 ];
 
-// Solo añadir si existen y no son strings vacíos
-if (env.FRONTEND_URL) allowedOrigins.push(env.FRONTEND_URL);
-if (env.ADMIN_URL) allowedOrigins.push(env.ADMIN_URL);
+// Solo añadir si existen y no son strings vacíos, soportando múltiples URLs separadas por coma
+if (env.FRONTEND_URL) {
+  const frontendUrls = env.FRONTEND_URL.split(',').map(url => url.trim());
+  allowedOrigins.push(...frontendUrls);
+}
+if (env.ADMIN_URL) {
+  const adminUrls = env.ADMIN_URL.split(',').map(url => url.trim());
+  allowedOrigins.push(...adminUrls);
+}
 
 console.info('[CORS] Orígenes permitidos:', JSON.stringify(allowedOrigins));
 
