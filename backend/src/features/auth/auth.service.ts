@@ -17,6 +17,7 @@ import { Role } from '@prisma/client';
 import { AppError } from '../../shared/errors/AppError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../shared/utils/jwt.utils';
 import { sendPasswordReset } from '../../services/emailService';
+import { env } from '../../config/env';
 import { RegisterInput, LoginInput, GoogleLoginInput } from './auth.schemas';
 
 export class AuthService {
@@ -112,7 +113,7 @@ export class AuthService {
   }
 
   static async googleLogin(data: GoogleLoginInput) {
-    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const googleClientId = env.GOOGLE_CLIENT_ID;
     if (!googleClientId) {
       throw new AppError('Google login is not configured', 503);
     }

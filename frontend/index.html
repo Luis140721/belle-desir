@@ -203,10 +203,12 @@
       <ul class="navbar-menu" id="navbar-menu" role="list">
         <li><a href="#">Inicio</a></li>
         <li class="navbar-dropdown">
-          <a href="#catalogo" class="dropdown-toggle" aria-haspopup="true">Catálogo <span class="dropdown-arrow">▼</span></a>
+          <a href="#catalogo" class="dropdown-toggle" aria-haspopup="true">Catálogo</a>
           <ul class="dropdown-menu">
-            <li><a href="#catalogo" class="nav-filter-btn" data-filter="juguetes">Juguetes</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="todos">Ver todo</a></li>
             <li><a href="#catalogo" class="nav-filter-btn" data-filter="lenceria">Lencería</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="juguetes">Juguetes</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="pareja">Pareja</a></li>
             <li><a href="#catalogo" class="nav-filter-btn" data-filter="hombre">Hombre</a></li>
             <li><a href="#catalogo" class="nav-filter-btn" data-filter="mujer">Mujer</a></li>
           </ul>
@@ -245,7 +247,17 @@
           Productos pensados para tu bienestar íntimo,
           con discreción, calidad y confianza.
         </p>
-        <a href="#catalogo" class="btn-primario">Ver catálogo</a>
+        <div class="hero-actions-container navbar-dropdown">
+          <a href="#catalogo" class="btn-primario dropdown-toggle">Ver catálogo</a>
+          <ul class="dropdown-menu hero-dropdown-menu">
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="todos">Ver todo</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="lenceria">Lencería</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="juguetes">Juguetes</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="pareja">Pareja</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="hombre">Hombre</a></li>
+            <li><a href="#catalogo" class="nav-filter-btn" data-filter="mujer">Mujer</a></li>
+          </ul>
+        </div>
       </div>
     </section>
     <!-- FIN hero -->

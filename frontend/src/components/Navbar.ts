@@ -40,6 +40,39 @@ export function initNavbar(): void {
     });
   }
 
+  // ── Menú Catálogo (Dropdown por Click) ───────────────────
+  const dropdowns = document.querySelectorAll('.navbar-dropdown');
+  
+  dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isActive = dropdown.classList.contains('active');
+      
+      // Cerrar otros dropdowns si los hubiera
+      dropdowns.forEach(d => d.classList.remove('active'));
+      
+      if (!isActive) {
+        dropdown.classList.add('active');
+      }
+    });
+  });
+
+  // Cerrar al hacer click fuera
+  document.addEventListener('click', () => {
+    dropdowns.forEach(d => d.classList.remove('active'));
+  });
+
+  // Cerrar al seleccionar opción
+  document.querySelectorAll('.dropdown-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      dropdowns.forEach(d => d.classList.remove('active'));
+    });
+  });
+
   // ── Clase scrolled para efectos futuros ──────────────────
   if (navbar) {
     window.addEventListener(
