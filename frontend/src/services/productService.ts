@@ -23,8 +23,9 @@ export async function getAllProducts(page = 1, limit = 12): Promise<PaginatedPro
  * Si no hay slug o es "todos", devuelve todos los productos.
  */
 export async function getProductsByCategory(slug: string, page = 1, limit = 12): Promise<PaginatedProducts> {
-  if (!slug || slug === 'todos') return getAllProducts(page, limit);
-  const body = await lazyJson<PaginatedProducts>(buildApiUrl(`products?category=${encodeURIComponent(slug)}&page=${page}&limit=${limit}`), {
+  const normalizedSlug = (slug || '').toLowerCase();
+  if (!normalizedSlug || normalizedSlug === 'todos') return getAllProducts(page, limit);
+  const body = await lazyJson<PaginatedProducts>(buildApiUrl(`products?category=${encodeURIComponent(normalizedSlug)}&page=${page}&limit=${limit}`), {
     timeoutMs: 30000,
     retries: 3,
   });

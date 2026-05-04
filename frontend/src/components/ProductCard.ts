@@ -47,7 +47,7 @@ export function ProductCard(product: Product): string {
   }
 
   return /* html */ `
-    <article class="producto-card" data-product-id="${product.id}">
+    <article class="producto-card" data-product-slug="${product.slug}">
       <div class="producto-card-imagen">
         ${imgHtml}
         ${!inStock ? '<div class="out-of-stock-overlay">Agotado</div>' : ''}
