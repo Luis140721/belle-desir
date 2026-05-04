@@ -53,13 +53,31 @@ export function initNavbar(): void {
       const isActive = dropdown.classList.contains('active');
       
       // Cerrar otros dropdowns si los hubiera
-      dropdowns.forEach(d => d.classList.remove('active'));
+      dropdowns.forEach(d => {
+        if (d !== dropdown) d.classList.remove('active');
+      });
       
       if (!isActive) {
         dropdown.classList.add('active');
+        // Auto-scroll si es el botón del hero en mobile
+        if (dropdown.classList.contains('hero-actions-container') && window.innerWidth < 768) {
+          dropdown.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        dropdown.classList.remove('active');
       }
     });
   });
+
+  // Cierra el menú hamburguesa solo al pulsar enlaces que NO son dropdown toggles
+  if (menu && btnMenu) {
+    menu.querySelectorAll('a:not(.dropdown-toggle)').forEach((link) => {
+      link.addEventListener('click', () => {
+        menu.classList.remove('abierto');
+        btnMenu.classList.remove('abierto');
+      });
+    });
+  }
 
   // Cerrar al hacer click fuera
   document.addEventListener('click', () => {
