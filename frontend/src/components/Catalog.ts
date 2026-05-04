@@ -12,6 +12,9 @@ import { emit } from '../utils/events.js';
 import { toNumber } from '../utils/currency.js';
 import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
 import { initCatalogScrollEffects } from './ScrollAnimations.js';
+import { openProductModal } from './ProductModal.js';
+
+let currentProducts: Product[] = [];
 
 export async function initCatalogo(): Promise<void> {
   const grid     = document.getElementById('catalogo-grid') as HTMLDivElement | null;
@@ -48,7 +51,8 @@ export async function initCatalogo(): Promise<void> {
 
     // 2. Cargar primera tanda de productos
     const paginated = await getAllProducts(1, 10);
-    renderProductos(paginated.data, grid, loading, vacio);
+    currentProducts = paginated.data || [];
+    renderProductos(currentProducts, grid, loading, vacio);
     updatePagination(paginated.meta);
     
     requestAnimationFrame(() => initCatalogScrollEffects());
@@ -64,7 +68,9 @@ export async function initCatalogo(): Promise<void> {
       loadMoreBtn.innerHTML = 'Cargando...';
       try {
         const paginated = await getProductsByCategory(currentSlug, currentPage, 10);
-        const newHtml = paginated.data.map(ProductCard).join('');
+        const newProducts = paginated.data || [];
+        currentProducts = [...currentProducts, ...newProducts];
+        const newHtml = newProducts.map(ProductCard).join('');
         grid.insertAdjacentHTML('beforeend', newHtml);
         updatePagination(paginated.meta);
         requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
@@ -105,53 +111,24 @@ export async function initCatalogo(): Promise<void> {
     btn.classList.add('agregado');
     btn.disabled = true;
     setTimeout(() => {
-      btn.textContent = '+ Agregar';
+      btn.textContent = '+';
       btn.classList.remove('agregado');
       btn.disabled = false;
     }, 1500);
   });
 
-  // ── Delegación de eventos: botones de carrusel ──────────────
+  // ── Delegación de eventos: abrir modal ────────────────────
   grid.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     
-    const btn = target.closest<HTMLButtonElement>('.carousel-btn');
-    if (btn) {
-      e.stopPropagation();
-      e.preventDefault();
-      
-      const carousel = btn.closest('.card-carousel');
-      const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
-      if (!carousel || !track) return;
-      
-      const scrollAmount = track.clientWidth;
-      if (btn.classList.contains('next-btn')) {
-        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      } else if (btn.classList.contains('prev-btn')) {
-        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      }
-      return;
-    }
-    
-    const indicator = target.closest<HTMLElement>('.indicator');
-    if (indicator) {
-      e.stopPropagation();
-      e.preventDefault();
-      
-      const indicatorSpan = indicator as HTMLElement;
-      const carousel = indicatorSpan.closest('.card-carousel');
-      const track = carousel?.querySelector('.card-carousel-track') as HTMLElement;
-      
-      if (!carousel || !track) return;
-      
-      const dotsContainer = indicatorSpan.parentElement;
-      if (dotsContainer) {
-        const dotsArray = Array.from(dotsContainer.children);
-        const index = dotsArray.indexOf(indicatorSpan);
-        if (index !== -1) {
-          track.scrollTo({ left: index * track.clientWidth, behavior: 'smooth' });
-        }
-      }
+    // Si hace click en agregar al carrito, no abrir modal
+    if (target.closest('.btn-agregar-carrito')) return;
+
+    const card = target.closest('.producto-card') as HTMLElement;
+    if (card) {
+      const productId = card.dataset.productId;
+      const product = currentProducts.find(p => String(p.id) === productId);
+      if (product) openProductModal(product);
     }
   });
   
@@ -190,7 +167,8 @@ export async function initCatalogo(): Promise<void> {
           currentSlug = slug;
           currentPage = 1;
           const paginated = await getProductsByCategory(slug, 1, 10);
-          renderProductos(paginated.data, grid, loading, vacio);
+          currentProducts = paginated.data || [];
+          renderProductos(currentProducts, grid, loading, vacio);
           updatePagination(paginated.meta);
           requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
         } catch {

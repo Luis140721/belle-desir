@@ -13,54 +13,25 @@ import { formatCOP, toNumber } from '../utils/currency.js';
  */
 export function ProductCard(product: Product): string {
   const precio = formatCOP(toNumber(product.price));
-  const imagen = product.images?.[0];
-  const categoria = product.category?.name ?? '';
+  const imagenPrincipal = product.images?.[0];
+  const imagenHover = product.images?.[1] || imagenPrincipal;
   const inStock = (product as any).inStock ?? product.stock > 0;
   
-  // Quitamos la variable stockBajo ya que la MEJORA-008 pide eliminar "unidades disponibles"
-
-  const imagenes = product.images && product.images.length > 0 ? product.images : [];
-  
-  let imgHtml = '✨';
-  if (imagenes.length > 0) {
-    if (imagenes.length === 1) {
-      imgHtml = `<img src="${imagenes[0]}" alt="${escapeHtml(product.name)}" loading="lazy" decoding="async">`;
-    } else {
-      // CSS-based scrollable carousel
-      const imagesHtml = imagenes.map((img, i) => 
-        `<img src="${img}" alt="${escapeHtml(product.name)} - vista ${i + 1}" loading="lazy" decoding="async">`
-      ).join('');
-      
-      imgHtml = `
-        <div class="card-carousel">
-          <div class="card-carousel-track">
-            ${imagesHtml}
-          </div>
-          <div class="card-carousel-indicators">
-            ${imagenes.map((_, i) => `<div class="indicator ${i === 0 ? 'active' : ''}"></div>`).join('')}
-          </div>
-          <button class="carousel-btn prev-btn" aria-label="Anterior">‹</button>
-          <button class="carousel-btn next-btn" aria-label="Siguiente">›</button>
-        </div>
-      `;
-    }
-  }
+  const imgHtml = imagenPrincipal 
+    ? `<img src="${imagenPrincipal}" alt="${escapeHtml(product.name)}" class="main-img" loading="lazy">
+       <img src="${imagenHover}" alt="${escapeHtml(product.name)} - vista alternativa" class="hover-img" loading="lazy">`
+    : '<div class="no-image">✨</div>';
 
   return /* html */ `
-    <article class="producto-card" data-product-slug="${product.slug}">
+    <article class="producto-card" data-product-slug="${product.slug}" data-product-id="${product.id}">
       <div class="producto-card-imagen">
         ${imgHtml}
         ${!inStock ? '<div class="out-of-stock-overlay">Agotado</div>' : ''}
       </div>
+      
       <div class="producto-card-info">
-        ${categoria ? `<span class="seccion-eyebrow" style="font-size:0.65rem">${escapeHtml(categoria)}</span>` : ''}
         <h3 class="producto-card-nombre">${escapeHtml(product.name)}</h3>
-        <p class="producto-card-descripcion">${escapeHtml(product.description)}</p>
-        
-        <!-- Stock indicators: Solo muestra Agotado según MEJORA-008 -->
-        <div class="stock-indicators">
-          ${!inStock ? '<span class="stock-badge out-of-stock">Agotado</span>' : ''}
-        </div>
+        <p class="producto-card-hint">Toca para ver detalles</p>
         
         <div class="producto-card-footer">
           <span class="producto-card-precio">${precio}</span>
@@ -69,11 +40,11 @@ export function ProductCard(product: Product): string {
             data-id="${product.id}"
             data-nombre="${escapeHtml(product.name)}"
             data-precio="${toNumber(product.price)}"
-            data-imagen="${imagen ?? ''}"
+            data-imagen="${imagenPrincipal ?? ''}"
             aria-label="Agregar ${escapeHtml(product.name)} al carrito"
             ${!inStock ? 'disabled' : ''}
           >
-            ${!inStock ? 'Agotado' : '+ Agregar'}
+            ${!inStock ? 'Agotado' : '+'}
           </button>
         </div>
       </div>
