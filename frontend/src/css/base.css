@@ -17,8 +17,8 @@
   --texto-gris:       #9a8fb0;
 
   /* --- TIPOGRAFÍA --- */
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-sans:  'Segoe UI', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans:  'Outfit', sans-serif;
 
   /* --- ESPACIADO (escala 4px) --- */
   --space-1:  0.25rem;   /* 4px  */

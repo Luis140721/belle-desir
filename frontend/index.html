@@ -17,6 +17,8 @@
       --critical-muted: #9a8fb0;
       --critical-accent: #C4A8E8;
       --critical-violet: #5B2A86;
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Outfit', sans-serif;
     }
 
     * {
@@ -32,7 +34,7 @@
       min-height: 100vh;
       background: var(--critical-bg);
       color: var(--critical-text);
-      font-family: 'Segoe UI', sans-serif;
+      font-family: var(--font-sans);
       -webkit-font-smoothing: antialiased;
     }
 
@@ -44,6 +46,12 @@
       position: absolute;
       top: -100%;
       left: 1rem;
+      background: var(--critical-violet);
+      color: var(--critical-text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      z-index: 10000;
     }
 
     .verificacion-overlay {
@@ -73,7 +81,7 @@
     .verificacion-logo {
       margin-bottom: 0.5rem;
       color: var(--critical-text);
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: var(--font-serif);
       font-size: clamp(2rem, 8vw, 2.5rem);
       font-style: italic;
       font-weight: 300;
@@ -100,6 +108,7 @@
       color: var(--critical-text);
       font-size: 1.6rem;
       font-weight: 400;
+      font-family: var(--font-serif);
     }
 
     .verificacion-texto {
@@ -138,15 +147,13 @@
     }
   </style>
 
-  <!-- Fuente elegante para los títulos -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap"
-    rel="stylesheet"
-  >
+  <!-- Fuentes amigables y premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
   <!-- Skip link de accesibilidad -->
   <a class="skip-link" href="#catalogo">Ir al catálogo</a>
 
@@ -169,7 +176,6 @@
       </div>
     </div>
   </div>
-  <!-- FIN verificacion-edad -->
 
   <!-- ========================================
        CONTENIDO PRINCIPAL
@@ -233,7 +239,7 @@
     <!-- FIN navbar -->
     <section class="hero">
       <div class="hero-contenido">
-        <p class="hero-eyebrow">Bienvenida a Belle Désir</p>
+        <p class="hero-eyebrow">Bienvenidx a Belle Désir</p>
         <h1 class="hero-titulo">Conócete<br><em>sin límites,<br>sin juicios.</em></h1>
         <p class="hero-subtitulo">
           Productos pensados para tu bienestar íntimo,
@@ -391,7 +397,7 @@
               </div>
             </div>
             <div class="whatsapp-burbuja">
-              <p>¡Hola! 👋 Bienvenida a Belle Désir.</p>
+              <p>¡Hola! 👋 Bienvenidx a Belle Désir.</p>
               <p>¿En qué te podemos ayudar hoy?</p>
               <span class="whatsapp-hora">ahora</span>
             </div>
@@ -463,7 +469,10 @@
         </div>
       </div>
     </footer>
-    <!-- FIN footer -->\n\n\n    <!-- SIDEBAR DEL CARRITO -->
+    <!-- FIN footer -->
+
+
+    <!-- SIDEBAR DEL CARRITO -->
     <aside
       id="carrito-sidebar"
       class="carrito-sidebar"
