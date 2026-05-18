@@ -87,6 +87,21 @@ export interface PaymentStatusResponse {
   checkoutUrl: string | null;
   transactionId: string | null;
   message: string;
+  orderData?: {
+    id: string;
+    status: string;
+    total: string;
+    subtotal: string;
+    shipping: string;
+    items: Array<{
+      quantity: number;
+      unitPrice: string;
+      product: {
+        name: string;
+        images: string[];
+      };
+    }>;
+  };
 }
 
 // Respuesta paginada de /api/products

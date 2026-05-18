@@ -1,5 +1,6 @@
 import { getPaymentStatus } from '../services/checkoutService.js';
 import type { PaymentStatusResponse } from '../types/index.js';
+import { formatCOP, toNumber } from '../utils/currency.js';
 
 const SOPORTE_WHATSAPP = '573159739914';
 const CART_KEYS = ['belle-desir-cart', 'cart', 'carrito', 'cartItems', 'checkoutCart', 'belle_cart'];
@@ -83,15 +84,45 @@ function renderChecking(container: HTMLElement, orderId: string): void {
 function renderPaymentResult(container: HTMLElement, status: PaymentStatusResponse): void {
   if (status.boldStatus === 'APPROVED' || status.orderStatus === 'PAID') {
     clearLocalCart();
+    
+    let summaryHtml = '';
+    if (status.orderData) {
+      const itemsHtml = status.orderData.items.map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; font-size:0.95rem; color:var(--texto-gris);">
+          <span>${escapeHtml(item.product.name)} <strong style="color:var(--lila-claro);">x${item.quantity}</strong></span>
+          <span>${formatCOP(toNumber(item.unitPrice) * item.quantity)}</span>
+        </div>
+      `).join('');
+
+      summaryHtml = `
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(196,168,232,0.1); border-radius:12px; padding:1.2rem; margin:1.5rem 0; text-align:left;">
+          <h3 style="color:var(--champana); font-family:var(--font-serif); font-size:1.1rem; border-bottom:1px solid rgba(196,168,232,0.15); padding-bottom:0.5rem; margin-bottom:1rem;">Resumen de tu pedido</h3>
+          <div style="max-height:180px; overflow-y:auto; margin-bottom:1rem; border-bottom:1px dashed rgba(196,168,232,0.1); padding-bottom:0.5rem;">
+            ${itemsHtml}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.9rem; color:var(--texto-gris);">
+            <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span>${formatCOP(toNumber(status.orderData.subtotal))}</span></div>
+            <div style="display:flex; justify-content:space-between;"><span>Envío:</span><span>${formatCOP(toNumber(status.orderData.shipping))}</span></div>
+            <div style="display:flex; justify-content:space-between; color:var(--champana); font-weight:bold; font-size:1.05rem; margin-top:0.3rem; border-top:1px solid rgba(196,168,232,0.1); padding-top:0.5rem;">
+              <span>Total:</span><span>${formatCOP(toNumber(status.orderData.total))}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     container.innerHTML = /* html */ `
       <main class="confirmacion-page">
-        <section class="confirmacion-card payment-result payment-result--success">
+        <section class="confirmacion-card payment-result payment-result--success" style="max-width:550px;">
           <div class="confirmacion-check">✓</div>
           <p class="confirmacion-eyebrow">Pago aprobado</p>
           <h1>Pedido confirmado</h1>
           <p>Tu pago fue aprobado y tu orden entro a preparacion.</p>
           <p class="confirmacion-ref">Orden: <strong>${escapeHtml(status.orderId)}</strong></p>
           ${status.transactionId ? `<p class="confirmacion-ref">Transaccion Bold: <strong>${escapeHtml(status.transactionId)}</strong></p>` : ''}
+          
+          ${summaryHtml}
+
           <div class="confirmacion-actions">
             <a href="/mis-pedidos/${encodeURIComponent(status.orderId)}" class="btn-primario confirmacion-btn">Ver pedido</a>
             <a href="/" class="btn-secundario confirmacion-btn">Seguir comprando</a>

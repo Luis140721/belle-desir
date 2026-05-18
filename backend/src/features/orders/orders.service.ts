@@ -163,25 +163,39 @@ export class OrderService {
     }
   }
 
-  static async getPublicPaymentStatus(orderId: string, redirectStatus?: string): Promise<PaymentStatusResult> {
+  static async getPublicPaymentStatus(orderId: string, redirectStatus?: string): Promise<PaymentStatusResult & { orderData?: any }> {
+    const orderSelect = {
+      id: true,
+      status: true,
+      stripeSessionId: true,
+      stripePaymentIntentId: true,
+      total: true,
+      subtotal: true,
+      shipping: true,
+      items: {
+        select: {
+          quantity: true,
+          unitPrice: true,
+          product: {
+            select: { name: true, images: true }
+          }
+        }
+      }
+    };
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      select: {
-        id: true,
-        status: true,
-        stripeSessionId: true,
-        stripePaymentIntentId: true,
-      },
+      select: orderSelect,
     });
 
     if (!order) throw new AppError('Order not found', 404);
 
     if (order.status === 'PAID') {
-      return this.buildPaymentStatus(order, 'APPROVED', 'Tu pago ya fue confirmado.');
+      return { ...this.buildPaymentStatus(order, 'APPROVED', 'Tu pago ya fue confirmado.'), orderData: order };
     }
 
     if (['CANCELLED', 'REFUNDED'].includes(order.status)) {
-      return this.buildPaymentStatus(order, 'REJECTED', 'El pago fue rechazado o cancelado.');
+      return { ...this.buildPaymentStatus(order, 'REJECTED', 'El pago fue rechazado o cancelado.'), orderData: order };
     }
 
     // ── 1. Intentar fallback por API de Bold ──────────────────
@@ -228,12 +242,7 @@ export class OrderService {
     // ── 3. Re-leer la orden actualizada ──────────────────────
     const refreshed = await prisma.order.findUnique({
       where: { id: orderId },
-      select: {
-        id: true,
-        status: true,
-        stripeSessionId: true,
-        stripePaymentIntentId: true,
-      },
+      select: orderSelect,
     });
 
     if (!refreshed) throw new AppError('Order not found', 404);
@@ -244,13 +253,16 @@ export class OrderService {
         ? 'REJECTED'
         : fallback?.boldStatus ?? 'PENDING';
 
-    return this.buildPaymentStatus(
-      refreshed,
-      boldStatus,
-      boldStatus === 'PENDING'
-        ? 'Estamos esperando la confirmacion de Bold.'
-        : 'Estado de pago actualizado.'
-    );
+    return {
+      ...this.buildPaymentStatus(
+        refreshed,
+        boldStatus,
+        boldStatus === 'PENDING'
+          ? 'Estamos esperando la confirmacion de Bold.'
+          : 'Estado de pago actualizado.'
+      ),
+      orderData: refreshed
+    };
   }
 
   static async applyBoldNotification(payload: any) {
