@@ -67,7 +67,8 @@ if (!_env.success) {
 }
 
 if (_env.data.NODE_ENV === 'production') {
-  const productionRequiredVars = [
+  const productionRequiredVars: (keyof z.infer<typeof envSchema>)[] = [
+    'DATABASE_URL',
     'JWT_SECRET',
     'JWT_ACCESS_SECRET',
     'JWT_REFRESH_SECRET',
@@ -78,7 +79,6 @@ if (_env.data.NODE_ENV === 'production') {
     'CLOUDINARY_API_SECRET',
     'BOLD_API_KEY',
     'BOLD_INTEGRITY_SECRET',
-    'BOLD_WEBHOOK_SECRET',
   ];
 
   const missingProductionVars = productionRequiredVars.filter((key) => !process.env[key]);
