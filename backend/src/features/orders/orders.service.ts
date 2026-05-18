@@ -7,6 +7,18 @@ import axios from 'axios';
 import { BOLD_API_URL, getBoldHeaders } from '../../config/bold';
 import { sendOrderConfirmation, sendOrderStatusUpdate, OrderData } from '../../services/emailService';
 
+type BoldPaymentState = 'APPROVED' | 'REJECTED' | 'PENDING' | 'UNKNOWN';
+
+interface PaymentStatusResult {
+  orderId: string;
+  orderStatus: string;
+  boldStatus: BoldPaymentState;
+  paymentLink: string | null;
+  checkoutUrl: string | null;
+  transactionId: string | null;
+  message: string;
+}
+
 export class OrderService {
   static async createOrder(userId: string, data: CreateOrderInput) {
     if (!userId) {
@@ -120,7 +132,7 @@ export class OrderService {
       description: `Pedido Belle Desir #${order.id.slice(0, 8).toUpperCase()}`,
       expiration_date: Math.floor((Date.now() + 30 * 60 * 1000) * 1e6),
       payment_methods: ['CREDIT_CARD', 'PSE', 'NEQUI', 'BOTON_BANCOLOMBIA'],
-      callback_url: `${env.FRONTEND_URL.split(',')[0]}/pedido-confirmado`,
+      callback_url: `${env.FRONTEND_URL.split(',')[0]}/pedido-confirmado?orderId=${order.id}`,
     };
 
     try {
@@ -149,6 +161,109 @@ export class OrderService {
       });
       return { orderId: order.id, checkoutUrl: null, paymentLink: null };
     }
+  }
+
+  static async getPublicPaymentStatus(orderId: string, redirectStatus?: string): Promise<PaymentStatusResult> {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        status: true,
+        stripeSessionId: true,
+        stripePaymentIntentId: true,
+      },
+    });
+
+    if (!order) throw new AppError('Order not found', 404);
+
+    if (order.status === 'PAID') {
+      return this.buildPaymentStatus(order, 'APPROVED', 'Tu pago ya fue confirmado.');
+    }
+
+    if (['CANCELLED', 'REFUNDED'].includes(order.status)) {
+      return this.buildPaymentStatus(order, 'REJECTED', 'El pago fue rechazado o cancelado.');
+    }
+
+    // ── 1. Intentar fallback por API de Bold ──────────────────
+    let resolved = false;
+
+    const fallback = await this.fetchBoldFallbackNotification(order.id);
+    if (fallback?.orderId) {
+      if (fallback.boldStatus === 'APPROVED') {
+        await this.markOrderPaid(fallback.orderId, fallback.transactionId);
+        resolved = true;
+      } else if (fallback.boldStatus === 'REJECTED') {
+        await this.markOrderCancelled(fallback.orderId, fallback.transactionId);
+        resolved = true;
+      }
+    }
+
+    if (!resolved && order.stripeSessionId) {
+      const linkStatus = await this.fetchBoldPaymentLinkStatus(order.stripeSessionId);
+      if (linkStatus?.boldStatus === 'APPROVED') {
+        await this.markOrderPaid(order.id, linkStatus.transactionId);
+        resolved = true;
+      } else if (linkStatus?.boldStatus === 'REJECTED') {
+        await this.markOrderCancelled(order.id, linkStatus.transactionId);
+        resolved = true;
+      }
+    }
+
+    // ── 2. Si la API no devolvió resultado, usar el redirect status de Bold ──
+    if (!resolved && redirectStatus) {
+      const mappedStatus = mapBoldNotificationStatus(redirectStatus);
+      console.info('[PaymentStatus] API fallback sin resultado, usando redirectStatus:', {
+        orderId, redirectStatus, mappedStatus,
+      });
+
+      if (mappedStatus === 'APPROVED') {
+        await this.markOrderPaid(order.id, null);
+        resolved = true;
+      } else if (mappedStatus === 'REJECTED') {
+        await this.markOrderCancelled(order.id, null);
+        resolved = true;
+      }
+    }
+
+    // ── 3. Re-leer la orden actualizada ──────────────────────
+    const refreshed = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        status: true,
+        stripeSessionId: true,
+        stripePaymentIntentId: true,
+      },
+    });
+
+    if (!refreshed) throw new AppError('Order not found', 404);
+
+    const boldStatus = refreshed.status === 'PAID'
+      ? 'APPROVED'
+      : ['CANCELLED', 'REFUNDED'].includes(refreshed.status)
+        ? 'REJECTED'
+        : fallback?.boldStatus ?? 'PENDING';
+
+    return this.buildPaymentStatus(
+      refreshed,
+      boldStatus,
+      boldStatus === 'PENDING'
+        ? 'Estamos esperando la confirmacion de Bold.'
+        : 'Estado de pago actualizado.'
+    );
+  }
+
+  static async applyBoldNotification(payload: any) {
+    const parsed = this.parseBoldNotification(payload);
+    if (!parsed.orderId) return parsed;
+
+    if (parsed.boldStatus === 'APPROVED') {
+      await this.markOrderPaid(parsed.orderId, parsed.transactionId);
+    } else if (parsed.boldStatus === 'REJECTED') {
+      await this.markOrderCancelled(parsed.orderId, parsed.transactionId);
+    }
+
+    return parsed;
   }
 
   static async getUserOrders(userId: string, query: any) {
@@ -232,4 +347,177 @@ export class OrderService {
       });
     });
   }
+
+  private static async markOrderPaid(orderId: string, transactionId?: string | null) {
+    await prisma.$transaction(async (tx) => {
+      const currentOrder = await tx.order.findUnique({
+        where: { id: orderId },
+        include: { items: true },
+      });
+
+      if (!currentOrder || currentOrder.status === 'PAID') return;
+
+      const order = await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: 'PAID',
+          ...(transactionId && { stripePaymentIntentId: transactionId }),
+        },
+        include: { items: true },
+      });
+
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.quantity } },
+        });
+      }
+
+      try {
+        const user = await tx.user.findUnique({ where: { id: order.userId } });
+        if (user?.email) {
+          const orderData: OrderData = {
+            id: order.id,
+            items: order.items.map((item: any) => ({
+              name: (item.productSnapshot as any).name as string,
+              quantity: item.quantity,
+              unitPrice: Number(item.unitPrice),
+            })),
+            total: Number(order.total),
+            shippingAddress: order.shippingAddress as any,
+          };
+          await sendOrderStatusUpdate(user.email, orderData, 'PAID');
+        }
+      } catch (emailError) {
+        console.warn('[Orders] No se pudo enviar email de pago confirmado:', emailError);
+      }
+    });
+  }
+
+  private static async markOrderCancelled(orderId: string, transactionId?: string | null) {
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: { items: true },
+      });
+
+      if (!order || order.status === 'CANCELLED') return;
+
+      if (order.status === 'PAID') {
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+      }
+
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          status: 'CANCELLED',
+          ...(transactionId && { stripePaymentIntentId: transactionId }),
+        },
+      });
+    });
+  }
+
+  private static async fetchBoldFallbackNotification(orderId: string) {
+    if (!env.BOLD_API_KEY) return null;
+
+    try {
+      const { data } = await axios.get(
+        `${BOLD_API_URL}/payments/webhook/notifications/${encodeURIComponent(orderId)}?is_external_reference=true`,
+        { headers: getBoldHeaders(), timeout: 8000 }
+      );
+      const notification = Array.isArray(data?.notifications) ? data.notifications[0] : null;
+      return notification ? this.parseBoldNotification(notification) : null;
+    } catch (error: any) {
+      console.warn('[BoldFallback] No se pudo consultar notificacion por referencia', {
+        orderId,
+        status: error?.response?.status,
+        message: error?.message,
+      });
+      return null;
+    }
+  }
+
+  private static async fetchBoldPaymentLinkStatus(paymentLink: string) {
+    if (!env.BOLD_API_KEY) return null;
+
+    try {
+      const { data } = await axios.get(
+        `${BOLD_API_URL}/online/link/v1/${encodeURIComponent(paymentLink)}`,
+        { headers: getBoldHeaders(), timeout: 8000 }
+      );
+      return {
+        boldStatus: mapBoldLinkStatus(data?.status),
+        transactionId: data?.transaction_id ?? null,
+      };
+    } catch (error: any) {
+      console.warn('[BoldFallback] No se pudo consultar link de pago', {
+        paymentLink,
+        status: error?.response?.status,
+        message: error?.message,
+      });
+      return null;
+    }
+  }
+
+  private static parseBoldNotification(payload: any) {
+    const transaction = payload?.transaction;
+    const data = payload?.data ?? transaction ?? {};
+    const type = payload?.type as string | undefined;
+    const rawStatus = transaction?.status ?? type ?? data?.status;
+    const metadata = data?.metadata ?? transaction?.metadata ?? {};
+
+    return {
+      orderId:
+        transaction?.order_reference ??
+        metadata?.reference ??
+        data?.reference ??
+        payload?.reference ??
+        null,
+      boldStatus: mapBoldNotificationStatus(rawStatus),
+      transactionId:
+        data?.payment_id ??
+        payload?.subject ??
+        transaction?.id ??
+        transaction?.payment_id ??
+        null,
+      rawStatus,
+    };
+  }
+
+  private static buildPaymentStatus(
+    order: { id: string; status: string; stripeSessionId: string | null; stripePaymentIntentId: string | null },
+    boldStatus: BoldPaymentState,
+    message: string
+  ): PaymentStatusResult {
+    return {
+      orderId: order.id,
+      orderStatus: order.status,
+      boldStatus,
+      paymentLink: order.stripeSessionId,
+      checkoutUrl: order.stripeSessionId ? `https://checkout.bold.co/${order.stripeSessionId}` : null,
+      transactionId: order.stripePaymentIntentId,
+      message,
+    };
+  }
+}
+
+function mapBoldNotificationStatus(status: string | undefined): BoldPaymentState {
+  const normalized = String(status ?? '').toUpperCase();
+  if (['APPROVED', 'SALE_APPROVED', 'VOID_REJECTED'].includes(normalized)) return 'APPROVED';
+  if (['DECLINED', 'REJECTED', 'SALE_REJECTED', 'VOIDED', 'VOID_APPROVED', 'ERROR', 'FAILED', 'CANCELLED'].includes(normalized)) return 'REJECTED';
+  if (['PENDING', 'PROCESSING', 'ACTIVE'].includes(normalized)) return 'PENDING';
+  return 'UNKNOWN';
+}
+
+function mapBoldLinkStatus(status: string | undefined): BoldPaymentState {
+  const normalized = String(status ?? '').toUpperCase();
+  if (normalized === 'PAID') return 'APPROVED';
+  if (['REJECTED', 'CANCELLED', 'EXPIRED'].includes(normalized)) return 'REJECTED';
+  if (['ACTIVE', 'PROCESSING'].includes(normalized)) return 'PENDING';
+  return 'UNKNOWN';
 }

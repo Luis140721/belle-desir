@@ -3,6 +3,7 @@ import type {
   CheckoutPayload,
   CheckoutResponse,
   OrderResponse,
+  PaymentStatusResponse,
   ShippingAddress,
   CartItem,
 } from '../types/index.js';
@@ -97,6 +98,18 @@ export async function createOrderWithShipping(
   shippingAddress: ShippingAddress
 ): Promise<OrderResponse> {
   return createOrder({ shippingAddress });
+}
+
+export async function getPaymentStatus(orderId: string, redirectStatus?: string): Promise<PaymentStatusResponse> {
+  const qs = redirectStatus ? `?redirectStatus=${encodeURIComponent(redirectStatus)}` : '';
+  const res = await fetch(buildApiUrl(`/orders/${orderId}/payment-status${qs}`));
+  const body = await safeJson(res);
+
+  if (!res.ok) {
+    throw new Error(body?.message ?? `Error ${res.status} consultando el pago`);
+  }
+
+  return body.data as PaymentStatusResponse;
 }
 
 export function getCartItems(): CartItem[] {

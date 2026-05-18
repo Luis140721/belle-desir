@@ -79,6 +79,16 @@ export interface OrderResponse {
   paymentLink: string | null;
 }
 
+export interface PaymentStatusResponse {
+  orderId: string;
+  orderStatus: 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  boldStatus: 'APPROVED' | 'REJECTED' | 'PENDING' | 'UNKNOWN';
+  paymentLink: string | null;
+  checkoutUrl: string | null;
+  transactionId: string | null;
+  message: string;
+}
+
 // Respuesta paginada de /api/products
 export interface PaginatedProducts {
   data: Product[];

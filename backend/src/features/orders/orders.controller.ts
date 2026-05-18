@@ -22,6 +22,12 @@ export class OrderController {
     sendResponse(res, 200, result);
   }
 
+  static async getPublicPaymentStatus(req: Request, res: Response) {
+    const redirectStatus = (req.query.redirectStatus as string) || undefined;
+    const result = await OrderService.getPublicPaymentStatus(req.params.id as string, redirectStatus);
+    sendResponse(res, 200, result);
+  }
+
   static async getAdminOrders(req: Request, res: Response) {
     const result = await OrderService.getAdminOrders(req.query);
     sendResponse(res, 200, result.data, result.meta);

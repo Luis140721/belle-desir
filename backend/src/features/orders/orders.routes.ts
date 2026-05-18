@@ -7,6 +7,8 @@ import { asyncHandler } from '../../shared/utils/asyncHandler';
 
 export const orderRoutes = Router();
 
+orderRoutes.get('/:id/payment-status', asyncHandler(OrderController.getPublicPaymentStatus));
+
 // Buying requires an authenticated account.
 orderRoutes.post(
   '/',

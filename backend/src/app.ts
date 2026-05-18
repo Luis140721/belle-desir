@@ -126,7 +126,12 @@ app.use('/api', limiter);
 
 // ── 4. Body Parser ───────────────────────────────────────────
 // Limitar tamaño del body para prevenir ataques de payload grande
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({
+  limit: '10kb',
+  verify: (req, _res, buf) => {
+    (req as express.Request).rawBody = Buffer.from(buf);
+  },
+}));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // ── 5. HTTP Parameter Pollution ──────────────────────────────

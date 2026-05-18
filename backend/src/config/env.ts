@@ -39,6 +39,7 @@ const envSchema = z.object({
 
   BOLD_API_KEY: z.string().min(1).optional(),
   BOLD_INTEGRITY_SECRET: z.string().min(1).optional(),
+  BOLD_WEBHOOK_SECRET: z.string().optional(),
 
   RESEND_API_KEY: z.string().min(1).optional(),
   FROM_EMAIL: z.string().email().optional(),
@@ -77,6 +78,7 @@ if (_env.data.NODE_ENV === 'production') {
     'CLOUDINARY_API_SECRET',
     'BOLD_API_KEY',
     'BOLD_INTEGRITY_SECRET',
+    'BOLD_WEBHOOK_SECRET',
   ];
 
   const missingProductionVars = productionRequiredVars.filter((key) => !process.env[key]);

@@ -63,7 +63,7 @@ export function initRouter(): void {
       return;
 
     case '/pedido-confirmado':
-      initPedidoConfirmadoPage();
+      void initPedidoConfirmadoPage();
       return;
   }
 

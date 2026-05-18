@@ -2364,12 +2364,76 @@
 
 .confirmacion-ref {
   color: var(--champana) !important;
+  overflow-wrap: anywhere;
 }
 
 .confirmacion-btn {
   display: block;
   width: 100%;
   margin-top: 0.7rem;
+}
+
+.confirmacion-eyebrow {
+  color: var(--lila-claro) !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.confirmacion-actions {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+.payment-result {
+  border-radius: 8px;
+}
+
+.payment-result--success {
+  border-color: rgba(120, 214, 135, 0.42);
+}
+
+.payment-result--failed {
+  border-color: rgba(255, 119, 119, 0.38);
+}
+
+.payment-result--pending,
+.payment-result--checking {
+  border-color: rgba(196, 168, 232, 0.28);
+}
+
+.payment-result-icon {
+  width: 86px;
+  height: 86px;
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.payment-result-icon--failed {
+  background: rgba(255, 119, 119, 0.12);
+  border: 1px solid rgba(255, 119, 119, 0.5);
+  color: #ff9b9b;
+}
+
+.payment-result-icon--pending {
+  background: rgba(196, 168, 232, 0.1);
+  border: 1px solid rgba(196, 168, 232, 0.32);
+  color: var(--champana);
+}
+
+.payment-result-icon--spinner {
+  border: 2px solid rgba(196, 168, 232, 0.18);
+  border-top-color: var(--lila-claro);
+  animation: payment-spin 900ms linear infinite;
+}
+
+@keyframes payment-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ======================================================
