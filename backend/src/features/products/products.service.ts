@@ -14,7 +14,8 @@ export class ProductService {
     };
 
     if (category) {
-      where.category = { slug: category as string };
+      const categorySlugs = normalizeCategoryFilter(category as string);
+      where.category = { slug: { in: categorySlugs } };
     }
 
     if (search) {
@@ -195,4 +196,21 @@ export class ProductService {
       data: { images: newImages },
     });
   }
+}
+
+function normalizeCategoryFilter(category: string): string[] {
+  return category
+    .split(',')
+    .map((value) => slugify(value))
+    .filter(Boolean);
+}
+
+function slugify(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
 }

@@ -4,7 +4,7 @@
 // ============================================================
 
 import { getAccessToken, isLoggedIn } from '../services/authService.js';
-import { buildApiUrl } from '../config/api.js';
+import { buildApiUrl, buildMediaUrl } from '../config/api.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 
 interface Order {
@@ -139,7 +139,7 @@ function renderOrderCard(order: Order): string {
           ${order.items.slice(0, 3).map(item => `
             <div class="product-preview" title="${item.product.name}">
               ${item.product.images?.[0] 
-                ? `<img src="${item.product.images[0]}" alt="${item.product.name}" loading="lazy">`
+                ? `<img src="${buildMediaUrl(item.product.images[0])}" alt="${item.product.name}" loading="lazy">`
                 : `<div class="product-preview-placeholder">${item.product.name.charAt(0).toUpperCase()}</div>`
               }
             </div>

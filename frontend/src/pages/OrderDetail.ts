@@ -4,7 +4,7 @@
 // ============================================================
 
 import { getAccessToken, isLoggedIn } from '../services/authService.js';
-import { buildApiUrl } from '../config/api.js';
+import { buildApiUrl, buildMediaUrl } from '../config/api.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 
 interface OrderDetail {
@@ -140,7 +140,7 @@ function renderOrderDetail(container: HTMLElement, order: OrderDetail): void {
                       <td class="product-cell">
                         <div class="product-info">
                           ${item.product.images?.[0] 
-                            ? `<img src="${item.product.images[0]}" alt="${item.product.name}" class="product-image">`
+                            ? `<img src="${buildMediaUrl(item.product.images[0])}" alt="${item.product.name}" class="product-image">`
                             : `<div class="product-image-placeholder">${item.product.name.charAt(0).toUpperCase()}</div>`
                           }
                           <div>

@@ -7,7 +7,7 @@ import type { Product } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
 import { emit } from '../utils/events.js';
-import { buildApiUrl } from '../config/api';
+import { buildApiUrl, buildMediaUrl } from '../config/api';
 
 export async function initProductDetailPage(): Promise<void> {
   const container = document.getElementById('contenido-principal');
@@ -33,7 +33,8 @@ export async function initProductDetailPage(): Promise<void> {
       throw new Error(`Error ${res.status}`);
     }
     
-    const product: Product = await res.json();
+    const body = await res.json();
+    const product: Product = body.data ?? body;
     renderProductDetail(container, product);
     
   } catch (error) {
@@ -47,7 +48,7 @@ function renderProductDetail(container: HTMLElement, product: Product): void {
   document.title = `${product.name} - Belle Désir`;
   
   const precio = formatCOP(toNumber(product.price));
-  const imagenes = product.images?.length ? product.images : [];
+  const imagenes = product.images?.map(buildMediaUrl).filter(Boolean) ?? [];
   const inStock = (product as any).inStock ?? product.stock > 0;
   const stockBajo = product.stock > 0 && product.stock <= 5;
   
@@ -256,7 +257,7 @@ function initAddToCart(product: Product): void {
         id: product.id,
         name: product.name,
         price: toNumber(product.price),
-        image: product.images?.[0] || '',
+        image: buildMediaUrl(product.images?.[0]),
         quantity: quantity,
       });
 
@@ -295,7 +296,7 @@ function initBuyNow(product: Product): void {
         id: product.id,
         name: product.name,
         price: toNumber(product.price),
-        image: product.images?.[0] || '',
+        image: buildMediaUrl(product.images?.[0]),
         quantity: quantity,
       });
 

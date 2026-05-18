@@ -5,9 +5,14 @@ import { AppError } from '../../shared/errors/AppError';
 export class CategoryService {
   static async getAll() {
     return prisma.category.findMany({
+      orderBy: { name: 'asc' },
       include: {
         _count: {
-          select: { products: true }
+          select: {
+            products: {
+              where: { isActive: true },
+            },
+          }
         }
       }
     });

@@ -5,7 +5,7 @@
 // ============================================================
 
 import type { Product, Category } from '../types/index.js';
-import { getAllProducts, getProductsByCategory } from '../services/productService.js';
+import { getProductsByCategory } from '../services/productService.js';
 import { getAllCategories } from '../services/categoryService.js';
 import { ProductCard } from './ProductCard.js';
 import { emit } from '../utils/events.js';
@@ -15,6 +15,7 @@ import { initCatalogScrollEffects } from './ScrollAnimations.js';
 import { openProductModal } from './ProductModal.js';
 
 let currentProducts: Product[] = [];
+const ALL_PRODUCTS_SLUG = 'todos';
 
 export async function initCatalogo(): Promise<void> {
   const grid     = document.getElementById('catalogo-grid') as HTMLDivElement | null;
@@ -27,7 +28,7 @@ export async function initCatalogo(): Promise<void> {
   if (!grid) return;
 
   let currentPage = 1;
-  let currentSlug = 'todos';
+  let currentSlug = ALL_PRODUCTS_SLUG;
 
   function updatePagination(meta: any) {
     // meta.page < meta.totalPages
@@ -44,13 +45,16 @@ export async function initCatalogo(): Promise<void> {
   try {
     // 1. Cargar Categorías primero para los filtros
     const categories = await getAllCategories();
-    initFiltros(categories, filtros, grid, loading, vacio, updatePagination, (slug, page) => {
+    const visibleCategories = categories.filter((category) => !category._count || category._count.products > 0);
+    currentSlug = getInitialCategorySlug(visibleCategories);
+    syncNavCategoryFilters(visibleCategories);
+    initFiltros(visibleCategories, filtros, grid, loading, vacio, updatePagination, currentSlug, (slug, page) => {
       currentSlug = slug;
       currentPage = page;
     });
 
     // 2. Cargar primera tanda de productos
-    const paginated = await getAllProducts(1, 10);
+    const paginated = await getProductsByCategory(currentSlug, 1, 10);
     currentProducts = paginated.data || [];
     renderProductos(currentProducts, grid, loading, vacio);
     updatePagination(paginated.meta);
@@ -152,7 +156,7 @@ export async function initCatalogo(): Promise<void> {
   document.querySelectorAll('.nav-filter-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const targetEl = e.currentTarget as HTMLElement;
-      const slug = targetEl.dataset.filter ?? 'todos';
+      const slug = targetEl.dataset.filter ?? ALL_PRODUCTS_SLUG;
       
       const targetBtn = document.querySelector(`.filtro-btn[data-slug="${slug}"]`) as HTMLButtonElement | null;
       if (targetBtn) {
@@ -224,23 +228,24 @@ function initFiltros(
   loading: HTMLElement | null,
   vacio: HTMLElement | null,
   updatePagination: (meta: any) => void,
+  activeSlug: string,
   onFilterChange: (slug: string, page: number) => void
 ): void {
   if (!contenedor) return;
 
   // Limpiar filtros existentes excepto "Todos" si ya existe o crearlo si no
-  let todosBtn = contenedor.querySelector('.filtro-btn[data-slug="todos"]');
+  let todosBtn = contenedor.querySelector(`.filtro-btn[data-slug="${ALL_PRODUCTS_SLUG}"]`);
   if (!todosBtn) {
     todosBtn = document.createElement('button');
-    todosBtn.className = 'filtro-btn activo';
-    (todosBtn as HTMLElement).dataset.slug = 'todos';
+    todosBtn.className = 'filtro-btn';
+    (todosBtn as HTMLElement).dataset.slug = ALL_PRODUCTS_SLUG;
     todosBtn.textContent = 'Todos';
     contenedor.appendChild(todosBtn);
   }
 
   // Eliminar otros botones de filtro para regenerarlos
   contenedor.querySelectorAll('.filtro-btn').forEach(b => {
-    if ((b as HTMLElement).dataset.slug !== 'todos') b.remove();
+    if ((b as HTMLElement).dataset.slug !== ALL_PRODUCTS_SLUG) b.remove();
   });
 
   // Genera botones de categoría
@@ -250,6 +255,12 @@ function initFiltros(
     btn.dataset.slug = cat.slug;
     btn.textContent = cat.name;
     contenedor.appendChild(btn);
+  });
+
+  const activeFilterSlug = getKnownCategorySlug(activeSlug, categories);
+  contenedor.querySelectorAll('.filtro-btn').forEach((button) => {
+    const isActive = (button as HTMLElement).dataset.slug === activeFilterSlug;
+    button.classList.toggle('activo', isActive);
   });
 
   // Delegación de clics sobre los filtros
@@ -265,14 +276,71 @@ function initFiltros(
     vacio?.classList.add('oculto');
 
     try {
-      const slug = btn.dataset.slug ?? 'todos';
+      const slug = btn.dataset.slug ?? ALL_PRODUCTS_SLUG;
       onFilterChange(slug, 1);
       const paginated = await getProductsByCategory(slug, 1, 10);
-      renderProductos(paginated.data, grid, loading, vacio);
+      currentProducts = paginated.data || [];
+      renderProductos(currentProducts, grid, loading, vacio);
       updatePagination(paginated.meta);
       requestAnimationFrame(() => initCatalogScrollEffects({ cardsOnly: true }));
     } catch {
       renderError(grid, loading);
     }
   });
+}
+
+function getInitialCategorySlug(categories: Category[]): string {
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get('categoria') || params.get('category');
+
+  if (!category) return ALL_PRODUCTS_SLUG;
+
+  return getKnownCategorySlug(category, categories);
+}
+
+function getKnownCategorySlug(slug: string, categories: Category[]): string {
+  const normalizedSlug = normalizeSlug(slug);
+  const knownSlugs = new Set(categories.map((category) => category.slug));
+
+  if (normalizedSlug === ALL_PRODUCTS_SLUG || knownSlugs.has(normalizedSlug)) {
+    return normalizedSlug;
+  }
+
+  return ALL_PRODUCTS_SLUG;
+}
+
+function normalizeSlug(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+}
+
+function syncNavCategoryFilters(categories: Category[]): void {
+  const dropdownMenus = document.querySelectorAll<HTMLUListElement>('.navbar-dropdown .dropdown-menu');
+
+  dropdownMenus.forEach((menu) => {
+    menu.innerHTML = '';
+    menu.appendChild(createNavFilterItem(ALL_PRODUCTS_SLUG, 'Ver todo'));
+
+    categories.forEach((category) => {
+      menu.appendChild(createNavFilterItem(category.slug, category.name));
+    });
+  });
+}
+
+function createNavFilterItem(slug: string, label: string): HTMLLIElement {
+  const item = document.createElement('li');
+  const link = document.createElement('a');
+
+  link.href = '#catalogo';
+  link.className = 'nav-filter-btn';
+  link.dataset.filter = slug;
+  link.textContent = label;
+
+  item.appendChild(link);
+  return item;
 }

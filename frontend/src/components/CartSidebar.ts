@@ -3,6 +3,7 @@ import { on, emit } from '../utils/events.js';
 import { formatCOP } from '../utils/currency.js';
 import { isLoggedIn } from '../services/authService.js';
 import { syncCart } from '../services/checkoutService.js';
+import { buildMediaUrl } from '../config/api.js';
 
 let items: CartItem[] = [];
 const CART_STORAGE_KEY = 'belle-desir-cart';
@@ -191,7 +192,7 @@ function renderItems(contenedor: HTMLElement | null, totalEl: HTMLElement | null
   contenedor.innerHTML = items.map((item) => /* html */ `
     <div class="carrito-item">
       <div class="carrito-item-imagen">
-        ${item.image ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` : ''}
+        ${item.image ? `<img src="${buildMediaUrl(item.image)}" alt="${item.name}" loading="lazy">` : ''}
       </div>
       <div class="carrito-item-info">
         <p class="carrito-item-nombre">${item.name}</p>

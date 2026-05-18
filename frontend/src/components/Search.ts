@@ -4,7 +4,7 @@
 // ============================================================
 
 import { formatCOP, toNumber } from '../utils/currency.js';
-import { buildApiUrl } from '../config/api';
+import { buildApiUrl, buildMediaUrl } from '../config/api';
 
 interface SearchResult {
   id: string;
@@ -135,8 +135,8 @@ export function initSearch(): void {
     resultsContainer.innerHTML = searchResults.map(product => `
       <a href="/producto/${product.slug}" class="search-result-item" data-slug="${product.slug}">
         <div class="search-result-image">
-          ${product.images?.[0] 
-            ? `<img src="${product.images[0]}" alt="${product.name}" loading="lazy">`
+          ${product.images?.[0]
+            ? `<img src="${buildMediaUrl(product.images[0])}" alt="${product.name}" loading="lazy">`
             : `<div class="search-result-placeholder">${product.name.charAt(0).toUpperCase()}</div>`
           }
         </div>

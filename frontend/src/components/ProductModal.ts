@@ -1,6 +1,7 @@
 import type { Product } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 import { emit } from '../utils/events.js';
+import { buildMediaUrl } from '../config/api.js';
 
 let modalOverlay: HTMLElement | null = null;
 
@@ -26,7 +27,7 @@ export function openProductModal(product: Product): void {
 
   const precio = formatCOP(toNumber(product.price));
   const inStock = (product as any).inStock ?? product.stock > 0;
-  const imagenes = product.images && product.images.length > 0 ? product.images : [];
+  const imagenes = product.images?.map(buildMediaUrl).filter(Boolean) ?? [];
   const categoria = product.category?.name ?? 'Belle Désir';
 
   const imagesHtml = imagenes.map((img, i) => `

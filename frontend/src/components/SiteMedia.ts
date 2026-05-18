@@ -1,5 +1,5 @@
 import { SiteMedia } from '../types/index.js';
-import { API_BASE_URL } from '../config/api.js';
+import { buildMediaUrl } from '../config/api.js';
 import { getSiteMedia, groupSiteMedia } from '../services/siteMediaService.js';
 
 function escapeHtml(value: string | null | undefined): string {
@@ -11,24 +11,14 @@ function escapeHtml(value: string | null | undefined): string {
     .replace(/'/g, '&#039;');
 }
 
-function getMediaUrl(url: string): string {
-  if (!url) return '';
-
-  if (url.startsWith('/')) {
-    return `${API_BASE_URL}${url}`;
-  }
-
-  return url;
-}
-
 function escapeCssUrl(value: string): string {
-  return getMediaUrl(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return buildMediaUrl(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 function renderMediaFrame(item: SiteMedia): string {
   const title = escapeHtml(item.title);
   const alt = escapeHtml(item.altText || item.title);
-  const mediaUrl = getMediaUrl(item.url);
+  const mediaUrl = buildMediaUrl(item.url);
 
   if (item.type === 'IMAGE') {
     return `
@@ -45,7 +35,7 @@ function renderMediaFrame(item: SiteMedia): string {
     <video
       class="site-media-asset"
       src="${escapeHtml(mediaUrl)}"
-      ${item.posterUrl ? `poster="${escapeHtml(getMediaUrl(item.posterUrl))}"` : ''}
+      ${item.posterUrl ? `poster="${escapeHtml(buildMediaUrl(item.posterUrl))}"` : ''}
       title="${title}"
       controls
       playsinline

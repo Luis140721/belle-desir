@@ -6,6 +6,7 @@ import {
 import { isLoggedIn } from '../services/authService.js';
 import { formatCOP } from '../utils/currency.js';
 import type { CartResponse, ShippingAddress } from '../types/index.js';
+import { buildMediaUrl } from '../config/api.js';
 
 const SOPORTE_WHATSAPP = '573159739914';
 const MIN_ORDER = 20000;
@@ -84,7 +85,7 @@ export async function initCheckoutPage(): Promise<void> {
   const summaryHtml = cart.items.map(item => `
     <div class="summary-item">
       <div class="summary-item-img">
-        <img src="${item.product.images[0] || ''}" alt="${item.product.name}">
+        <img src="${buildMediaUrl(item.product.images[0])}" alt="${item.product.name}">
       </div>
       <div class="summary-item-info">
         <p class="item-nombre">${item.product.name}</p>

@@ -5,6 +5,7 @@
 
 import type { Product } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
+import { buildMediaUrl } from '../config/api.js';
 
 /**
  * Retorna el HTML de una tarjeta de producto.
@@ -13,8 +14,8 @@ import { formatCOP, toNumber } from '../utils/currency.js';
  */
 export function ProductCard(product: Product): string {
   const precio = formatCOP(toNumber(product.price));
-  const imagenPrincipal = product.images?.[0];
-  const imagenHover = product.images?.[1] || imagenPrincipal;
+  const imagenPrincipal = buildMediaUrl(product.images?.[0]);
+  const imagenHover = buildMediaUrl(product.images?.[1] || product.images?.[0]);
   const inStock = (product as any).inStock ?? product.stock > 0;
   
   const imgHtml = imagenPrincipal 
