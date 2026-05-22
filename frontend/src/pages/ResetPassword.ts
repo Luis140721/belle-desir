@@ -6,7 +6,7 @@
 import { buildApiUrl } from '../config/api';
 
 export function initResetPasswordPage(): void {
-  const container = document.getElementById('contenido-principal');
+  const container = document.getElementById('spa-page-root');
   if (!container) return;
 
   // Obtener token de la URL

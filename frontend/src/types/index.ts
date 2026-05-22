@@ -35,6 +35,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  maxQuantity?: number; // Cantidad máxima disponible en stock
 }
 
 export interface ShippingAddress {

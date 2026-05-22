@@ -91,8 +91,8 @@ export async function initCatalogo(): Promise<void> {
     const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.btn-agregar-carrito');
     if (!btn) return;
 
-    const { id, nombre, precio, imagen } = btn.dataset as {
-      id: string; nombre: string; precio: string; imagen: string;
+    const { id, nombre, precio, imagen, maxQty } = btn.dataset as {
+      id: string; nombre: string; precio: string; imagen: string; maxQty?: string;
     };
 
     // Ejecutar animación fly-to-cart desde el botón
@@ -108,6 +108,7 @@ export async function initCatalogo(): Promise<void> {
       price: toNumber(precio),
       image: imagen ?? '',
       quantity: 1,
+      maxQuantity: Number(maxQty ?? '1'),
     });
 
     // Feedback visual momentáneo
@@ -124,18 +125,20 @@ export async function initCatalogo(): Promise<void> {
   // ── Delegación de eventos: abrir modal ────────────────────
   grid.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    
-    // Si hace click en agregar al carrito, no abrir modal
     if (target.closest('.btn-agregar-carrito')) return;
 
-    const card = target.closest('.producto-card') as HTMLElement;
-    if (card) {
-      const productId = card.dataset.productId;
-      const product = currentProducts.find(p => String(p.id) === productId);
-      if (product) openProductModal(product);
+    const card = target.closest('.producto-card') as HTMLElement | null;
+    if (!card) return;
+
+    const productId = card.dataset.productId;
+    if (!productId) return;
+
+    const product = currentProducts.find((item) => String(item.id) === productId);
+    if (product) {
+      openProductModal(product);
     }
   });
-  
+
   // ── Delegación de eventos: Scroll para indicadores ──────────
   grid.addEventListener('scroll', (e) => {
     const track = e.target as HTMLElement;
@@ -258,10 +261,18 @@ function initFiltros(
   });
 
   const activeFilterSlug = getKnownCategorySlug(activeSlug, categories);
+  let activeBtn: HTMLButtonElement | null = null;
   contenedor.querySelectorAll('.filtro-btn').forEach((button) => {
     const isActive = (button as HTMLElement).dataset.slug === activeFilterSlug;
     button.classList.toggle('activo', isActive);
+    if (isActive) activeBtn = button as HTMLButtonElement;
   });
+
+  if (activeBtn && window.matchMedia('(max-width: 768px)').matches) {
+    requestAnimationFrame(() => {
+      activeBtn!.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+  }
 
   // Delegación de clics sobre los filtros
   contenedor.addEventListener('click', async (e) => {
@@ -270,6 +281,10 @@ function initFiltros(
 
     contenedor.querySelectorAll('.filtro-btn').forEach((b) => b.classList.remove('activo'));
     btn.classList.add('activo');
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
 
     grid.innerHTML = '';
     setLoading(true, loading);

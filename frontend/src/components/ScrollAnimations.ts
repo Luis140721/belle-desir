@@ -64,12 +64,14 @@ export function initCatalogScrollEffects(options: { cardsOnly?: boolean } = {}):
   if (!options.cardsOnly && filters?.length && !catalog.dataset.filtersAnimated) {
     catalog.dataset.filtersAnimated = 'true';
     gsap.from(filters, {
-      y: 16,
-      duration: 0.55,
-      stagger: 0.06,
+      y: 12,
+      autoAlpha: 0,
+      duration: 0.45,
+      stagger: 0.05,
       ease: 'power2.out',
+      clearProps: 'transform,opacity,visibility',
       scrollTrigger: {
-        trigger: '.catalogo-filtros',
+        trigger: '.catalogo-filtros-wrapper',
         start: 'top 88%',
       },
     });
@@ -130,7 +132,7 @@ function initCubeScrollPin(): void {
   cubo.style.animation = 'none';
   gsap.set(cubo, { rotateX: isDesktop ? -15 : -12, rotateY: 0 });
 
-  const labelEls = isDesktop ? crearEtiquetas(escena) : [];
+  const labelEls = crearEtiquetas(escena);
 
   // ── Helper: forzar que la sección pineada ocupe el viewport real ──
   // El navegador mobile cambia el viewport al colapsar la barra de direcciones.

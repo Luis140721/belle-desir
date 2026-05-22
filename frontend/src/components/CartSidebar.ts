@@ -8,6 +8,18 @@ import { buildMediaUrl } from '../config/api.js';
 let items: CartItem[] = [];
 const CART_STORAGE_KEY = 'belle-desir-cart';
 
+// ── Función centralizada: Sincronizar scroll del body ──────
+// (Fallback local en caso de que Navbar no esté inicializado)
+const syncBodyOverflow = (): void => {
+  const body = document.body;
+  const drawerOpen = body.classList.contains('nav-drawer-open');
+  const modalOpen = Boolean(document.querySelector('.product-modal-overlay.active'));
+  const cartOpen = Boolean(document.querySelector('.carrito-sidebar.abierto'));
+  const anyOverlayOpen = drawerOpen || modalOpen || cartOpen;
+
+  body.style.overflow = anyOverlayOpen ? 'hidden' : '';
+};
+
 export function initCartSidebar(): void {
   const sidebar = document.getElementById('carrito-sidebar') as HTMLElement | null;
   const overlay = document.getElementById('carrito-overlay') as HTMLElement | null;
@@ -29,6 +41,7 @@ export function initCartSidebar(): void {
     sidebar!.setAttribute('aria-hidden', 'false');
     overlay?.classList.remove('oculto');
     floatingBtn?.classList.add('oculto-sidebar');
+    syncBodyOverflow(); // Sincronizar overflow
     renderItems(itemsEl, totalEl);
   }
 
@@ -37,6 +50,7 @@ export function initCartSidebar(): void {
     sidebar!.setAttribute('aria-hidden', 'true');
     overlay?.classList.add('oculto');
     floatingBtn?.classList.remove('oculto-sidebar');
+    syncBodyOverflow(); // Sincronizar overflow
   }
 
   on('cart:open', abrir);
@@ -50,11 +64,14 @@ export function initCartSidebar(): void {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(); });
 
   on('cart:add', (item) => {
+    const maxQty = item.maxQuantity ?? 99;
     const existing = items.find((candidate) => candidate.id === item.id);
     if (existing) {
-      existing.quantity += item.quantity;
+      if (item.maxQuantity != null) existing.maxQuantity = item.maxQuantity;
+      const cap = existing.maxQuantity ?? maxQty;
+      existing.quantity = Math.min(existing.quantity + item.quantity, cap);
     } else {
-      items.push({ ...item });
+      items.push({ ...item, quantity: Math.min(item.quantity, maxQty), maxQuantity: item.maxQuantity ?? maxQty });
     }
 
     actualizarContador(contEl);
@@ -71,7 +88,12 @@ export function initCartSidebar(): void {
       const item = items.find((candidate) => candidate.id === id);
       if (!item) return;
 
-      quantityButton.dataset.accion === 'sumar' ? item.quantity++ : item.quantity--;
+      const maxQty = item.maxQuantity ?? 99;
+      if (quantityButton.dataset.accion === 'sumar') {
+        if (item.quantity < maxQty) item.quantity++;
+      } else {
+        item.quantity--;
+      }
       if (item.quantity <= 0) items = items.filter((candidate) => candidate.id !== id);
 
       actualizarContador(contEl);
@@ -201,7 +223,7 @@ function renderItems(contenedor: HTMLElement | null, totalEl: HTMLElement | null
       <div class="carrito-cantidad">
         <button data-id="${item.id}" data-accion="restar" aria-label="Quitar uno">-</button>
         <span>${item.quantity}</span>
-        <button data-id="${item.id}" data-accion="sumar" aria-label="Agregar uno">+</button>
+        <button data-id="${item.id}" data-accion="sumar" aria-label="Agregar uno"${(item.maxQuantity != null && item.quantity >= item.maxQuantity) ? ' disabled' : ''}>+</button>
       </div>
       <button class="btn-eliminar-item" data-eliminar="${item.id}" aria-label="Eliminar ${item.name}">×</button>
     </div>

@@ -278,6 +278,16 @@ export class OrderService {
     return parsed;
   }
 
+  static readonly orderListInclude = {
+    items: {
+      include: {
+        product: {
+          select: { id: true, name: true, slug: true, images: true },
+        },
+      },
+    },
+  } as const;
+
   static async getUserOrders(userId: string, query: any) {
     const { page, limit } = query;
     const { take, skip } = getPagination(page ? +page : 1, limit ? +limit : 10);
@@ -285,8 +295,10 @@ export class OrderService {
     const [orders, total] = await prisma.$transaction([
       prisma.order.findMany({
         where: { userId },
-        take, skip,
+        take,
+        skip,
         orderBy: { createdAt: 'desc' },
+        include: OrderService.orderListInclude,
       }),
       prisma.order.count({ where: { userId } }),
     ]);
@@ -297,7 +309,7 @@ export class OrderService {
   static async getOrderById(userId: string, orderId: string, role: string) {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: OrderService.orderListInclude,
     });
 
     if (!order) throw new AppError('Order not found', 404);

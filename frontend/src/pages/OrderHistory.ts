@@ -5,44 +5,32 @@
 
 import { getAccessToken, isLoggedIn } from '../services/authService.js';
 import { buildApiUrl, buildMediaUrl } from '../config/api.js';
-import { formatCOP, toNumber } from '../utils/currency.js';
-
-interface Order {
-  id: string;
-  status: string;
-  subtotal: number;
-  shipping: number;
-  total: number;
-  createdAt: string;
-  items: Array<{
-    id: string;
-    quantity: number;
-    unitPrice: number;
-    product: {
-      name: string;
-      images: string[];
-    };
-  }>;
-}
+import { formatCOP } from '../utils/currency.js';
+import { getSpaPageRoot } from '../utils/pageContainer.js';
+import { normalizeOrders, type OrderDisplay } from '../utils/orderDisplay.js';
 
 export async function initOrderHistoryPage(): Promise<void> {
-  const container = document.getElementById('contenido-principal');
+  const container = getSpaPageRoot();
   if (!container) return;
 
-  // Verificar autenticación
   if (!isLoggedIn()) {
     const currentPath = encodeURIComponent(window.location.pathname);
     window.location.href = `/login?redirect=${currentPath}`;
     return;
   }
 
+  container.innerHTML = /* html */ `
+    <main class="order-history-page">
+      <div class="order-history-container">
+        <p class="order-history-loading">Cargando tus pedidos…</p>
+      </div>
+    </main>
+  `;
+
   try {
-    // Obtener pedidos del usuario
     const token = getAccessToken();
-    const res = await fetch(buildApiUrl('orders'), {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+    const res = await fetch(buildApiUrl('orders?limit=50'), {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!res.ok) {
@@ -54,16 +42,16 @@ export async function initOrderHistoryPage(): Promise<void> {
       throw new Error(`Error ${res.status}`);
     }
 
-    const { data: orders } = await res.json();
+    const body = await res.json();
+    const orders = normalizeOrders(body.data);
     renderOrderHistory(container, orders);
-
   } catch (error) {
     console.error('Error loading orders:', error);
     renderError(container);
   }
 }
 
-function renderOrderHistory(container: HTMLElement, orders: Order[]): void {
+function renderOrderHistory(container: HTMLElement, orders: OrderDisplay[]): void {
   document.title = 'Mis Pedidos - Belle Désir';
 
   if (orders.length === 0) {
@@ -72,7 +60,7 @@ function renderOrderHistory(container: HTMLElement, orders: Order[]): void {
         <div class="order-history-container">
           <h1 class="seccion-titulo">Mis pedidos</h1>
           <div class="empty-orders">
-            <div class="empty-orders-icon">Shopping Cart</div>
+            <div class="empty-orders-icon">🛍️</div>
             <h2>Aún no tienes pedidos</h2>
             <p>Comienza a explorar nuestros productos y realiza tu primera compra.</p>
             <a href="/" class="btn-primario">Ver productos</a>
@@ -83,9 +71,8 @@ function renderOrderHistory(container: HTMLElement, orders: Order[]): void {
     return;
   }
 
-  // Ordenar pedidos por fecha (más reciente primero)
-  const sortedOrders = orders.sort((a, b) => 
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
   container.innerHTML = /* html */ `
@@ -93,23 +80,24 @@ function renderOrderHistory(container: HTMLElement, orders: Order[]): void {
       <div class="order-history-container">
         <h1 class="seccion-titulo">Mis pedidos</h1>
         <div class="orders-list">
-          ${sortedOrders.map(order => renderOrderCard(order)).join('')}
+          ${sortedOrders.map((order) => renderOrderCard(order)).join('')}
         </div>
       </div>
     </main>
   `;
 }
 
-function renderOrderCard(order: Order): string {
+function renderOrderCard(order: OrderDisplay): string {
   const date = new Date(order.createdAt);
   const formattedDate = date.toLocaleDateString('es-CO', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 
   const orderIdShort = order.id.slice(0, 8).toUpperCase();
   const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+  const previewItems = order.items.slice(0, 3);
 
   return /* html */ `
     <article class="order-card">
@@ -122,7 +110,7 @@ function renderOrderCard(order: Order): string {
           ${getStatusBadge(order.status)}
         </div>
       </div>
-      
+
       <div class="order-card-body">
         <div class="order-summary">
           <div class="order-items-count">
@@ -131,30 +119,40 @@ function renderOrderCard(order: Order): string {
           </div>
           <div class="order-total">
             <span class="total-label">Total:</span>
-            <span class="total-amount">${formatCOP(toNumber(order.total))}</span>
+            <span class="total-amount">${formatCOP(order.total)}</span>
           </div>
         </div>
-        
+
         <div class="order-products-preview">
-          ${order.items.slice(0, 3).map(item => `
-            <div class="product-preview" title="${item.product.name}">
-              ${item.product.images?.[0] 
-                ? `<img src="${buildMediaUrl(item.product.images[0])}" alt="${item.product.name}" loading="lazy">`
-                : `<div class="product-preview-placeholder">${item.product.name.charAt(0).toUpperCase()}</div>`
+          ${previewItems.map((item) => {
+            const initial = item.product.name.charAt(0).toUpperCase();
+            const img = item.product.images?.[0];
+            return `
+            <div class="product-preview" title="${escapeHtml(item.product.name)}">
+              ${img
+                ? `<img src="${buildMediaUrl(img)}" alt="${escapeHtml(item.product.name)}" loading="lazy">`
+                : `<div class="product-preview-placeholder">${initial}</div>`
               }
             </div>
-          `).join('')}
-          ${order.items.length > 3 ? `
-            <div class="more-products">+${order.items.length - 3}</div>
-          ` : ''}
+          `;
+          }).join('')}
+          ${order.items.length > 3 ? `<div class="more-products">+${order.items.length - 3}</div>` : ''}
         </div>
       </div>
-      
+
       <div class="order-card-footer">
         <a href="/mis-pedidos/${order.id}" class="btn-secundario">Ver detalle</a>
       </div>
     </article>
   `;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function getStatusBadge(status: string): string {
@@ -165,10 +163,10 @@ function getStatusBadge(status: string): string {
     SHIPPED: { text: 'Enviado', class: 'status-shipped' },
     DELIVERED: { text: 'Entregado', class: 'status-delivered' },
     CANCELLED: { text: 'Cancelado', class: 'status-cancelled' },
-    REFUNDED: { text: 'Reembolsado', class: 'status-refunded' }
+    REFUNDED: { text: 'Reembolsado', class: 'status-refunded' },
   };
 
-  const config = statusConfig[status as keyof typeof statusConfig] || 
+  const config = statusConfig[status as keyof typeof statusConfig] ||
     { text: status, class: 'status-unknown' };
 
   return `<span class="status-badge ${config.class}">${config.text}</span>`;
@@ -180,7 +178,7 @@ function renderError(container: HTMLElement): void {
       <div class="error-container">
         <h1 class="error-title">Error al cargar tus pedidos</h1>
         <p class="error-text">No pudimos cargar tu historial de pedidos. Por favor, intenta nuevamente.</p>
-        <button onclick="location.reload()" class="btn-primario">Reintentar</button>
+        <button type="button" onclick="location.reload()" class="btn-primario">Reintentar</button>
         <a href="/" class="btn-secundario">Ir a la tienda</a>
       </div>
     </main>

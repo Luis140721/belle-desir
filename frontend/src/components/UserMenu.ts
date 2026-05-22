@@ -49,12 +49,6 @@ function renderAuthenticatedMenu(container: HTMLElement): void {
               Mis pedidos
             </a>
           </li>
-          <li>
-            <a href="/perfil" class="user-dropdown-link">
-              <span class="link-icon">Profile</span>
-              Mi perfil
-            </a>
-          </li>
           <li class="dropdown-divider"></li>
           <li>
             <button type="button" class="user-dropdown-link logout-btn" id="logout-btn">

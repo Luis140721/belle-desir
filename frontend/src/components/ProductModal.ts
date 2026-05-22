@@ -2,8 +2,21 @@ import type { Product } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
 import { emit } from '../utils/events.js';
 import { buildMediaUrl } from '../config/api.js';
+import { syncBodyOverflow } from './Navbar.js';
 
 let modalOverlay: HTMLElement | null = null;
+
+// ── Función centralizada: Sincronizar scroll del body ──────
+// (Fallback local en caso de que Navbar no esté inicializado)
+const localSyncBodyOverflow = (): void => {
+  const body = document.body;
+  const drawerOpen = body.classList.contains('nav-drawer-open');
+  const modalOpen = Boolean(document.querySelector('.product-modal-overlay.active'));
+  const cartOpen = Boolean(document.querySelector('.carrito-sidebar.abierto'));
+  const anyOverlayOpen = drawerOpen || modalOpen || cartOpen;
+
+  body.style.overflow = anyOverlayOpen ? 'hidden' : '';
+};
 
 export function openProductModal(product: Product): void {
   if (!product || !product.id || !product.name) {
@@ -29,6 +42,7 @@ export function openProductModal(product: Product): void {
   const inStock = (product as any).inStock ?? product.stock > 0;
   const imagenes = product.images?.map(buildMediaUrl).filter(Boolean) ?? [];
   const categoria = product.category?.name ?? 'Belle Désir';
+  const maxQty = product.stock || 1;
 
   const imagesHtml = imagenes.map((img, i) => `
     <img src="${img}" alt="${escapeHtml(product.name)} - vista ${i + 1}" class="${i === 0 ? 'active' : ''}" data-index="${i}">
@@ -66,6 +80,7 @@ export function openProductModal(product: Product): void {
               data-nombre="${escapeHtml(product.name)}"
               data-precio="${toNumber(product.price)}"
               data-imagen="${imagenes[0] ?? ''}"
+              data-max-qty="${maxQty}"
               ${!inStock ? 'disabled' : ''}
             >
               ${!inStock ? 'Agotado' : 'Agregar al Carrito'}
@@ -76,13 +91,16 @@ export function openProductModal(product: Product): void {
     </div>
   `;
 
-  // Prevent background scroll
-  document.body.style.overflow = 'hidden';
+  // Activate modal overlay
+  modalOverlay.classList.add('active');
   
-  // Activate modal
-  requestAnimationFrame(() => {
-    modalOverlay?.classList.add('active');
-  });
+  // Sincronizar overflow del body
+  try {
+    syncBodyOverflow();
+  } catch {
+    // Fallback si Navbar no está disponible
+    localSyncBodyOverflow();
+  }
 
   // Listeners
   const closeBtn = modalOverlay.querySelector('.product-modal-close');
@@ -91,22 +109,23 @@ export function openProductModal(product: Product): void {
   const addBtn = modalOverlay.querySelector('.btn-add-modal');
   addBtn?.addEventListener('click', (e) => {
     const btn = e.currentTarget as HTMLButtonElement;
-    
+
     emit('cart:add', {
       id: btn.dataset.id!,
       name: btn.dataset.nombre!,
       price: Number(btn.dataset.precio),
       image: btn.dataset.imagen!,
-      quantity: 1
+      quantity: 1,
+      maxQuantity: Number(btn.dataset.maxQty) || 1
     });
-    
-    // Feedback
-    const oldText = btn.textContent;
-    btn.textContent = '¡Agregado!';
-    btn.style.background = 'linear-gradient(135deg, #2a7a4f, #1e6640)';
+
+    // Feedback visual usando clases CSS
+    btn.classList.add('added');
+    btn.disabled = true;
+
     setTimeout(() => {
-      btn.textContent = oldText;
-      btn.style.background = '';
+      btn.classList.remove('added');
+      btn.disabled = false;
     }, 1500);
   });
 
@@ -115,20 +134,20 @@ export function openProductModal(product: Product): void {
     let currentIndex = 0;
     const imgs = modalOverlay.querySelectorAll('.product-modal-media img');
     const dots = modalOverlay.querySelectorAll('.modal-dot');
-    
+
     const updateCarousel = (newIndex: number) => {
       imgs[currentIndex].classList.remove('active');
       dots[currentIndex].classList.remove('active');
-      
+
       currentIndex = (newIndex + imagenes.length) % imagenes.length;
-      
+
       imgs[currentIndex].classList.add('active');
       dots[currentIndex].classList.add('active');
     };
 
     modalOverlay.querySelector('.modal-nav-btn.next')?.addEventListener('click', () => updateCarousel(currentIndex + 1));
     modalOverlay.querySelector('.modal-nav-btn.prev')?.addEventListener('click', () => updateCarousel(currentIndex - 1));
-    
+
     dots.forEach((dot, i) => {
       dot.addEventListener('click', () => updateCarousel(i));
     });
@@ -138,8 +157,14 @@ export function openProductModal(product: Product): void {
 function closeModal(): void {
   if (!modalOverlay) return;
   modalOverlay.classList.remove('active');
-  document.body.style.overflow = '';
-  // Optional: remove from DOM after transition
+
+  // Sincronizar overflow del body
+  try {
+    syncBodyOverflow();
+  } catch {
+    // Fallback si Navbar no está disponible
+    localSyncBodyOverflow();
+  }
 }
 
 function escapeHtml(str: string): string {

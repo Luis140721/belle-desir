@@ -1,12 +1,13 @@
 import { getPaymentStatus } from '../services/checkoutService.js';
 import type { PaymentStatusResponse } from '../types/index.js';
 import { formatCOP, toNumber } from '../utils/currency.js';
+import { getSpaPageRoot } from '../utils/pageContainer.js';
 
 const SOPORTE_WHATSAPP = '573159739914';
 const CART_KEYS = ['belle-desir-cart', 'cart', 'carrito', 'cartItems', 'checkoutCart', 'belle_cart'];
 
 export async function initPedidoConfirmadoPage(): Promise<void> {
-  const container = document.getElementById('contenido-principal');
+  const container = getSpaPageRoot();
   if (!container) return;
 
   const params = new URLSearchParams(window.location.search);

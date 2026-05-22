@@ -1,7 +1,8 @@
 import { login, saveSession, renderGoogleSignInButton } from '../services/authService.js';
+import { getSpaPageRoot } from '../utils/pageContainer.js';
 
 export function initLoginPage(): void {
-  const container = document.getElementById('contenido-principal');
+  const container = getSpaPageRoot();
   if (!container) return;
 
   const params = new URLSearchParams(window.location.search);

@@ -8,9 +8,10 @@ import { formatCOP, toNumber } from '../utils/currency.js';
 import { flyToCart, findCartIcon } from '../utils/cartAnimation.js';
 import { emit } from '../utils/events.js';
 import { buildApiUrl, buildMediaUrl } from '../config/api';
+import { getSpaPageRoot } from '../utils/pageContainer.js';
 
 export async function initProductDetailPage(): Promise<void> {
-  const container = document.getElementById('contenido-principal');
+  const container = getSpaPageRoot();
   if (!container) return;
 
   // Obtener slug de la URL

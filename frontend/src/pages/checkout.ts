@@ -7,12 +7,13 @@ import { isLoggedIn } from '../services/authService.js';
 import { formatCOP } from '../utils/currency.js';
 import type { CartResponse, ShippingAddress } from '../types/index.js';
 import { buildMediaUrl } from '../config/api.js';
+import { getSpaPageRoot } from '../utils/pageContainer.js';
 
 const SOPORTE_WHATSAPP = '573159739914';
 const MIN_ORDER = 20000;
 
 export async function initCheckoutPage(): Promise<void> {
-  const container = document.getElementById('contenido-principal');
+  const container = getSpaPageRoot();
   if (!container) return;
 
   if (!isLoggedIn()) {

@@ -42,6 +42,7 @@ export function ProductCard(product: Product): string {
             data-nombre="${escapeHtml(product.name)}"
             data-precio="${toNumber(product.price)}"
             data-imagen="${imagenPrincipal ?? ''}"
+            data-max-qty="${product.stock || 1}"
             aria-label="Agregar ${escapeHtml(product.name)} al carrito"
             ${!inStock ? 'disabled' : ''}
           >

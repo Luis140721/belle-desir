@@ -6,7 +6,7 @@
 import { register, saveSession, renderGoogleSignInButton } from '../services/authService.js';
 
 export function initRegisterPage(): void {
-  const container = document.getElementById('contenido-principal');
+  const container = document.getElementById('spa-page-root');
   if (!container) return;
 
   container.innerHTML = /* html */ `

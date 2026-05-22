@@ -6,7 +6,7 @@
 import { buildApiUrl } from '../config/api';
 
 export function initForgotPasswordPage(): void {
-  const container = document.getElementById('contenido-principal');
+  const container = document.getElementById('spa-page-root');
   if (!container) return;
 
   container.innerHTML = /* html */ `
