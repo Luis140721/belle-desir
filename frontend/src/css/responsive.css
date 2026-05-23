@@ -242,6 +242,12 @@
     display: block;
     margin-top: 0.5rem;
   }
+    }
+    /* Ajuste adicional: reducir tamaño para móviles reales muy pequeños */
+    .hero-titulo {
+      font-size: 1.4rem;
+      line-height: 1.08;
+      margin-bottom: 1rem;
 
   .hero-eyebrow { 
     margin-bottom: 0.75rem; 
@@ -266,6 +272,12 @@
     padding: var(--space-8) var(--space-4);
   }
 
+  }
+  /* Forzar grilla 2 columnas en mobile para asegurar 2xN layout */
+  .catalogo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: var(--space-4);
   .catalogo-filtros-wrapper {
     display: flex;
     flex-wrap: nowrap;
