@@ -249,6 +249,48 @@
       line-height: 1.08;
       margin-bottom: 1rem;
 
+
+    /* Compactar tipografías y tarjetas en mobile */
+    .hero-titulo {
+      font-size: 1.2rem !important;
+      line-height: 1.06 !important;
+    }
+
+    .hero-subtitulo {
+      font-size: 0.86rem !important;
+      line-height: 1.5 !important;
+    }
+
+    /* Ajustes para el catálogo: tarjetas más compactas */
+    .catalogo-grid {
+      gap: var(--space-3) !important;
+      grid-auto-rows: auto;
+    }
+
+    .producto-card {
+      max-height: 380px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    .producto-card-imagen {
+      height: 160px !important;
+      aspect-ratio: auto !important;
+      position: relative !important;
+    }
+
+    .producto-card-info {
+      padding: 0.85rem 1rem !important;
+    }
+
+    .producto-card-nombre {
+      font-size: 1rem !important;
+    }
+
+    .producto-card-precio {
+      font-size: 1.05rem !important;
+    }
   .hero-eyebrow { 
     margin-bottom: 0.75rem; 
   }
